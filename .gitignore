@@ -1,0 +1,43 @@
+# Binaries for programs and plugins
+*.exe
+*.dll
+*.so
+*.dylib
+.direnv
+
+# Test binary, build with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+coverage.*
+
+# Generated bin
+bin/
+
+# Temporary bin
+tmp/
+
+# Dependencies (run: go mod vendor)
+vendor/
+
+# IDE project files
+*.vscode/
+
+# PyCharm files
+.idea/
+
+# OS files
+.DS_Store
+
+# Everything else
+tags
+
+# Generated env.{environment} files
+.env.*
+
+# UML
+*.plum
+
+# scratch repo to hack
+/scratch

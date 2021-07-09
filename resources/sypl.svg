@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1329px" height="1028px" viewBox="0 0 1329 1028" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Group</title>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="1266" height="888"></rect>
+        <rect id="path-3" x="0" y="0" width="121" height="39"></rect>
+        <rect id="path-5" x="0" y="0" width="1326" height="987"></rect>
+        <rect id="path-7" x="0" y="0" width="121" height="39"></rect>
+        <rect id="path-9" x="0" y="0" width="756" height="110"></rect>
+        <rect id="path-11" x="0" y="0" width="121" height="39"></rect>
+        <rect id="path-13" x="0" y="0" width="816" height="208"></rect>
+        <rect id="path-15" x="0" y="0" width="121" height="39"></rect>
+        <rect id="path-17" x="0" y="0" width="756" height="110"></rect>
+        <rect id="path-19" x="0" y="0" width="121" height="39"></rect>
+        <rect id="path-21" x="0" y="0" width="816" height="208"></rect>
+        <rect id="path-23" x="0" y="0" width="121" height="39"></rect>
+        <rect id="path-25" x="0" y="0" width="756" height="110"></rect>
+        <rect id="path-27" x="0" y="0" width="121" height="39"></rect>
+        <rect id="path-29" x="0" y="0" width="816" height="208"></rect>
+        <rect id="path-31" x="0" y="0" width="121" height="39"></rect>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group" transform="translate(1.000000, 1.000000)">
+            <rect id="Rectangle" fill="#FFFFFF" x="0" y="0" width="1328" height="1027"></rect>
+            <g id="sypl" transform="translate(1.000000, 1.000000)">
+                <g id="Landing-Page-Copy" transform="translate(60.000000, 577.000000)">
+                    <path d="M1.01413536,53.5 L117.915513,53.5 M116.709075,53.7470046 L160.646845,0.435483871 M0.204187605,53.747619 L42.6752094,1.25238095 M43.8938685,0.5 L159.837917,0.5" id="Combined-Shape" stroke="#000000" stroke-width="3" stroke-linecap="square"></path>
+                    <g id="Data" transform="translate(51.000000, 19.000000)" fill="#000000" fill-rule="nonzero" font-family="Raleway-Regular, Raleway" font-size="14" font-weight="normal">
+                        <text id="Message">
+                            <tspan x="0" y="13">Message</tspan>
+                        </text>
+                    </g>
+                </g>
+                <polygon id="Line-Copy-4" fill="#000000" fill-rule="nonzero" points="271 294 280 298.5 271 303 271 299 250 299 250 298 271 298"></polygon>
+                <polygon id="Line-Copy-5" fill="#000000" fill-rule="nonzero" points="271 876 280 880.5 271 885 271 881 250 881 250 880 271 880"></polygon>
+                <polygon id="Line-Copy-6" fill="#000000" fill-rule="nonzero" points="271 600 280 604.5 271 609 271 605 198 605 198 604 271 604"></polygon>
+                <g id="Rectangle" stroke-dasharray="5,5" transform="translate(30.000000, 107.000000)">
+                    <g id="path-1-Clipped">
+                        <mask id="mask-2" fill="white">
+                            <use xlink:href="#path-1"></use>
+                        </mask>
+                        <g id="path-1"></g>
+                        <path d="M0,0 L1266,0 L1266,888 L0,888 L0,0 Z" id="path-1" stroke="#000000" stroke-width="2" mask="url(#mask-2)"></path>
+                    </g>
+                </g>
+                <g id="Group-2" transform="translate(30.000000, 68.000000)">
+                    <g id="Rectangle" stroke-dasharray="5,5">
+                        <g id="path-3-Clipped">
+                            <mask id="mask-4" fill="white">
+                                <use xlink:href="#path-3"></use>
+                            </mask>
+                            <g id="path-3"></g>
+                            <path d="M0,0 L121,0 L121,39 L0,39 L0,0 Z" id="path-3" stroke="#000000" stroke-width="4" mask="url(#mask-4)"></path>
+                        </g>
+                    </g>
+                    <g id="Data" transform="translate(47.000000, 11.000000)" fill="#000000" fill-rule="nonzero" font-family="Raleway-Regular, Raleway" font-size="14" font-weight="normal">
+                        <text id="Printf">
+                            <tspan x="0" y="13">Printf</tspan>
+                        </text>
+                    </g>
+                </g>
+                <g id="Rectangle-Copy" stroke-dasharray="5,5" transform="translate(0.000000, 38.000000)">
+                    <g id="path-5-Clipped">
+                        <mask id="mask-6" fill="white">
+                            <use xlink:href="#path-5"></use>
+                        </mask>
+                        <g id="path-5"></g>
+                        <path d="M0,0 L1326,0 L1326,987 L0,987 L0,0 Z" id="path-5" stroke="#000000" stroke-width="2" mask="url(#mask-6)"></path>
+                    </g>
+                </g>
+                <g id="Group-2-Copy">
+                    <g id="Rectangle" stroke-dasharray="5,5">
+                        <g id="path-7-Clipped">
+                            <mask id="mask-8" fill="white">
+                                <use xlink:href="#path-7"></use>
+                            </mask>
+                            <g id="path-7"></g>
+                            <path d="M0,0 L121,0 L121,39 L0,39 L0,0 Z" id="path-7" stroke="#000000" stroke-width="4" mask="url(#mask-8)"></path>
+                        </g>
+                    </g>
+                    <text id="sypl" fill="#000000" fill-rule="nonzero" font-family="Raleway-Regular, Raleway" font-size="14" font-weight="normal">
+                        <tspan x="47" y="25">sypl</tspan>
+                    </text>
+                </g>
+                <g id="Landing-Page-Copy-5" transform="translate(1127.500000, 853.000000)">
+                    <path d="M0.869258882,53.5 L101.07044,53.5 M100.03635,53.7470046 L137.697296,0.435483871 M0.175017947,53.747619 L36.5787509,1.25238095 M37.6233158,0.5 L137.003929,0.5" id="Combined-Shape" stroke="#000000" stroke-width="3" stroke-linecap="square"></path>
+                    <g id="Data" transform="translate(51.000000, 19.000000)" fill="#000000" fill-rule="nonzero" font-family="Raleway-Regular, Raleway" font-size="14" font-weight="normal">
+                        <text id="Write">
+                            <tspan x="0" y="13">Write</tspan>
+                        </text>
+                    </g>
+                </g>
+                <line x1="250.5" y1="298.5" x2="250.5" y2="880.5" id="Line" stroke="#000000" stroke-linecap="square"></line>
+                <g id="Rectangle" stroke-dasharray="5,5" transform="translate(311.000000, 825.000000)">
+                    <g id="path-9-Clipped">
+                        <mask id="mask-10" fill="white">
+                            <use xlink:href="#path-9"></use>
+                        </mask>
+                        <g id="path-9"></g>
+                        <path d="M0,0 L756,0 L756,110 L0,110 L0,0 Z" id="path-9" stroke="#000000" stroke-width="2" mask="url(#mask-10)"></path>
+                    </g>
+                </g>
+                <g id="Rectangle" stroke-dasharray="5,5" transform="translate(311.000000, 787.000000)">
+                    <g id="path-11-Clipped">
+                        <mask id="mask-12" fill="white">
+                            <use xlink:href="#path-11"></use>
+                        </mask>
+                        <g id="path-11"></g>
+                        <path d="M0,0 L121,0 L121,39 L0,39 L0,0 Z" id="path-11" stroke="#000000" stroke-width="4" mask="url(#mask-12)"></path>
+                    </g>
+                </g>
+                <g id="Rectangle-Copy-4" stroke-dasharray="5,5" transform="translate(281.000000, 757.000000)">
+                    <g id="path-13-Clipped">
+                        <mask id="mask-14" fill="white">
+                            <use xlink:href="#path-13"></use>
+                        </mask>
+                        <g id="path-13"></g>
+                        <path d="M0,0 L816,0 L816,208 L0,208 L0,0 Z" id="path-13" stroke="#000000" stroke-width="2" mask="url(#mask-14)"></path>
+                    </g>
+                </g>
+                <g id="Rectangle-Copy-3" stroke-dasharray="5,5" transform="translate(281.000000, 719.000000)">
+                    <g id="path-15-Clipped">
+                        <mask id="mask-16" fill="white">
+                            <use xlink:href="#path-15"></use>
+                        </mask>
+                        <g id="path-15"></g>
+                        <path d="M0,0 L121,0 L121,39 L0,39 L0,0 Z" id="path-15" stroke="#000000" stroke-width="4" mask="url(#mask-16)"></path>
+                    </g>
+                </g>
+                <text id="Processors" fill="#000000" fill-rule="nonzero" font-family="Raleway-Regular, Raleway" font-size="14" font-weight="normal">
+                    <tspan x="336" y="812">Processors</tspan>
+                </text>
+                <text id="Output-(Redis)" fill="#000000" fill-rule="nonzero" font-family="Raleway-Regular, Raleway" font-size="14" font-weight="normal">
+                    <tspan x="295" y="744">Output (Redis)</tspan>
+                </text>
+                <g id="Group-Copy-10" transform="translate(339.500000, 853.000000)">
+                    <g id="Landing-Page">
+                        <path d="M0.944846611,53.5 L109.859173,53.5 M108.735163,53.7470046 L149.670974,0.435483871 M0.190236899,53.747619 L39.7595118,1.25238095 M40.8949085,0.5 L148.917314,0.5" id="Combined-Shape" stroke="#000000" stroke-width="3" stroke-linecap="square"></path>
+                        <text id="Masker" fill="#000000" fill-rule="nonzero" font-family="Raleway-Regular, Raleway" font-size="14" font-weight="normal">
+                            <tspan x="51" y="32">Masker</tspan>
+                        </text>
+                    </g>
+                    <polygon id="Line-Copy-2" fill="#000000" fill-rule="nonzero" points="184.5 23 193.5 27.5 184.5 32 184.5 28 130.5 28 130.5 27 184.5 27"></polygon>
+                </g>
+                <g id="Group-Copy-9" transform="translate(516.500000, 853.000000)">
+                    <g id="Landing-Page">
+                        <path d="M0.97004252,53.5 L112.788751,53.5 M111.634767,53.7470046 L153.6622,0.435483871 M0.195309883,53.747619 L40.8197655,1.25238095 M41.9854394,0.5 L152.888442,0.5" id="Combined-Shape" stroke="#000000" stroke-width="3" stroke-linecap="square"></path>
+                        <text id="Cleaner" fill="#000000" fill-rule="nonzero" font-family="Raleway-Regular, Raleway" font-size="14" font-weight="normal">
+                            <tspan x="51" y="32">Cleaner</tspan>
+                        </text>
+                    </g>
+                    <polygon id="Line-Copy-2" fill="#000000" fill-rule="nonzero" points="187.5 23 196.5 27.5 187.5 32 187.5 28 133.5 28 133.5 27 187.5 27"></polygon>
+                </g>
+                <g id="Landing-Page" transform="translate(696.000000, 853.000000)">
+                    <path d="M0.900753769,53.5 L104.732412,53.5 M103.660855,53.7470046 L142.686328,0.435483871 M0.181359177,53.747619 L37.904068,1.25238095 M38.9864794,0.5 L141.967839,0.5" id="Combined-Shape" stroke="#000000" stroke-width="3" stroke-linecap="square"></path>
+                    <g id="Data" transform="translate(51.000000, 19.000000)" fill="#000000" fill-rule="nonzero" font-family="Raleway-Regular, Raleway" font-size="14" font-weight="normal">
+                        <text id="Lower">
+                            <tspan x="0" y="13">Lower</tspan>
+                        </text>
+                    </g>
+                </g>
+                <polygon id="Line-Copy-7" fill="#000000" fill-rule="nonzero" points="1135 876 1144 880.5 1135 885 1135 881 821 881 821 880 1135 880"></polygon>
+                <g id="Landing-Page-Copy-5" transform="translate(1127.500000, 577.000000)">
+                    <path d="M0.869258882,53.5 L101.07044,53.5 M100.03635,53.7470046 L137.697296,0.435483871 M0.175017947,53.747619 L36.5787509,1.25238095 M37.6233158,0.5 L137.003929,0.5" id="Combined-Shape" stroke="#000000" stroke-width="3" stroke-linecap="square"></path>
+                    <g id="Data" transform="translate(51.000000, 19.000000)" fill="#000000" fill-rule="nonzero" font-family="Raleway-Regular, Raleway" font-size="14" font-weight="normal">
+                        <text id="Write">
+                            <tspan x="0" y="13">Write</tspan>
+                        </text>
+                    </g>
+                </g>
+                <g id="Rectangle-Copy-8" stroke-dasharray="5,5" transform="translate(311.000000, 549.000000)">
+                    <g id="path-17-Clipped">
+                        <mask id="mask-18" fill="white">
+                            <use xlink:href="#path-17"></use>
+                        </mask>
+                        <g id="path-17"></g>
+                        <path d="M0,0 L756,0 L756,110 L0,110 L0,0 Z" id="path-17" stroke="#000000" stroke-width="2" mask="url(#mask-18)"></path>
+                    </g>
+                </g>
+                <g id="Rectangle-Copy-7" stroke-dasharray="5,5" transform="translate(311.000000, 511.000000)">
+                    <g id="path-19-Clipped">
+                        <mask id="mask-20" fill="white">
+                            <use xlink:href="#path-19"></use>
+                        </mask>
+                        <g id="path-19"></g>
+                        <path d="M0,0 L121,0 L121,39 L0,39 L0,0 Z" id="path-19" stroke="#000000" stroke-width="4" mask="url(#mask-20)"></path>
+                    </g>
+                </g>
+                <g id="Rectangle-Copy-6" stroke-dasharray="5,5" transform="translate(281.000000, 481.000000)">
+                    <g id="path-21-Clipped">
+                        <mask id="mask-22" fill="white">
+                            <use xlink:href="#path-21"></use>
+                        </mask>
+                        <g id="path-21"></g>
+                        <path d="M0,0 L816,0 L816,208 L0,208 L0,0 Z" id="path-21" stroke="#000000" stroke-width="2" mask="url(#mask-22)"></path>
+                    </g>
+                </g>
+                <g id="Rectangle-Copy-5" stroke-dasharray="5,5" transform="translate(281.000000, 443.000000)">
+                    <g id="path-23-Clipped">
+                        <mask id="mask-24" fill="white">
+                            <use xlink:href="#path-23"></use>
+                        </mask>
+                        <g id="path-23"></g>
+                        <path d="M0,0 L121,0 L121,39 L0,39 L0,0 Z" id="path-23" stroke="#000000" stroke-width="4" mask="url(#mask-24)"></path>
+                    </g>
+                </g>
+                <text id="Processors" fill="#000000" fill-rule="nonzero" font-family="Raleway-Regular, Raleway" font-size="14" font-weight="normal">
+                    <tspan x="336" y="536">Processors</tspan>
+                </text>
+                <text id="Output-(File)" fill="#000000" fill-rule="nonzero" font-family="Raleway-Regular, Raleway" font-size="14" font-weight="normal">
+                    <tspan x="301" y="468">Output (File)</tspan>
+                </text>
+                <g id="Group-Copy" transform="translate(339.500000, 577.000000)">
+                    <g id="Landing-Page">
+                        <path d="M0.957444565,53.5 L111.323962,53.5 M110.184965,53.7470046 L151.666587,0.435483871 M0.192773391,53.747619 L40.2896387,1.25238095 M41.4401739,0.5 L150.902878,0.5" id="Combined-Shape" stroke="#000000" stroke-width="3" stroke-linecap="square"></path>
+                        <text id="Prefixer" fill="#000000" fill-rule="nonzero" font-family="Raleway-Regular, Raleway" font-size="14" font-weight="normal">
+                            <tspan x="51" y="32">Prefixer</tspan>
+                        </text>
+                    </g>
+                    <polygon id="Line-Copy-2" fill="#000000" fill-rule="nonzero" points="185.5 23 194.5 27.5 185.5 32 185.5 28 131.5 28 131.5 27 185.5 27"></polygon>
+                </g>
+                <g id="Group-Copy-2" transform="translate(513.500000, 577.000000)">
+                    <g id="Landing-Page" transform="translate(0.500000, 0.000000)">
+                        <path d="M1.01413536,53.5 L117.915513,53.5 M116.709075,53.7470046 L160.646845,0.435483871 M0.204187605,53.747619 L42.6752094,1.25238095 M43.8938685,0.5 L159.837917,0.5" id="Combined-Shape" stroke="#000000" stroke-width="3" stroke-linecap="square"></path>
+                        <g id="Data" transform="translate(51.000000, 19.000000)" fill="#000000" fill-rule="nonzero" font-family="Raleway-Regular, Raleway" font-size="14" font-weight="normal">
+                            <text id="Colorizer">
+                                <tspan x="0" y="13">Colorizer</tspan>
+                            </text>
+                        </g>
+                    </g>
+                    <polygon id="Line-Copy-2" fill="#000000" fill-rule="nonzero" points="191.5 23 200.5 27.5 191.5 32 191.5 28 137.5 28 137.5 27 191.5 27"></polygon>
+                </g>
+                <g id="Group-Copy-3" transform="translate(697.500000, 577.000000)">
+                    <g id="Landing-Page" transform="translate(0.500000, 0.000000)">
+                        <path d="M0.888155814,53.5 L103.267623,53.5 M102.211053,53.7470046 L140.690715,0.435483871 M0.178822685,53.747619 L37.3739411,1.25238095 M38.441214,0.5 L139.982275,0.5" id="Combined-Shape" stroke="#000000" stroke-width="3" stroke-linecap="square"></path>
+                        <g id="Data" transform="translate(51.000000, 19.000000)" fill="#000000" fill-rule="nonzero" font-family="Raleway-Regular, Raleway" font-size="14" font-weight="normal">
+                            <text id="Muter">
+                                <tspan x="0" y="13">Muter</tspan>
+                            </text>
+                        </g>
+                    </g>
+                    <polygon id="Line-Copy-2" fill="#000000" fill-rule="nonzero" points="178.5 23 187.5 27.5 178.5 32 178.5 28 124.5 28 124.5 27 178.5 27"></polygon>
+                </g>
+                <g id="Landing-Page" transform="translate(867.500000, 577.000000)">
+                    <path d="M0.888155814,53.5 L103.267623,53.5 M102.211053,53.7470046 L140.690715,0.435483871 M0.178822685,53.747619 L37.3739411,1.25238095 M38.441214,0.5 L139.982275,0.5" id="Combined-Shape" stroke="#000000" stroke-width="3" stroke-linecap="square"></path>
+                    <g id="Data" transform="translate(47.000000, 19.000000)" fill="#000000" fill-rule="nonzero" font-family="Raleway-Regular, Raleway" font-size="14" font-weight="normal">
+                        <text id="Suffixer">
+                            <tspan x="0.94" y="13">Suffixer</tspan>
+                        </text>
+                    </g>
+                </g>
+                <polygon id="Line-Copy-2" fill="#000000" fill-rule="nonzero" points="1135 600 1144 604.5 1135 609 1135 605 988 605 988 604 1135 604"></polygon>
+                <g id="Landing-Page-Copy-5" transform="translate(1127.500000, 271.000000)">
+                    <path d="M0.869258882,53.5 L101.07044,53.5 M100.03635,53.7470046 L137.697296,0.435483871 M0.175017947,53.747619 L36.5787509,1.25238095 M37.6233158,0.5 L137.003929,0.5" id="Combined-Shape" stroke="#000000" stroke-width="3" stroke-linecap="square"></path>
+                    <g id="Data" transform="translate(51.000000, 19.000000)" fill="#000000" fill-rule="nonzero" font-family="Raleway-Regular, Raleway" font-size="14" font-weight="normal">
+                        <text id="Write">
+                            <tspan x="0" y="13">Write</tspan>
+                        </text>
+                    </g>
+                </g>
+                <g id="Rectangle-Copy-12" stroke-dasharray="5,5" transform="translate(311.000000, 243.000000)">
+                    <g id="path-25-Clipped">
+                        <mask id="mask-26" fill="white">
+                            <use xlink:href="#path-25"></use>
+                        </mask>
+                        <g id="path-25"></g>
+                        <path d="M0,0 L756,0 L756,110 L0,110 L0,0 Z" id="path-25" stroke="#000000" stroke-width="2" mask="url(#mask-26)"></path>
+                    </g>
+                </g>
+                <g id="Rectangle-Copy-11" stroke-dasharray="5,5" transform="translate(311.000000, 205.000000)">
+                    <g id="path-27-Clipped">
+                        <mask id="mask-28" fill="white">
+                            <use xlink:href="#path-27"></use>
+                        </mask>
+                        <g id="path-27"></g>
+                        <path d="M0,0 L121,0 L121,39 L0,39 L0,0 Z" id="path-27" stroke="#000000" stroke-width="4" mask="url(#mask-28)"></path>
+                    </g>
+                </g>
+                <g id="Rectangle-Copy-10" stroke-dasharray="5,5" transform="translate(281.000000, 175.000000)">
+                    <g id="path-29-Clipped">
+                        <mask id="mask-30" fill="white">
+                            <use xlink:href="#path-29"></use>
+                        </mask>
+                        <g id="path-29"></g>
+                        <path d="M0,0 L816,0 L816,208 L0,208 L0,0 Z" id="path-29" stroke="#000000" stroke-width="2" mask="url(#mask-30)"></path>
+                    </g>
+                </g>
+                <g id="Rectangle-Copy-9" stroke-dasharray="5,5" transform="translate(281.000000, 137.000000)">
+                    <g id="path-31-Clipped">
+                        <mask id="mask-32" fill="white">
+                            <use xlink:href="#path-31"></use>
+                        </mask>
+                        <g id="path-31"></g>
+                        <path d="M0,0 L121,0 L121,39 L0,39 L0,0 Z" id="path-31" stroke="#000000" stroke-width="4" mask="url(#mask-32)"></path>
+                    </g>
+                </g>
+                <text id="Processors" fill="#000000" fill-rule="nonzero" font-family="Raleway-Regular, Raleway" font-size="14" font-weight="normal">
+                    <tspan x="336" y="230">Processors</tspan>
+                </text>
+                <text id="Output-(Console)" fill="#000000" fill-rule="nonzero" font-family="Raleway-Regular, Raleway" font-size="14" font-weight="normal">
+                    <tspan x="286" y="162">Output (Console)</tspan>
+                </text>
+                <g id="Landing-Page" transform="translate(339.500000, 271.000000)">
+                    <path d="M0.957444565,53.5 L111.323962,53.5 M110.184965,53.7470046 L151.666587,0.435483871 M0.192773391,53.747619 L40.2896387,1.25238095 M41.4401739,0.5 L150.902878,0.5" id="Combined-Shape" stroke="#000000" stroke-width="3" stroke-linecap="square"></path>
+                    <g id="Data" transform="translate(51.000000, 19.000000)" fill="#000000" fill-rule="nonzero" font-family="Raleway-Regular, Raleway" font-size="14" font-weight="normal">
+                        <text id="Prefixer">
+                            <tspan x="0" y="13">Prefixer</tspan>
+                        </text>
+                    </g>
+                </g>
+                <polygon id="Line-Copy-8" fill="#000000" fill-rule="nonzero" points="1135 294 1144 298.5 1135 303 1135 299 470 299 470 298 1135 298"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>

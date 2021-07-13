@@ -57,7 +57,7 @@ func TestNewIntegration(t *testing.T) {
 		component: "componentNameTest",
 		content:   "contentTest",
 		dir:       "/tmp",
-		filename:  "spyl-integration-test.log",
+		filename:  "sypl-integration-test.log",
 		level:     level.Info,
 		maxLevel:  level.Debug,
 		run: func(a args) string {

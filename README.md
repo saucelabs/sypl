@@ -1,6 +1,6 @@
 # sypl
 
-`spyl` provides a **S**imple **Y**et **P**owerful **L**ogger built on top of the Golang sypl. A sypl logger can have many `Output`s, and each `Output` is responsible for writing to a specified destination. Each `Output` can have multiple `Processor`s, which run in isolation manipulating the log message. The order of execution is important, and is according to the registering (add) order. These features allow `sypl` to fit into many different logging flows.
+`sypl` provides a **S**imple **Y**et **P**owerful **L**ogger built on top of the Golang sypl. A sypl logger can have many `Output`s, and each `Output` is responsible for writing to a specified destination. Each `Output` can have multiple `Processor`s, which run in isolation manipulating the log message. The order of execution is important, and is according to the registering (add) order. These features allow `sypl` to fit into many different logging flows.
 
 ## Install
 

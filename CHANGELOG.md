@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add support for structured logging.
 
+## [1.1.2] - 2021-07-13
+### Changed
+- Fix typo (`spyl`)
+
 ## [1.1.1] - 2021-07-13
 # Added
 - Adds `print{ln}Pretty` which allows to print data structures as JSON text.

@@ -5,6 +5,8 @@
 package sypl
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -109,7 +111,7 @@ func (sypl *Sypl) write(message *Message) {
 		defaultCallDepth,
 		message.GetProcessedContent(),
 	); err != nil {
-		log.Println("Error: Failed to log to output.", err)
+		log.Println("[sypl] [Error] write: Failed to write to output.", err)
 	}
 }
 
@@ -201,6 +203,22 @@ func (sypl *Sypl) process(options *Options, lvl level.Level, content string) *Sy
 	}
 
 	return sypl
+}
+
+// prettify encodes data returning its JSON-stringified version.
+func prettify(data interface{}) string {
+	buf := new(bytes.Buffer)
+
+	enc := json.NewEncoder(buf)
+	enc.SetIndent("", "\t")
+
+	if err := enc.Encode(data); err != nil {
+		log.Println("[sypl] [Error] prettify: Failed to encode data")
+
+		return ""
+	}
+
+	return buf.String()
 }
 
 // Print prints the message (if has content).
@@ -342,6 +360,20 @@ func (sypl *Sypl) PrintfWithOptions(options *Options, level level.Level, format 
 // adding a new line to the end, and to the specified outputs.
 func (sypl *Sypl) PrintlnWithOptions(options *Options, level level.Level, args ...interface{}) *Sypl {
 	return sypl.process(options, level, fmt.Sprintln(args...))
+}
+
+// PrintPretty prints data structures as JSON text.
+//nolint:forbidigo
+func (sypl *Sypl) PrintPretty(data interface{}) {
+	fmt.Print(prettify(data))
+}
+
+// PrintlnPretty prints data structures as JSON text, also adding a new line to
+// the end. Its content will be printed regardless of the level, and it isn't
+// processed.
+//nolint:forbidigo
+func (sypl *Sypl) PrintlnPretty(data interface{}) {
+	fmt.Println(prettify(data))
 }
 
 // New creates a new custom logger.

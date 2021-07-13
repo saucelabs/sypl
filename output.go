@@ -139,7 +139,7 @@ func File(path string, maxLevel level.Level, processors ...*Processor) *Output {
 		defaultFileMode,
 	)
 	if err != nil {
-		log.Fatalf("Failed to create/open %s: %s", path, err)
+		log.Fatalf("[sypl] [Error] File Output: Failed to create/open %s: %s", path, err)
 	}
 
 	return FileBased("File", path, maxLevel, f, processors...)

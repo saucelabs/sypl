@@ -900,3 +900,16 @@ func ExampleNew_printWithOptions() {
 	// Output: Console 3 Processor: Prefixer Content: contentTest
 	// Output: Console 1 Processor: Prefixer Content: contentTest - My Suffix
 }
+
+// PrintPretty example.
+func ExampleNew_printPretty() {
+	New("Testing Logger", Console(level.Info)).PrintPretty(NewDefaultOptions())
+
+	// output:
+	// {
+	// 	"Flag": 0,
+	// 	"OutputsNames": [],
+	// 	"ProcessorsNames": [],
+	// 	"Tags": []
+	// }
+}

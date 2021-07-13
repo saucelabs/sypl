@@ -5,7 +5,6 @@
 package level
 
 import (
-	"log"
 	"strings"
 )
 
@@ -35,19 +34,21 @@ func (l Level) String() string {
 }
 
 // FromInt returns a `Level` from a given integer.
+//
+// Note: Failure will return "Unknown".
 func FromInt(level int) Level {
 	return Level(level)
 }
 
 // FromInt returns a `Level` from a given integer.
+//
+// Note: Failure will return `None` level.
 func FromString(level string) Level {
 	for i, levelString := range names {
 		if strings.EqualFold(level, levelString) {
 			return Level(i)
 		}
 	}
-
-	log.Fatalf("Invalid specified log level %s", level)
 
 	return None
 }

@@ -19,7 +19,7 @@ import (
 func generateUUID() string {
 	id, err := uuid.NewRandom()
 	if err != nil {
-		log.Println("Failed to generate UUID for message", err)
+		log.Println("[sypl] [Error] generateUUID: Failed to generate UUID for message", err)
 	}
 
 	return id.String()
@@ -28,7 +28,6 @@ func generateUUID() string {
 // Message envelops the content storing references of the `Logger`, `Output` and
 // used `Processor`s. The original content is also stored, and can be used - but
 // no changed by `Processor`s.
-
 type Message struct {
 	// Content that should be written to `Output`.
 	content *content.Content

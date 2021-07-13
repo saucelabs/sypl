@@ -12,6 +12,7 @@ import (
 
 	"github.com/saucelabs/lumberjack/v3"
 	"github.com/saucelabs/sypl/internal/builtin"
+	"github.com/saucelabs/sypl/level"
 )
 
 const defaultFileMode = 0644
@@ -26,21 +27,17 @@ type FileRotationOptions lumberjack.Logger
 // - Any message with a `level` beyond `maxLevel` will not be written.
 // - Messages are processed according to the order `processors` are added.
 type Output struct {
-	Logger *builtin.Builtin
+	builtinLogger *builtin.Builtin
 
 	enabled    bool
-	maxLevel   Level
+	maxLevel   level.Level
 	name       string
 	processors []*Processor
 }
 
-// AddProcessor adds a processor.
-//
-// Note: This method is chainable.
-func (o *Output) AddProcessor(processor *Processor) *Output {
-	o.processors = append(o.processors, processor)
-
-	return o
+// GetBuiltinLogger returns the output's built-in logger.
+func (o *Output) GetBuiltinLogger() *builtin.Builtin {
+	return o.builtinLogger
 }
 
 // GetStatus returns if the output is enabled or disabled.
@@ -53,15 +50,48 @@ func (o *Output) SetStatus(status bool) {
 	o.enabled = status
 }
 
+// GetName returns the output's `name`.
+func (o *Output) GetMaxLevel() level.Level {
+	return o.maxLevel
+}
+
+// GetName returns the output's `name`.
+func (o *Output) GetName() string {
+	return o.name
+}
+
+// AddProcessor adds a processor.
+//
+// Note: This method is chainable.
+func (o *Output) AddProcessor(processor *Processor) *Output {
+	o.processors = append(o.processors, processor)
+
+	return o
+}
+
+// GetProcessor returns the specified processor by its index.
+func (o *Output) GetProcessor(i int) *Processor {
+	if i < 0 || i > len(o.processors)-1 {
+		return nil
+	}
+
+	return o.processors[i]
+}
+
+// GetProcessors returns registered processors.
+func (o *Output) GetProcessors() []*Processor {
+	return o.processors
+}
+
 // NewOutput creates a new `output`.
 //
 // Notes:
 // - The created `output` is enabled by default.
 // - processors can be added here, or later using the `AddProcessor` method.
 // - This method is chainable.
-func NewOutput(name string, maxLevel Level, writer io.Writer, processors ...*Processor) *Output {
+func NewOutput(name string, maxLevel level.Level, writer io.Writer, processors ...*Processor) *Output {
 	return &Output{
-		Logger: builtin.NewBuiltin(writer, "", 0),
+		builtinLogger: builtin.NewBuiltin(writer, "", 0),
 
 		enabled:    true,
 		maxLevel:   maxLevel,
@@ -72,13 +102,13 @@ func NewOutput(name string, maxLevel Level, writer io.Writer, processors ...*Pro
 
 // OutputsNames extract the names of the given outputs.
 func OutputsNames(outputs []*Output) string {
-	outputNames := []string{}
+	outputsNames := []string{}
 
 	for _, output := range outputs {
-		outputNames = append(outputNames, output.name)
+		outputsNames = append(outputsNames, output.name)
 	}
 
-	return strings.Join(outputNames, ",")
+	return strings.Join(outputsNames, ",")
 }
 
 //////
@@ -86,14 +116,14 @@ func OutputsNames(outputs []*Output) string {
 //////
 
 // Console is a specialized `output` that outputs to the console (stdout).
-func Console(maxLevel Level, processors ...*Processor) *Output {
+func Console(maxLevel level.Level, processors ...*Processor) *Output {
 	return NewOutput("Console", maxLevel, os.Stdout, processors...)
 }
 
 // FileBased is a specialized `output` that outputs to a file. If the usual, and
 // common used "-" is used, it will behave as a Console writing to stdout and
 // named "-".
-func FileBased(name string, path string, maxLevel Level, writer io.Writer, processors ...*Processor) *Output {
+func FileBased(name string, path string, maxLevel level.Level, writer io.Writer, processors ...*Processor) *Output {
 	if path == "-" {
 		return NewOutput("-", maxLevel, os.Stdout, processors...)
 	}
@@ -102,7 +132,7 @@ func FileBased(name string, path string, maxLevel Level, writer io.Writer, proce
 }
 
 // File is a specialized `output` that outputs to the specified file.
-func File(path string, maxLevel Level, processors ...*Processor) *Output {
+func File(path string, maxLevel level.Level, processors ...*Processor) *Output {
 	f, err := os.OpenFile(
 		path,
 		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
@@ -119,7 +149,7 @@ func File(path string, maxLevel Level, processors ...*Processor) *Output {
 // file, with rotation.
 func FileWithRotation(
 	path string,
-	maxLevel Level,
+	maxLevel level.Level,
 	options *FileRotationOptions,
 	processors ...*Processor,
 ) *Output {

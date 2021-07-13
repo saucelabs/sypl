@@ -10,6 +10,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/saucelabs/sypl/level"
 )
 
 // List files test files.
@@ -45,8 +47,8 @@ func TestNewIntegration(t *testing.T) {
 		content   string
 		dir       string
 		filename  string
-		level     Level
-		maxLevel  Level
+		level     level.Level
+		maxLevel  level.Level
 
 		run func(a args) string
 	}
@@ -56,15 +58,15 @@ func TestNewIntegration(t *testing.T) {
 		content:   "contentTest",
 		dir:       "/tmp",
 		filename:  "spyl-integration-test.log",
-		level:     INFO,
-		maxLevel:  DEBUG,
+		level:     level.Info,
+		maxLevel:  level.Debug,
 		run: func(a args) string {
 			filePath := filepath.Join(a.dir, a.filename)
 
 			deleteTestFiles(t, filePath)
 
 			New(a.component).
-				AddOutput(FileWithRotation(filePath, DEBUG, &FileRotationOptions{
+				AddOutput(FileWithRotation(filePath, level.Debug, &FileRotationOptions{
 					Compress:   true,
 					MaxAge:     28, // Days.
 					MaxBackups: 5,

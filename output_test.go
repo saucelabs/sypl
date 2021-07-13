@@ -8,11 +8,13 @@ import (
 	"bufio"
 	"bytes"
 	"testing"
+
+	"github.com/saucelabs/sypl/level"
 )
 
 func TestNewOutput(t *testing.T) {
 	type args struct {
-		maxLevel Level
+		maxLevel level.Level
 		name     string
 	}
 	tests := []struct {
@@ -24,7 +26,7 @@ func TestNewOutput(t *testing.T) {
 			name: "Should work",
 			args: args{
 				name:     "Buffer",
-				maxLevel: TRACE,
+				maxLevel: level.Trace,
 			},
 			want: defaultPrefixValue + defaultContentOutput,
 		},
@@ -36,17 +38,22 @@ func TestNewOutput(t *testing.T) {
 
 			output := NewOutput(tt.args.name, tt.args.maxLevel, bufWriter, Prefixer(defaultPrefixValue))
 
-			message := &Message{
-				ContentOriginal:  defaultContentOutput,
-				ContentProcessed: defaultContentOutput,
-				Level:            INFO,
+			message := NewMessage(&Sypl{}, &Output{}, &Processor{}, level.Info, defaultContentOutput)
+			message.SetSypl(nil)
+			message.SetOutput(nil)
+			message.SetProcessor(nil)
+
+			if message.GetSypl() != nil &&
+				message.GetOutput() != nil &&
+				message.GetProcessor() != nil {
+				t.Error("Message should not have sypl, output, and processor")
 			}
 
 			for _, processor := range output.processors {
 				processor.Run(message)
 			}
 
-			if err := output.Logger.OutputBuiltin(defaultCallDepth, message.ContentProcessed); err != nil {
+			if err := output.GetBuiltinLogger().OutputBuiltin(defaultCallDepth, message.GetProcessedContent()); err != nil {
 				t.Errorf("Failed to log to output: %w", err)
 			}
 
@@ -61,7 +68,7 @@ func TestNewOutput(t *testing.T) {
 
 func TestOutput_GetStatus(t *testing.T) {
 	type args struct {
-		maxLevel Level
+		maxLevel level.Level
 		name     string
 	}
 	tests := []struct {
@@ -73,14 +80,14 @@ func TestOutput_GetStatus(t *testing.T) {
 			name: "Should work",
 			args: args{
 				name:     "Buffer",
-				maxLevel: TRACE,
+				maxLevel: level.Trace,
 			},
 			want: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			output := Console(TRACE)
+			output := Console(level.Trace)
 			output.SetStatus(false)
 
 			if output.GetStatus() != tt.want {

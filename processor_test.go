@@ -10,13 +10,16 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/saucelabs/sypl/content"
+	"github.com/saucelabs/sypl/level"
 )
 
 func Test_generateDefaultPrefix(t *testing.T) {
 	type args struct {
-		timestampFormat string
-		component       string
-		level           Level
+		timestamp string
+		component string
+		level     level.Level
 	}
 	tests := []struct {
 		name string
@@ -26,11 +29,11 @@ func Test_generateDefaultPrefix(t *testing.T) {
 		{
 			name: "Should work",
 			args: args{
-				timestampFormat: defaultTimestampFormat,
-				component:       defaultComponentNameOutput,
-				level:           TRACE,
+				timestamp: time.Now().Format(defaultTimestampFormat),
+				component: defaultComponentNameOutput,
+				level:     level.Trace,
 			},
-			want: fmt.Sprintf("%d [%d] [%s] [TRACE] ",
+			want: fmt.Sprintf("%d [%d] [%s] [Trace] ",
 				time.Now().Year(),
 				os.Getpid(),
 				defaultComponentNameOutput,
@@ -39,7 +42,7 @@ func Test_generateDefaultPrefix(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := generateDefaultPrefix(tt.args.timestampFormat, tt.args.component, tt.args.level); got != tt.want {
+			if got := generateDefaultPrefix(tt.args.timestamp, tt.args.component, tt.args.level); got != tt.want {
 				t.Errorf("generateDefaultPrefix() = %v, want %v", got, tt.want)
 			}
 		})
@@ -61,10 +64,8 @@ func TestPrefixer(t *testing.T) {
 			args: args{
 				prefix: defaultPrefixValue,
 			},
-			message: &Message{
-				ContentProcessed: defaultContentOutput,
-			},
-			want: defaultPrefixValue + defaultContentOutput,
+			message: NewMessage(nil, nil, nil, level.Info, defaultContentOutput),
+			want:    defaultPrefixValue + defaultContentOutput,
 		},
 	}
 	for _, tt := range tests {
@@ -72,8 +73,39 @@ func TestPrefixer(t *testing.T) {
 			p := Prefixer(tt.args.prefix)
 			p.Run(tt.message)
 
-			if !strings.EqualFold(tt.message.ContentProcessed, tt.want) {
-				t.Errorf("Prefixer() = %v, want %v", tt.message.ContentProcessed, tt.want)
+			if !strings.EqualFold(tt.message.GetProcessedContent(), tt.want) {
+				t.Errorf("Prefixer() = %v, want %v", tt.message.GetProcessedContent(), tt.want)
+			}
+		})
+	}
+}
+
+func TestSuffixer(t *testing.T) {
+	type args struct {
+		suffix string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		message *Message
+		want    string
+	}{
+		{
+			name: "Should work",
+			args: args{
+				suffix: " - My Suffix",
+			},
+			message: NewMessage(nil, nil, nil, level.Info, defaultContentOutput),
+			want:    defaultContentOutput + " - My Suffix",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p := Suffixer(tt.args.suffix)
+			p.Run(tt.message)
+
+			if !strings.EqualFold(tt.message.GetProcessedContent(), tt.want) {
+				t.Errorf("Suffixer() = %v, want %v", tt.message.GetProcessedContent(), tt.want)
 			}
 		})
 	}
@@ -94,7 +126,7 @@ func TestNewProcessor(t *testing.T) {
 			args: args{
 				name: "Prefixer",
 				processorFunc: func(message *Message) {
-					message.ContentProcessed = defaultPrefixValue + message.ContentProcessed
+					message.SetProcessedContent(defaultPrefixValue + message.GetProcessedContent())
 				},
 			},
 			want: defaultPrefixValue + defaultContentOutput,
@@ -105,14 +137,13 @@ func TestNewProcessor(t *testing.T) {
 			p := NewProcessor(tt.args.name, tt.args.processorFunc)
 
 			m := &Message{
-				ContentOriginal:  defaultContentOutput,
-				ContentProcessed: defaultContentOutput,
+				content: content.NewContent(defaultContentOutput),
 			}
 
 			p.Run(m)
 
-			if m.ContentProcessed != tt.want {
-				t.Errorf("Got %v, want %v", m.ContentProcessed, tt.want)
+			if m.GetProcessedContent() != tt.want {
+				t.Errorf("Got %v, want %v", m.GetProcessedContent(), tt.want)
 			}
 		})
 	}
@@ -134,7 +165,7 @@ func TestProcessor_SetStatus(t *testing.T) {
 			args: args{
 				name: "Prefixer",
 				processorFunc: func(message *Message) {
-					message.ContentProcessed = defaultPrefixValue + message.ContentProcessed
+					message.SetProcessedContent(defaultPrefixValue + message.GetProcessedContent())
 				},
 			},
 			status: true,
@@ -145,7 +176,7 @@ func TestProcessor_SetStatus(t *testing.T) {
 			args: args{
 				name: "Prefixer",
 				processorFunc: func(message *Message) {
-					message.ContentProcessed = defaultPrefixValue + message.ContentProcessed
+					message.SetProcessedContent(defaultPrefixValue + message.GetProcessedContent())
 				},
 			},
 			status: false,
@@ -157,16 +188,15 @@ func TestProcessor_SetStatus(t *testing.T) {
 			p := NewProcessor(tt.args.name, tt.args.processorFunc)
 
 			m := &Message{
-				ContentOriginal:  defaultContentOutput,
-				ContentProcessed: defaultContentOutput,
+				content: content.NewContent(defaultContentOutput),
 			}
 
 			p.SetStatus(tt.status)
 
 			p.Run(m)
 
-			if m.ContentProcessed != tt.want {
-				t.Errorf("Got %v, want %v", m.ContentProcessed, tt.want)
+			if m.GetProcessedContent() != tt.want {
+				t.Errorf("Got %v, want %v", m.GetProcessedContent(), tt.want)
 			}
 		})
 	}
@@ -188,7 +218,7 @@ func TestProcessor_GetStatus(t *testing.T) {
 			args: args{
 				name: "Prefixer",
 				processorFunc: func(message *Message) {
-					message.ContentProcessed = defaultPrefixValue + message.ContentProcessed
+					message.SetProcessedContent(defaultPrefixValue + message.GetProcessedContent())
 				},
 			},
 			status: true,

@@ -2,13 +2,13 @@
 // Use of this source code is governed by a MIT
 // license that can be found in the LICENSE file.
 
-package sypl
+package level
 
 import (
 	"testing"
 )
 
-func TestLevelFromInt(t *testing.T) {
+func TestFromInt(t *testing.T) {
 	type args struct {
 		level int
 	}
@@ -22,19 +22,19 @@ func TestLevelFromInt(t *testing.T) {
 			args: args{
 				level: 3,
 			},
-			want: INFO,
+			want: Info,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := LevelFromInt(tt.args.level); got != tt.want {
-				t.Errorf("LevelFromInt() = %v, want %v", got, tt.want)
+			if got := FromInt(tt.args.level); got != tt.want {
+				t.Errorf("FromInt() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestLevelFromString(t *testing.T) {
+func TestFromString(t *testing.T) {
 	type args struct {
 		level string
 	}
@@ -46,15 +46,15 @@ func TestLevelFromString(t *testing.T) {
 		{
 			name: "Should work",
 			args: args{
-				level: "info",
+				level: "Info",
 			},
-			want: INFO,
+			want: Info,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := LevelFromString(tt.args.level); got != tt.want {
-				t.Errorf("LevelFromString() = %v, want %v", got, tt.want)
+			if got := FromString(tt.args.level); got != tt.want {
+				t.Errorf("FromString() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -72,9 +72,9 @@ func TestLevelsToString(t *testing.T) {
 		{
 			name: "Should work",
 			args: args{
-				levels: []Level{INFO, WARN},
+				levels: []Level{Info, Warn},
 			},
-			want: "INFO,WARN",
+			want: "Info,Warn",
 		},
 	}
 	for _, tt := range tests {

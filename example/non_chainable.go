@@ -5,6 +5,7 @@ import (
 	"bytes"
 
 	"github.com/saucelabs/sypl"
+	"github.com/saucelabs/sypl/level"
 )
 
 // NonChainable is a non-chainable example of creating and setting up a new sypl
@@ -16,14 +17,14 @@ func NonChainable() string {
 	// Creates logger, and name it.
 	testingLogger := sypl.New("Testing Logger")
 
-	// Creates an `Output`. In this case, called "Console" that will print to
-	// `stdout` and max print level @ `INFO`.
-	ConsoleToStdOut := sypl.NewOutput("Console", sypl.INFO, bufWriter)
+	// Creates an `Output`. In this case, called "Console" that will write to a
+	// custom buffer, and max print level @ `Info`.
+	ConsoleToStdOut := sypl.NewOutput("Console", level.Info, bufWriter)
 
 	// Creates a `Processor`. It will prefix all messages.
 	Prefixer := func(prefix string) *sypl.Processor {
 		return sypl.NewProcessor("Prefixer", func(message *sypl.Message) {
-			message.ContentProcessed = prefix + message.ContentProcessed
+			message.SetProcessedContent(prefix + message.GetProcessedContent())
 		})
 	}
 
@@ -33,8 +34,8 @@ func NonChainable() string {
 	// Adds `Output` to logger.
 	testingLogger.AddOutput(ConsoleToStdOut)
 
-	// Prints: "My Prefix - Test message"
-	testingLogger.Print(sypl.INFO, "Test info message")
+	// Writes: "My Prefix - Test message"
+	testingLogger.Print(level.Info, "Test info message")
 
 	bufWriter.Flush()
 

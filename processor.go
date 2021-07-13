@@ -8,7 +8,9 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"time"
+
+	"github.com/saucelabs/sypl/flag"
+	"github.com/saucelabs/sypl/level"
 )
 
 // Casing definition, e.g.: Upper, Lower, Title, etc.
@@ -33,6 +35,11 @@ type Processor struct {
 	do      ProcessorFunc
 	enabled bool
 	name    string
+}
+
+// GetName returns the processor's name.
+func (p *Processor) GetName() string {
+	return p.name
 }
 
 // GetStatus returns if the processor is enabled or disabled.
@@ -65,15 +72,26 @@ func NewProcessor(name string, processorFunc ProcessorFunc) *Processor {
 	}
 }
 
+// ProcessorsNames extract the names of the given processors.
+func ProcessorsNames(processors []*Processor) string {
+	processorsNames := []string{}
+
+	for _, processor := range processors {
+		processorsNames = append(processorsNames, processor.name)
+	}
+
+	return strings.Join(processorsNames, ",")
+}
+
 //////
 // Helpers
 //////
 
 // generateDefaultPrefix generates prefix for the `PrefixBasedOnMask` processor.
-func generateDefaultPrefix(timestampFormat, component string, level Level) string {
+func generateDefaultPrefix(timestamp, component string, level level.Level) string {
 	return fmt.Sprintf("%s [%d] [%s] [%s] ",
 		// Timestamp.
-		time.Now().Format(timestampFormat),
+		timestamp,
 
 		// PID.
 		os.Getpid(),
@@ -93,88 +111,88 @@ func generateDefaultPrefix(timestampFormat, component string, level Level) strin
 // Prefixer prefixes messages with the given string.
 func Prefixer(prefix string) *Processor {
 	return NewProcessor("Prefixer", func(message *Message) {
-		message.ContentProcessed = prefix + message.ContentProcessed
+		message.SetProcessedContent(prefix + message.GetProcessedContent())
 	})
 }
 
 // Suffixer suffixes messages with the given string.
 func Suffixer(suffix string) *Processor {
 	return NewProcessor("Suffixer", func(message *Message) {
-		message.ContentProcessed += suffix
+		message.SetProcessedContent(message.GetProcessedContent() + suffix)
 	})
 }
 
 // PrefixBasedOnMask prefixes messages with the predefined mask.
 //
-// Example: 2021-06-22 12:51:46.089 [80819] [CLI] [INFO].
+// Example: 2021-06-22 12:51:46.089 [80819] [CLI] [Info].
 func PrefixBasedOnMask(timestampFormat string) *Processor {
 	return NewProcessor("PrefixBasedOnMask", func(message *Message) {
-		message.ContentProcessed = generateDefaultPrefix(
-			timestampFormat,
-			message.sypl.name,
-			message.Level,
-		) + message.ContentProcessed
+		message.SetProcessedContent(generateDefaultPrefix(
+			message.GetTimestamp().Format(timestampFormat),
+			message.GetSypl().GetName(),
+			message.GetLevel(),
+		) + message.GetProcessedContent())
 	})
 }
 
 // PrefixBasedOnMaskExceptForLevels is a specialized version of the
 // `PrefixBasedOnMask`. It prefixes all messages, except for the specified
 // levels.
-func PrefixBasedOnMaskExceptForLevels(timestampFormat string, levels ...Level) *Processor {
+func PrefixBasedOnMaskExceptForLevels(timestampFormat string, levels ...level.Level) *Processor {
 	return NewProcessor("PrefixBasedOnMaskExceptForLevels", func(message *Message) {
-		concatenatedLevels := LevelsToString(levels)
+		concatenatedLevels := level.LevelsToString(levels)
 
-		if !strings.Contains(concatenatedLevels, message.Level.String()) {
-			message.ContentProcessed = generateDefaultPrefix(
-				timestampFormat,
-				message.sypl.name,
-				message.Level,
-			) + message.ContentProcessed
+		if !strings.Contains(concatenatedLevels, message.GetLevel().String()) {
+			message.SetProcessedContent(generateDefaultPrefix(
+				message.GetTimestamp().Format(timestampFormat),
+				message.GetSypl().GetName(),
+				message.GetLevel(),
+			) + message.GetProcessedContent())
 		}
 	})
 }
 
 // ColorizeBasedOnLevel colorize messages based on the specified levels.
-func ColorizeBasedOnLevel(levelColorMap map[Level]Color) *Processor {
+func ColorizeBasedOnLevel(levelColorMap map[level.Level]Color) *Processor {
 	return NewProcessor("ColorizeBasedOnLevel", func(message *Message) {
 		for level, color := range levelColorMap {
-			if message.Level == level {
-				message.ContentProcessed = color(message.ContentProcessed)
+			if message.GetLevel() == level {
+				message.SetProcessedContent(color(message.GetProcessedContent()))
 			}
 		}
 	})
 }
 
 // ColorizeBasedOnWord colorize a messages with the specified colors if a
-// message contains a specified word.
+// message contains a specific word.
 func ColorizeBasedOnWord(wordColorMap map[string]Color) *Processor {
 	return NewProcessor("ColorizeBasedOnWord", func(message *Message) {
 		for word, color := range wordColorMap {
-			if strings.Contains(message.ContentProcessed, word) {
-				message.ContentProcessed = color(message.ContentProcessed)
+			if strings.Contains(message.GetProcessedContent(), word) {
+				message.SetProcessedContent(color(message.GetProcessedContent()))
 			}
 		}
 	})
 }
 
 // MuteBasedOnLevel mute messages based on the specified levels.
-func MuteBasedOnLevel(levels ...Level) *Processor {
+func MuteBasedOnLevel(levels ...level.Level) *Processor {
 	return NewProcessor("MuteBasedOnLevel", func(message *Message) {
-		concatenatedLevels := LevelsToString(levels)
+		concatenatedLevels := level.LevelsToString(levels)
 
-		if strings.Contains(concatenatedLevels, message.Level.String()) {
-			message.mute = true
+		if strings.Contains(concatenatedLevels, message.GetLevel().String()) {
+			message.SetFlag(flag.Mute)
 		}
 	})
 }
 
 // ForceBasedOnLevel force messages to be printed based on the specified levels.
-func ForceBasedOnLevel(levels ...Level) *Processor {
+func ForceBasedOnLevel(levels ...level.Level) *Processor {
 	return NewProcessor("ForceBasedOnLevel", func(message *Message) {
-		concatenatedLevels := LevelsToString(levels)
+		concatenatedLevels := level.LevelsToString(levels)
 
-		if strings.Contains(concatenatedLevels, message.Level.String()) {
-			message.force = true
+		if strings.Contains(concatenatedLevels, message.GetLevel().String()) {
+			message.SetFlag(flag.Force)
 		}
 	})
 }
@@ -187,9 +205,9 @@ func EnableDisableProcessors(status bool, names ...string) *Processor {
 	return NewProcessor("EnableDisableProcessors", func(message *Message) {
 		concatenatedNames := strings.Join(names, ",")
 
-		for i, processor := range message.output.processors {
-			if strings.Contains(concatenatedNames, processor.name) {
-				message.output.processors[i].SetStatus(status)
+		for i, processor := range message.GetOutput().GetProcessors() {
+			if strings.Contains(concatenatedNames, processor.GetName()) {
+				message.GetOutput().GetProcessor(i).SetStatus(status)
 			}
 		}
 	})
@@ -203,9 +221,9 @@ func EnableDisableOutputs(status bool, names ...string) *Processor {
 	return NewProcessor("EnableDisableOutputs", func(message *Message) {
 		concatenatedNames := strings.Join(names, ",")
 
-		for i, output := range message.sypl.outputs {
-			if strings.Contains(concatenatedNames, output.name) {
-				message.sypl.outputs[i].SetStatus(status)
+		for i, output := range message.GetSypl().GetOutputs() {
+			if strings.Contains(concatenatedNames, output.GetName()) {
+				message.GetSypl().GetOutput(i).SetStatus(status)
 			}
 		}
 	})
@@ -221,14 +239,14 @@ func EnableDisableOutputs(status bool, names ...string) *Processor {
 // content!
 func ChangeFirstCharCase(casing Casing) *Processor {
 	return NewProcessor("ChangeFirstCharCase", func(message *Message) {
-		firstChar := string(message.ContentProcessed[0])
-		contentWithoutFirstChar := message.ContentProcessed[1:len(message.ContentProcessed)]
+		firstChar := string(message.GetProcessedContent()[0])
+		contentWithoutFirstChar := message.GetProcessedContent()[1:len(message.GetProcessedContent())]
 
 		switch casing {
 		case Uppercase:
-			message.ContentProcessed = strings.ToUpper(firstChar) + contentWithoutFirstChar
+			message.SetProcessedContent(strings.ToUpper(firstChar) + contentWithoutFirstChar)
 		case Lowercase:
-			message.ContentProcessed = strings.ToLower(firstChar) + contentWithoutFirstChar
+			message.SetProcessedContent(strings.ToLower(firstChar) + contentWithoutFirstChar)
 		}
 	})
 }

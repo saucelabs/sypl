@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -522,6 +523,34 @@ func TestNew(t *testing.T) {
 		},
 	}
 
+	printflnArgs := args{
+		component: defaultComponentNameOutput,
+		content:   defaultContentOutput,
+		level:     level.Info,
+		maxLevel:  level.Trace,
+		run: func(a args) string {
+			var buf bytes.Buffer
+			bufWriter := bufio.NewWriter(&buf)
+
+			// Creates logger, and name it.
+			testingLogger := New("Testing Logger 1")
+
+			// Creates an `Output`. In this case, called Buffer that will write
+			// to the specified buffer, and max print level @ Info.
+			BufferOutput := NewOutput("Buffer", level.Info, bufWriter)
+
+			// Adds `Output` to logger.
+			testingLogger.AddOutput(BufferOutput)
+
+			testingLogger.
+				Printlnf(level.Info, "%s %s", "element 1", "element 2")
+
+			bufWriter.Flush()
+
+			return buf.String()
+		},
+	}
+
 	tests := []struct {
 		name string
 		args args
@@ -723,6 +752,13 @@ func TestNew(t *testing.T) {
 				return "My Prefix - Test message"
 			},
 		},
+		{
+			name: "Should print - printflnArgs",
+			args: printflnArgs,
+			want: func(a args) string {
+				return "element 1 element 2\n"
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -739,15 +775,14 @@ func TestNew(t *testing.T) {
 // NonChained is a non-chained example of creating, and setting up a `sypl`
 // logger. It writes to a custom buffer.
 func ExampleNew_notChained() {
-	var buf bytes.Buffer
-	bufWriter := bufio.NewWriter(&buf)
+	buf := new(strings.Builder)
 
 	// Creates logger, and name it.
 	testingLogger := New("Testing Logger")
 
 	// Creates an `Output`. In this case, called "Console" that will print to
 	// `stdout` and max print level @ `Info`.
-	ConsoleToStdOut := NewOutput("Console", level.Info, bufWriter)
+	ConsoleToStdOut := NewOutput("Console", level.Info, buf)
 
 	// Creates a `Processor`. It will prefix all messages.
 	Prefixer := func(prefix string) *Processor {
@@ -764,8 +799,6 @@ func ExampleNew_notChained() {
 
 	// Writes: "My Prefix - Test message"
 	testingLogger.Print(level.Info, "Test info message")
-
-	bufWriter.Flush()
 
 	fmt.Println(buf.String())
 
@@ -903,13 +936,19 @@ func ExampleNew_printWithOptions() {
 
 // PrintPretty example.
 func ExampleNew_printPretty() {
-	New("Testing Logger", Console(level.Info)).PrintPretty(NewDefaultOptions())
+	type TestType struct {
+		Key1 string
+		Key2 int
+	}
+
+	New("Testing Logger", Console(level.Info)).PrintPretty(&TestType{
+		Key1: "text",
+		Key2: 12,
+	})
 
 	// output:
 	// {
-	// 	"Flag": 0,
-	// 	"OutputsNames": [],
-	// 	"ProcessorsNames": [],
-	// 	"Tags": []
+	// 	"Key1": "text",
+	// 	"Key2": 12
 	// }
 }

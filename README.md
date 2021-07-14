@@ -8,30 +8,32 @@
 
 ### Specific version
 
-Example:
-
-`$ go get github.com/saucelabs/sypl@v1.0.0`
+Example: `$ go get github.com/saucelabs/sypl@v1.2.0`
 
 ## Usage
 
-See [`example/`](example/) folder, and [`sypl_test.go`](sypl_test.go) file or run `$ make doc`
+See [`example/`](example/) folder, and [`sypl_test.go`](sypl_test.go) file.
 
-# How it works
+### Documentation
+
+Run `$ make doc` or check out [online](https://pkg.go.dev/github.com/saucelabs/sypl).
+
+## How it works
 
 A picture worth thousand words.
 
 ![high-level-arch](resources/sypl.svg)
 
-# Development
+## Development
 
 Check out [CONTRIBUTION](CONTRIBUTION.md).
 
-## Release
+### Release
 
 1. Update [CHANGELOG](CHANGELOG.md) accordingly.
 2. Once changes from MR are merged.
 3. Tag and release.
 
-# Roadmap
+## Roadmap
 
 Check out [CHANGELOG](CHANGELOG.md).

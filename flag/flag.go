@@ -6,15 +6,22 @@ type Flag int
 const (
 	None Flag = iota
 
-	// Force if set message will be processed, and printed independent of
-	// `Level` restrictions.
+	// Force message will be processed, and printed independent of `Level`
+	// restrictions.
 	Force
 
-	// Mute if set, message will not be printed.
+	// Mute message will be processed, but not printed.
 	Mute
 
-	// Skip if set, processors will ignore the message, and do nothing.
+	// Skip message will not be processed.
 	Skip
+
+	// SkipAndForce message will not be processed, but will be printed
+	// independent of `Level` restrictions.
+	SkipAndForce
+
+	// SkipAndMute message will not be processed, neither printed.
+	SkipAndMute
 )
 
 var names = [...]string{"None", "Force", "Mute", "Skip"}

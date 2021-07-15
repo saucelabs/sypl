@@ -198,6 +198,8 @@ func (sypl *Sypl) process(options *Options, lvl level.Level, content string) *Sy
 }
 
 // prettify encodes data returning its JSON-stringified version.
+//
+// Note: Only exported fields of the data structure will be printed.
 func prettify(data interface{}) string {
 	buf := new(bytes.Buffer)
 
@@ -205,7 +207,7 @@ func prettify(data interface{}) string {
 	enc.SetIndent("", "\t")
 
 	if err := enc.Encode(data); err != nil {
-		log.Println("[sypl] [Error] prettify: Failed to encode data")
+		log.Println("[sypl] [Error] prettify: Failed to encode data.", err)
 
 		return ""
 	}
@@ -265,8 +267,10 @@ func (sypl *Sypl) Println(level level.Level, args ...interface{}) *Sypl {
 
 // PrintPretty prints data structures as JSON text.
 //
-// Note: Message will not be processed, but will printed independent of `Level`
+// Notes:
+// - Message will not be processed, but will printed independent of `Level`
 // restrictions.
+// - Only exported fields of the data structure will be printed.
 func (sypl *Sypl) PrintPretty(data interface{}) *Sypl {
 	return sypl.PrintWithOptions(&Options{
 		Flag: flag.SkipAndForce,
@@ -276,8 +280,10 @@ func (sypl *Sypl) PrintPretty(data interface{}) *Sypl {
 // PrintlnPretty prints data structures as JSON text, also adding a new line to
 // the end.
 //
-// Note: Message will not be processed, but will printed independent of `Level`
+// Notes:
+// - Message will not be processed, but will printed independent of `Level`
 // restrictions.
+// - Only exported fields of the data structure will be printed.
 func (sypl *Sypl) PrintlnPretty(data interface{}) *Sypl {
 	return sypl.PrintlnWithOptions(&Options{
 		Flag: flag.SkipAndForce,

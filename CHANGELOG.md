@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add support for structured logging.
 
+## [1.2.1] - 2021-07-15
+### Changed
+- Adds the error message for when `prettify` fails.
+
 ## [1.2.0] - 2021-07-14
 ### Changed
 - Finer-control on message's behaviour with two new `Flags`: `SkipAndForce` and `SkipAndMute`.

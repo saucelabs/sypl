@@ -14,6 +14,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/saucelabs/sypl/flag"
 	"github.com/saucelabs/sypl/level"
 	"github.com/spf13/afero"
 )
@@ -951,4 +952,44 @@ func ExampleNew_printPretty() {
 	// 	"Key1": "text",
 	// 	"Key2": 12
 	// }
+}
+
+// Flags example.
+func ExampleNew_flags() {
+	// Creates logger, and name it.
+	New("Testing Logger", Console(level.Info, Prefixer(defaultPrefixValue))).
+		// Message will be processed, and printed independent of `Level`
+		// restrictions.
+		PrintlnWithOptions(&Options{
+			Flag: flag.Force,
+		}, level.Debug, defaultContentOutput).
+
+		// Message will be processed, but not printed.
+		PrintlnWithOptions(&Options{
+			Flag: flag.Mute,
+		}, level.Info, defaultContentOutput).
+
+		// Message will not be processed, but printed.
+		PrintlnWithOptions(&Options{
+			Flag: flag.Skip,
+		}, level.Info, defaultContentOutput).
+
+		// Should not print - restricted by level.
+		Debugln(defaultContentOutput).
+
+		// SkipAndForce message will not be processed, but will be printed
+		// independent of `Level` restrictions.
+		PrintlnWithOptions(&Options{
+			Flag: flag.SkipAndForce,
+		}, level.Debug, defaultContentOutput).
+
+		// Message will not be processed, neither printed.
+		PrintlnWithOptions(&Options{
+			Flag: flag.SkipAndMute,
+		}, level.Debug, defaultContentOutput)
+
+	// output:
+	// My Prefix - contentTest
+	// contentTest
+	// contentTest
 }

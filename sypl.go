@@ -113,7 +113,7 @@ func (sypl *Sypl) processProcessor(
 	processorsNames string,
 ) {
 	// Should not process if message is flagged with `Skip` or `SkipAndForce`.
-	if message.GetFlag() != flag.Skip || message.GetFlag() != flag.SkipAndForce {
+	if message.GetFlag() != flag.Skip && message.GetFlag() != flag.SkipAndForce {
 		for _, processor := range output.processors {
 			// Should only use named (listed) ones.
 			// Should only use `enabled` `Processor`s, see logic in
@@ -153,8 +153,10 @@ func (sypl *Sypl) processOutput(
 
 			// Should print the message - regardless of the level, if flagged
 			// with `Force`.
-			if message.GetFlag() == flag.Force {
+			if message.GetFlag() == flag.Force || message.GetFlag() == flag.SkipAndForce {
 				sypl.write(message)
+
+				return
 			}
 
 			// Should only print if message `level` isn't above `MaxLevel`.
@@ -176,7 +178,7 @@ func (sypl *Sypl) processOutput(
 // printed.
 func (sypl *Sypl) process(options *Options, lvl level.Level, content string) *Sypl {
 	// Do nothing if message as no context, or flagged with `SkipAndMute`.
-	if content == "" || options.Flag == flag.SkipAndMute {
+	if content == "" && options.Flag == flag.SkipAndMute {
 		return sypl
 	}
 

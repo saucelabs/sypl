@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add support for structured logging.
 
+## [1.2.2] - 2021-07-15
+### Changed
+- Fixes `Flag`s processing logic.
+- Covers `Flag`s with test.
+
 ## [1.2.1] - 2021-07-15
 ### Changed
 - Adds the error message for when `prettify` fails.

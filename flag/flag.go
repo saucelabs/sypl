@@ -13,7 +13,7 @@ const (
 	// Mute message will be processed, but not printed.
 	Mute
 
-	// Skip message will not be processed.
+	// Skip message will not be processed, but printed.
 	Skip
 
 	// SkipAndForce message will not be processed, but will be printed

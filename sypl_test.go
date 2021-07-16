@@ -7,6 +7,7 @@ package sypl
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -992,4 +993,54 @@ func ExampleNew_flags() {
 	// My Prefix - contentTest
 	// contentTest
 	// contentTest
+}
+
+// Sinfo{f|lnf|ln} example.
+func ExampleNew_sinfoX() {
+	// Creates logger, and name it.
+	testingLogger := New("Testing Logger", Console(level.Info, Prefixer(defaultPrefixValue)))
+
+	sInfoResult := testingLogger.Sinfo(defaultContentOutput)
+	sInfofResult := testingLogger.Sinfof("%s", defaultContentOutput)
+	sInfolnfResult := testingLogger.Sinfolnf("%s", defaultContentOutput)
+	sInfolnResult := testingLogger.Sinfoln(defaultContentOutput)
+
+	fmt.Print(
+		defaultContentOutput == sInfoResult,
+		defaultContentOutput == sInfofResult,
+		defaultContentOutput+"\n" == sInfolnfResult,
+		defaultContentOutput == sInfolnResult,
+	)
+
+	// output:
+	// My Prefix - contentTestMy Prefix - contentTestMy Prefix - contentTest
+	// My Prefix - contentTest
+	// true true true true
+}
+
+// Serror{f|lnf|ln} example.
+//nolint:goerr113,lll
+func ExampleNew_serrorX() {
+	// Creates logger, and name it.
+	testingLogger := New("Testing Logger", Console(level.Info, Prefixer(defaultPrefixValue)))
+
+	sErrorResult := testingLogger.Serror(defaultContentOutput)
+
+	errExample := errors.New("Failed to reach something")
+	sErrorfResult := testingLogger.Serrorf("Failed to do something, %s", errExample)
+	sErrorlnfResult := testingLogger.Serrorlnf("Failed to do something, %s", errExample)
+
+	sErrorlnResult := testingLogger.Serrorln(defaultContentOutput)
+
+	fmt.Print(
+		sErrorResult.Error() == defaultContentOutput,
+		sErrorfResult.Error() == "Failed to do something, Failed to reach something",
+		sErrorlnfResult.Error() == "Failed to do something, Failed to reach something"+"\n",
+		sErrorlnResult.Error() == defaultContentOutput,
+	)
+
+	// output:
+	// 	My Prefix - contentTestMy Prefix - Failed to do something, Failed to reach somethingMy Prefix - Failed to do something, Failed to reach something
+	// My Prefix - contentTest
+	// true true true true
 }

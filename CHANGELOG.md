@@ -9,6 +9,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add support for structured logging.
 
+## [1.2.3] - 2021-07-15
+### Added
+- Adds `Sprint{f|lnf|ln}`, and `{Level}{f|lnf|ln}` Convenient methods. It's your `Sprint`, or `Sinfo` (example) but also returning the non-processed content.
+
+Before:
+
+```go
+// ...
+var errMsg := "Some error"
+
+logger.Errorln(errMsg)
+
+return errors.New(errMsg)
+```
+
+Now:
+
+```go
+// ...
+return logger.Serrorln("Some error") // Prints and process like `Errorln`, and returns an error.
+```
+
 ## [1.2.2] - 2021-07-15
 ### Changed
 - Fixes `Flag`s processing logic.
@@ -16,15 +38,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.2.1] - 2021-07-15
 ### Changed
-- Adds the error message for when `prettify` fails.
+- Fixes `prettify` not printing the error if it fails.
 
 ## [1.2.0] - 2021-07-14
-### Changed
+### Added
 - Finer-control on message's behaviour with two new `Flags`: `SkipAndForce` and `SkipAndMute`.
+- Adds `Printlnf`, and `{Level}{lnf}` Convenient methods. It's your `Printf`, or `Infof` (example) without the need to add `"\n"` to the format - less annoying repetition.
+
+Before:
+
+```go
+// ...
+exampleContent := "example"
+logger.Printf("Something %s\n", exampleContent)
+```
+
+Now:
+
+```go
+// ...
+exampleContent := "example"
+logger.Printlnf("Something %s", exampleContent)
+```
+
+### Changed
 - Improves testability, and maintainability: All "Convenient methods" are based on "Base methods" that are based on the implementation of the interface.
     - Testability: You mock the interface, and have full control over how it works.
     - Maintainability: You change the interface implementation, you change how everything works.
-- Adds `Printlnf`, and `{Level}{lnf}` Convenient methods. It's your `Printf`, or `Infof` without the need to add `"\n"` to the format - less annoying repetition.
 
 ## [1.1.2] - 2021-07-13
 ### Changed
@@ -33,6 +73,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.1] - 2021-07-13
 # Added
 - Adds `Print{ln}Pretty` which allows to print data structures as JSON text.
+
+Now:
+
+```go
+// ...
+logger.PrintlnPretty(&SomeStruct{
+    nonExportedKey: "Value1",
+    SomeExportedKey: "Value2",
+})
+
+// Prints:
+// {
+//     "SomeExportedKey": "Value2"
+// }
+```
 
 ### Changed
 - Prefixes sypl errors making it easier to identify when happens.

@@ -7,6 +7,7 @@ package sypl
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -27,7 +28,7 @@ type Printer interface {
 	// specified format.
 	PrintfWithOptions(options *Options, level level.Level, format string, args ...interface{}) *Sypl
 
-	// PrintlnWithOptions prints the message (if has content), with `Options`, also
+	// PrintlnWithOptions prints the message, with `Options`, also
 	// adding a new line to the end.
 	PrintlnWithOptions(options *Options, level level.Level, args ...interface{}) *Sypl
 }
@@ -232,8 +233,8 @@ func (sypl *Sypl) PrintfWithOptions(options *Options, level level.Level, format 
 	return sypl.process(options, level, fmt.Sprintf(format, args...))
 }
 
-// PrintlnWithOptions prints the message (if has content), with `Options`, also
-// adding a new line to the end.
+// PrintlnWithOptions prints the message, with `Options`, also adding a new line
+// to the end.
 func (sypl *Sypl) PrintlnWithOptions(options *Options, level level.Level, args ...interface{}) *Sypl {
 	return sypl.process(options, level, fmt.Sprintln(args...))
 }
@@ -242,29 +243,78 @@ func (sypl *Sypl) PrintlnWithOptions(options *Options, level level.Level, args .
 // Base methods.
 //////
 
-// Print prints the message (if has content).
+// SprintWithOptions prints like PrintWithOptions, and returns the
+// non-processed content.
+func (sypl *Sypl) SprintWithOptions(options *Options, level level.Level, args ...interface{}) string {
+	content := fmt.Sprint(args...)
+
+	sypl.PrintWithOptions(options, level, args...)
+
+	return content
+}
+
+// SprintfWithOptions prints like PrintfWithOptions, and returns the
+// non-processed content.
+func (sypl *Sypl) SprintfWithOptions(options *Options, level level.Level, format string, args ...interface{}) string {
+	content := fmt.Sprintf(format, args...)
+
+	sypl.PrintfWithOptions(options, level, format, args...)
+
+	return content
+}
+
+// SprintlnWithOptions prints like PrintlnWithOptions, and returns the
+// non-processed content.
+func (sypl *Sypl) SprintlnWithOptions(options *Options, level level.Level, args ...interface{}) string {
+	// Error message should not have a line break.
+	content := fmt.Sprint(args...)
+
+	sypl.PrintlnWithOptions(options, level, args...)
+
+	return content
+}
+
+// Print prints the message.
 func (sypl *Sypl) Print(level level.Level, args ...interface{}) *Sypl {
 	return sypl.PrintWithOptions(NewDefaultOptions(), level, args...)
 }
 
-// Printf prints the message (if has content) according with the specified
+// Printf prints the message according with the specified
 // format.
 func (sypl *Sypl) Printf(level level.Level, format string, args ...interface{}) *Sypl {
 	return sypl.PrintfWithOptions(NewDefaultOptions(), level, format, args...)
 }
 
-// Printlnf prints the message (if has content) according with the specified
+// Printlnf prints the message according with the specified
 // format, also adding a new line to the end.
 func (sypl *Sypl) Printlnf(level level.Level, format string, args ...interface{}) *Sypl {
-	format += "\n"
-
-	return sypl.PrintfWithOptions(NewDefaultOptions(), level, format, args...)
+	return sypl.Printf(level, format+"\n", args...)
 }
 
-// Println prints the message (if has content), also adding a new line to the
+// Println prints the message, also adding a new line to the
 // end.
 func (sypl *Sypl) Println(level level.Level, args ...interface{}) *Sypl {
 	return sypl.PrintlnWithOptions(NewDefaultOptions(), level, args...)
+}
+
+// Sprint prints like Print, and returns the non-processed content.
+func (sypl *Sypl) Sprint(level level.Level, args ...interface{}) string {
+	return sypl.SprintWithOptions(NewDefaultOptions(), level, args...)
+}
+
+// Sprintf prints like Printf, and returns the non-processed content.
+func (sypl *Sypl) Sprintf(level level.Level, format string, args ...interface{}) string {
+	return sypl.SprintfWithOptions(NewDefaultOptions(), level, format, args...)
+}
+
+// Sprintlnf prints like Printlnf, and returns the non-processed content.
+func (sypl *Sypl) Sprintlnf(level level.Level, format string, args ...interface{}) string {
+	return sypl.Sprintf(level, format+"\n", args...)
+}
+
+// Sprintln prints like Println, and returns the non-processed content.
+func (sypl *Sypl) Sprintln(level level.Level, args ...interface{}) string {
+	return sypl.SprintlnWithOptions(NewDefaultOptions(), level, args...)
 }
 
 // PrintPretty prints data structures as JSON text.
@@ -296,142 +346,258 @@ func (sypl *Sypl) PrintlnPretty(data interface{}) *Sypl {
 // Convenient methods.
 //////
 
-// Error prints the message (if has content) @ the Error level.
-func (sypl *Sypl) Error(args ...interface{}) *Sypl {
-	return sypl.Print(level.Error, args...)
-}
-
-// Errorf prints the message (if has content) according with the specified
-// format @ the Error level.
-func (sypl *Sypl) Errorf(format string, args ...interface{}) *Sypl {
-	return sypl.Printf(level.Error, format, args...)
-}
-
-// Errorlnf prints the message (if has content) according with the specified
-// format @ the Error level, also adding a new line to the end.
-func (sypl *Sypl) Errorlnf(format string, args ...interface{}) *Sypl {
-	return sypl.Printlnf(level.Error, format, args...)
-}
-
-// Errorln prints the message (if has content), also adding a new line to the
-// end @ the Error level.
-func (sypl *Sypl) Errorln(args ...interface{}) *Sypl {
-	return sypl.Println(level.Error, args...)
-}
-
-// Fatal prints the message (if has content), and exit with os.Exit(1).
+// Fatal prints the message, and exit with os.Exit(1).
 func (sypl *Sypl) Fatal(args ...interface{}) {
 	sypl.Print(level.Fatal, args...)
 }
 
-// Fatalf prints the message (if has content) according with the specified
+// Fatalf prints the message according with the specified
 // format, and exit with os.Exit(1).
 func (sypl *Sypl) Fatalf(format string, args ...interface{}) {
 	sypl.Printf(level.Fatal, format, args...)
 }
 
-// Fatallnf prints the message (if has content) according with the specified
+// Fatallnf prints the message according with the specified
 // format, also adding a new line to the end, and exit with os.Exit(1).
 func (sypl *Sypl) Fatallnf(format string, args ...interface{}) {
 	sypl.Printlnf(level.Fatal, format, args...)
 }
 
-// Fatalln prints the message (if has content), also adding a new line and the
+// Fatalln prints the message, also adding a new line and the
 // end, and exit with os.Exit(1).
 func (sypl *Sypl) Fatalln(args ...interface{}) {
 	sypl.Println(level.Fatal, args...)
 }
 
-// Info prints the message (if has content) @ the Info level.
+// Error prints the message @ the Error level.
+func (sypl *Sypl) Error(args ...interface{}) *Sypl {
+	return sypl.Print(level.Error, args...)
+}
+
+// Errorf prints the message according with the specified
+// format @ the Error level.
+func (sypl *Sypl) Errorf(format string, args ...interface{}) *Sypl {
+	return sypl.Printf(level.Error, format, args...)
+}
+
+// Errorlnf prints the message according with the specified
+// format @ the Error level, also adding a new line to the end.
+func (sypl *Sypl) Errorlnf(format string, args ...interface{}) *Sypl {
+	return sypl.Printlnf(level.Error, format, args...)
+}
+
+// Errorln prints the message, also adding a new line to the
+// end @ the Error level.
+func (sypl *Sypl) Errorln(args ...interface{}) *Sypl {
+	return sypl.Println(level.Error, args...)
+}
+
+// Serror prints like Error, and returns an error with the non-processed
+// content.
+//nolint:goerr113
+func (sypl *Sypl) Serror(args ...interface{}) error {
+	content := sypl.Sprint(level.Error, args...)
+
+	return errors.New(content)
+}
+
+// Serrorf prints like Errorf, and returns an error with the non-processed
+// content.
+//nolint:goerr113
+func (sypl *Sypl) Serrorf(format string, args ...interface{}) error {
+	content := sypl.Sprintf(level.Error, format, args...)
+
+	return errors.New(content)
+}
+
+// Serrorlnf prints like Errorlnf, and returns an error with the non-processed
+// content.
+//nolint:goerr113
+func (sypl *Sypl) Serrorlnf(format string, args ...interface{}) error {
+	content := sypl.Sprintlnf(level.Error, format, args...)
+
+	return errors.New(content)
+}
+
+// Serrorln prints like Errorln, and returns an error with the non-processed
+// content.
+//nolint:goerr113
+func (sypl *Sypl) Serrorln(args ...interface{}) error {
+	content := sypl.Sprintln(level.Error, args...)
+
+	return errors.New(content)
+}
+
+// Info prints the message @ the Info level.
 func (sypl *Sypl) Info(args ...interface{}) *Sypl {
 	return sypl.Print(level.Info, args...)
 }
 
-// Infof prints the message (if has content) according with the specified format
+// Infof prints the message according with the specified format
 // @ the Info level.
 func (sypl *Sypl) Infof(format string, args ...interface{}) *Sypl {
 	return sypl.Printf(level.Info, format, args...)
 }
 
-// Infolnf prints the message (if has content) according with the specified
+// Infolnf prints the message according with the specified
 // format @ the Info level, also adding a new line to the end.
 func (sypl *Sypl) Infolnf(format string, args ...interface{}) *Sypl {
 	return sypl.Printlnf(level.Info, format, args...)
 }
 
-// Infoln prints the message (if has content), also adding a new line to the end
+// Infoln prints the message, also adding a new line to the end
 // @ the Info level.
 func (sypl *Sypl) Infoln(args ...interface{}) *Sypl {
 	return sypl.Println(level.Info, args...)
 }
 
-// Warn prints the message (if has content) @ the Warn level.
+// Sinfo prints like Info, and returns the non-processed content.
+func (sypl *Sypl) Sinfo(args ...interface{}) string {
+	return sypl.Sprint(level.Info, args...)
+}
+
+// Sinfof prints like Infof, and returns the non-processed content.
+func (sypl *Sypl) Sinfof(format string, args ...interface{}) string {
+	return sypl.Sprintf(level.Info, format, args...)
+}
+
+// Sinfolnf prints like Infolnf, and returns the non-processed content.
+func (sypl *Sypl) Sinfolnf(format string, args ...interface{}) string {
+	return sypl.Sprintlnf(level.Info, format, args...)
+}
+
+// Sinfoln prints like Infoln, and returns the non-processed content.
+func (sypl *Sypl) Sinfoln(args ...interface{}) string {
+	return sypl.Sprintln(level.Info, args...)
+}
+
+// Warn prints the message @ the Warn level.
 func (sypl *Sypl) Warn(args ...interface{}) *Sypl {
 	return sypl.Print(level.Warn, args...)
 }
 
-// Warnf prints the message (if has content) according with the specified format
+// Warnf prints the message according with the specified format
 // @ the Warn level.
 func (sypl *Sypl) Warnf(format string, args ...interface{}) *Sypl {
 	return sypl.Printf(level.Warn, format, args...)
 }
 
-// Warnlnf prints the message (if has content) according with the specified
+// Warnlnf prints the message according with the specified
 // format @ the Warn level, also adding a new line to the end.
 func (sypl *Sypl) Warnlnf(format string, args ...interface{}) *Sypl {
 	return sypl.Printlnf(level.Warn, format, args...)
 }
 
-// Warnln prints the message (if has content), also adding a new line to the end
+// Warnln prints the message, also adding a new line to the end
 // @ the Warn level.
 func (sypl *Sypl) Warnln(args ...interface{}) *Sypl {
 	return sypl.Println(level.Warn, args...)
 }
 
-// Debug prints the message (if has content) @ the Debug level.
+// Swarn prints like Warn, and returns the non-processed content.
+func (sypl *Sypl) Swarn(args ...interface{}) string {
+	return sypl.Sprint(level.Warn, args...)
+}
+
+// Swarnf prints like Warnf, and returns the non-processed content.
+func (sypl *Sypl) Swarnf(format string, args ...interface{}) string {
+	return sypl.Sprintf(level.Warn, format, args...)
+}
+
+// Swarnlnf prints like Warnlnf, and returns the non-processed content.
+func (sypl *Sypl) Swarnlnf(format string, args ...interface{}) string {
+	return sypl.Sprintlnf(level.Warn, format, args...)
+}
+
+// Swarnln prints like Warnln, and returns the non-processed content.
+func (sypl *Sypl) Swarnln(args ...interface{}) string {
+	return sypl.Sprintln(level.Warn, args...)
+}
+
+// Debug prints the message @ the Debug level.
 func (sypl *Sypl) Debug(args ...interface{}) *Sypl {
 	return sypl.Print(level.Debug, args...)
 }
 
-// Debugf prints the message (if has content) according with the specified
+// Debugf prints the message according with the specified
 // format @ the Debug level.
 func (sypl *Sypl) Debugf(format string, args ...interface{}) *Sypl {
 	return sypl.Printf(level.Debug, format, args...)
 }
 
-// Debuglnf prints the message (if has content) according with the specified
+// Debuglnf prints the message according with the specified
 // format @ the Debug level, also adding a new line to the end.
 func (sypl *Sypl) Debuglnf(format string, args ...interface{}) *Sypl {
 	return sypl.Printlnf(level.Debug, format, args...)
 }
 
-// Debugln prints the message (if has content), also adding a new line to the
+// Debugln prints the message, also adding a new line to the
 // end @ the Debug level.
 func (sypl *Sypl) Debugln(args ...interface{}) *Sypl {
 	return sypl.Println(level.Debug, args...)
 }
 
-// Trace prints the message (if has content) @ the Trace level.
+// Sdebug prints like Debug, and returns the non-processed content.
+func (sypl *Sypl) Sdebug(args ...interface{}) string {
+	return sypl.Sprint(level.Debug, args...)
+}
+
+// Sdebugf prints like Debugf, and returns the non-processed content.
+func (sypl *Sypl) Sdebugf(format string, args ...interface{}) string {
+	return sypl.Sprintf(level.Debug, format, args...)
+}
+
+// Sdebuglnf prints like Debuglnf, and returns the non-processed content.
+func (sypl *Sypl) Sdebuglnf(format string, args ...interface{}) string {
+	return sypl.Sprintlnf(level.Debug, format, args...)
+}
+
+// Sdebugln prints like Debugln, and returns the non-processed content.
+func (sypl *Sypl) Sdebugln(args ...interface{}) string {
+	return sypl.Sprintln(level.Debug, args...)
+}
+
+// Trace prints the message @ the Trace level.
 func (sypl *Sypl) Trace(args ...interface{}) *Sypl {
 	return sypl.Print(level.Trace, args...)
 }
 
-// Tracef prints the message (if has content) according with the specified
+// Tracef prints the message according with the specified
 // format @ the Trace level.
 func (sypl *Sypl) Tracef(format string, args ...interface{}) *Sypl {
 	return sypl.Printf(level.Trace, format, args...)
 }
 
-// Tracelnf prints the message (if has content) according with the specified
+// Tracelnf prints the message according with the specified
 // format @ the Trace level, also adding a new line to the end.
 func (sypl *Sypl) Tracelnf(format string, args ...interface{}) *Sypl {
 	return sypl.Printlnf(level.Trace, format, args...)
 }
 
-// Traceln prints the message (if has content), also adding a new line to the
+// Traceln prints the message, also adding a new line to the
 // end @ the Trace level.
 func (sypl *Sypl) Traceln(args ...interface{}) *Sypl {
 	return sypl.Println(level.Trace, args...)
+}
+
+// Strace prints like Trace, and returns the non-processed content.
+func (sypl *Sypl) Strace(args ...interface{}) string {
+	return sypl.Sprint(level.Trace, args...)
+}
+
+// Stracef prints like Tracef, and returns the non-processed content.
+func (sypl *Sypl) Stracef(format string, args ...interface{}) string {
+	return sypl.Sprintf(level.Trace, format, args...)
+}
+
+// Stracelnf prints like Tracelnf, and returns the non-processed content.
+func (sypl *Sypl) Stracelnf(format string, args ...interface{}) string {
+	return sypl.Sprintlnf(level.Trace, format, args...)
+}
+
+// Straceln prints like Traceln, and returns the non-processed content.
+func (sypl *Sypl) Straceln(args ...interface{}) string {
+	return sypl.Sprintln(level.Trace, args...)
 }
 
 // New creates a new custom logger.

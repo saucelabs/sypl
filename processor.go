@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/acarl005/stripansi"
 	"github.com/saucelabs/sypl/flag"
 	"github.com/saucelabs/sypl/level"
 )
@@ -248,5 +249,12 @@ func ChangeFirstCharCase(casing Casing) *Processor {
 		case Lowercase:
 			message.SetProcessedContent(strings.ToLower(firstChar) + contentWithoutFirstChar)
 		}
+	})
+}
+
+// Decolourizer removes any colour.
+func Decolourizer() *Processor {
+	return NewProcessor("Decolourizer", func(message *Message) {
+		message.SetProcessedContent(stripansi.Strip(message.GetProcessedContent()))
 	})
 }

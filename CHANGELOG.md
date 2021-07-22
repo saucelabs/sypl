@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add support for structured logging.
 
+## [1.2.5] - 2021-07-22
+### Added
+- Adds the `Decolourizer` processor.
+
+## [1.2.4] - 2021-07-16
+### Changed
+- Go mod checksum.
+
 ## [1.2.3] - 2021-07-15
 ### Added
 - Adds `Sprint{f|lnf|ln}`, and `{Level}{f|lnf|ln}` Convenient methods. It's your `Sprint`, or `Sinfo` (example) but also returning the non-processed content.

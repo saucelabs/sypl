@@ -1,3 +1,7 @@
+// Copyright 2021 The sypl Authors. All rights reserved.
+// Use of this source code is governed by a MIT
+// license that can be found in the LICENSE file.
+
 package flag
 
 // Flag defines behaviours.
@@ -24,11 +28,11 @@ const (
 	SkipAndMute
 )
 
-var names = [...]string{"None", "Force", "Mute", "Skip"}
+var names = [...]string{"None", "Force", "Mute", "Skip", "SkipAndForce", "SkipAndMute"}
 
-// String translates enum flags to string.
+// String interface implementation.
 func (f Flag) String() string {
-	if f < None || f > Skip {
+	if f < None || f > SkipAndMute {
 		return "Unknown"
 	}
 

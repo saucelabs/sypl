@@ -12,6 +12,8 @@ import (
 	"testing"
 
 	"github.com/saucelabs/sypl/level"
+	"github.com/saucelabs/sypl/output"
+	"github.com/saucelabs/sypl/processor"
 )
 
 // List files test files.
@@ -66,12 +68,12 @@ func TestNewIntegration(t *testing.T) {
 			deleteTestFiles(t, filePath)
 
 			New(a.component).
-				AddOutput(FileWithRotation(filePath, level.Debug, &FileRotationOptions{
+				AddOutputs(output.FileWithRotation(filePath, level.Debug, &output.FileRotationOptions{
 					Compress:   true,
 					MaxAge:     28, // Days.
 					MaxBackups: 5,
 					MaxBytes:   50,
-				}, Prefixer("Test Prefix - "))).
+				}, processor.Prefixer("Test Prefix - "))).
 				Printf(a.level, "%s", a.content).
 				Printf(a.level, "%s 1", a.content).
 				Printf(a.level, "%s 2", a.content)

@@ -12,7 +12,7 @@ Example: `$ go get github.com/saucelabs/sypl@v1.2.0`
 
 ## Usage
 
-See [`example/`](example/) folder, and [`sypl_test.go`](sypl_test.go) file.
+See [`example_test.go`](example_test.go), and [`sypl_test.go`](sypl_test.go) file.
 
 ### Documentation
 

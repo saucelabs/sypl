@@ -35,6 +35,8 @@ import (
 // while flags Ldate | Ltime | Lmicroseconds | Llongfile produce,
 //	2009/01/23 01:23:23.123123 /a/b/c/d.go:23: message
 const (
+	DefaultCallDepth = 2
+
 	Ldate         = 1 << iota     // the date in the local time zone: 2009/01/23
 	Ltime                         // the time in the local time zone: 01:23:23
 	Lmicroseconds                 // microsecond resolution: 01:23:23.123123.  assumes Ltime.

@@ -7,7 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Roadmap
 
-- Add support for structured logging.
+- Improve documentation:
+    - Add `doc.go` for all packages.
+    - Update `README.md` to point to these new `doc.go`.
+
+## [1.3.0] - 2021-08-10
+### Added
+- Adds support for structured logging.
+- Components are interface(behaviour)-driven (design-pattern)
+- Components are Factory built (design-pattern)
+- Adds `Buffer` built-in `output`, it's a concurrent-safe buffer
+- Refactored code, components are packaged.
 
 ## [1.2.5] - 2021-07-22
 ### Added

@@ -5,7 +5,7 @@
 // The goal of Color isn't to expose all possible colors - its up to the user
 // to do that, but to provide some common used colors in logging.
 
-package sypl
+package color
 
 import "github.com/fatih/color"
 

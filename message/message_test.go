@@ -2,13 +2,15 @@
 // Use of this source code is governed by a MIT
 // license that can be found in the LICENSE file.
 
-package sypl
+package message
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/saucelabs/sypl/flag"
 	"github.com/saucelabs/sypl/level"
+	"github.com/saucelabs/sypl/shared"
 )
 
 func Test_generateUUID(t *testing.T) {
@@ -32,11 +34,8 @@ func Test_generateUUID(t *testing.T) {
 
 func TestNewMessage(t *testing.T) {
 	type args struct {
-		sypl      *Sypl
-		output    *Output
-		processor *Processor
-		level     level.Level
-		content   string
+		level   level.Level
+		content string
 	}
 	tests := []struct {
 		name string
@@ -46,18 +45,15 @@ func TestNewMessage(t *testing.T) {
 		{
 			name: "Should work - tags, flags",
 			args: args{
-				sypl:      nil,
-				output:    nil,
-				processor: nil,
-				level:     level.Info,
-				content:   "Test",
+				level:   level.Info,
+				content: "Test",
 			},
 			want: "",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m := NewMessage(tt.args.sypl, tt.args.output, tt.args.processor, tt.args.level, tt.args.content)
+			m := NewMessage(tt.args.level, tt.args.content)
 
 			lenID := len(m.GetID())
 
@@ -79,6 +75,25 @@ func TestNewMessage(t *testing.T) {
 			m.DeleteTag("x")
 			if m.GetFlag() != flag.Mute && m.GetTags()[0] != "y" {
 				t.Errorf("Expected %s flag, and %s tag", flag.Mute.String(), "y")
+			}
+		})
+	}
+}
+
+func TestCopy(t *testing.T) {
+	tests := []struct {
+		name string
+	}{
+		{
+			name: "Should work",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			m := NewMessage(level.Info, shared.DefaultContentOutput)
+
+			if got := Copy(m); !reflect.DeepEqual(got, m) {
+				t.Errorf("Copy() = %v, want %v", got, m)
 			}
 		})
 	}

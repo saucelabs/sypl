@@ -9,5 +9,5 @@ require (
 	github.com/google/uuid v1.2.0
 	github.com/saucelabs/lumberjack/v3 v3.0.2
 	github.com/spf13/afero v1.6.0
-	golang.org/x/sys v0.0.0-20210629170331-7dc0b73dc9fb // indirect
+	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 )

@@ -24,7 +24,7 @@ const (
 
 var names = [...]string{"None", "Fatal", "Error", "Info", "Warn", "Debug", "Trace"}
 
-// String translates enum levels to string.
+// String interface implementation.
 func (l Level) String() string {
 	if l < None || l > Trace {
 		return "Unknown"

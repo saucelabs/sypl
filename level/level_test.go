@@ -44,11 +44,18 @@ func TestFromString(t *testing.T) {
 		want Level
 	}{
 		{
-			name: "Should work",
+			name: "Should work - Valid",
 			args: args{
 				level: "Info",
 			},
 			want: Info,
+		},
+		{
+			name: "Should work - None",
+			args: args{
+				level: "Invalid",
+			},
+			want: None,
 		},
 	}
 	for _, tt := range tests {
@@ -70,11 +77,18 @@ func TestLevelsToString(t *testing.T) {
 		want string
 	}{
 		{
-			name: "Should work",
+			name: "Should work - Valid",
 			args: args{
 				levels: []Level{Info, Warn},
 			},
 			want: "Info,Warn",
+		},
+		{
+			name: "Should work - Unknown",
+			args: args{
+				levels: []Level{Level(10)},
+			},
+			want: "Unknown",
 		},
 	}
 	for _, tt := range tests {

@@ -1,0 +1,301 @@
+// Copyright 2021 The sypl Authors. All rights reserved.
+// Use of this source code is governed by a MIT
+// license that can be found in the LICENSE file.
+
+package output
+
+import (
+	"fmt"
+	"io"
+	"log"
+	"strings"
+
+	"github.com/saucelabs/sypl/flag"
+	"github.com/saucelabs/sypl/internal/builtin"
+	"github.com/saucelabs/sypl/level"
+	"github.com/saucelabs/sypl/message"
+	"github.com/saucelabs/sypl/processor"
+	"github.com/saucelabs/sypl/shared"
+	"github.com/saucelabs/sypl/status"
+)
+
+// Output process, and write the message to the defined writer. A writer is
+// anything that implements io.Writer.
+//
+// Notes:
+// - Any message with a `level` beyond `maxLevel` will not be written.
+// - Messages are processed according to the order processors are added.
+type output struct {
+	// Golang's builtin logger.
+	builtinLogger *builtin.Builtin
+
+	// Any message above the max level will not be written.
+	maxLevel level.Level
+
+	// Name of the processor.
+	name string
+
+	// Processors used to process the message.
+	processors []processor.IProcessor
+
+	// Status of the processor.
+	status status.Status
+
+	// Writer to write.
+	writer io.Writer
+}
+
+// String interface implementation.
+func (o output) String() string {
+	return o.name
+}
+
+//////
+// IMeta interface implementation.
+//////
+
+// Returns the processor name.
+func (o *output) GetName() string {
+	return o.name
+}
+
+// Sets the processor name.
+func (o *output) SetName(name string) {
+	o.name = name
+}
+
+// Returns the processor status.
+func (o *output) GetStatus() status.Status {
+	return o.status
+}
+
+// Sets the processor status.
+func (o *output) SetStatus(s status.Status) {
+	o.status = s
+}
+
+//////
+// IOutput interface implementation.
+//////
+
+// GetBuiltinLogger returns the Golang's builtin logger.
+func (o *output) GetBuiltinLogger() *builtin.Builtin {
+	return o.builtinLogger
+}
+
+// SetBuiltinLogger sets the Golang's builtin logger.
+func (o *output) SetBuiltinLogger(builtinLogger *builtin.Builtin) {
+	o.builtinLogger = builtinLogger
+}
+
+// GetMaxLevel returns the max level.
+func (o *output) GetMaxLevel() level.Level {
+	return o.maxLevel
+}
+
+// SetMaxLevel sets the max level.
+func (o *output) SetMaxLevel(l level.Level) {
+	o.maxLevel = l
+}
+
+// AddProcessors adds one or more processors.
+func (o *output) AddProcessors(processors ...processor.IProcessor) IOutput {
+	o.processors = append(o.processors, processors...)
+
+	return o
+}
+
+// GetProcessor returns the registered processor by its name. If not found, will
+// be nil.
+func (o *output) GetProcessor(name string) processor.IProcessor {
+	for _, p := range o.processors {
+		if strings.EqualFold(p.GetName(), name) {
+			return p
+		}
+	}
+
+	return nil
+}
+
+// SetProcessors sets one or more processors.
+func (o *output) GetProcessors() []processor.IProcessor {
+	return o.processors
+}
+
+// GetProcessors returns registered processors.
+func (o *output) SetProcessors(processors ...processor.IProcessor) {
+	for _, processor := range processors {
+		for i, p := range o.processors {
+			if strings.EqualFold(p.GetName(), processor.GetName()) {
+				o.processors[i] = processor
+			}
+		}
+	}
+}
+
+// GetProcessorsNames returns the names of the registered processors.
+func (o *output) GetProcessorsNames() []string {
+	processorsNames := []string{}
+
+	for _, processor := range o.processors {
+		processorsNames = append(processorsNames, processor.GetName())
+	}
+
+	return processorsNames
+}
+
+// GetWriter returns the writer.
+func (o *output) GetWriter() io.Writer {
+	return o.writer
+}
+
+// SetWriter sets the writer.
+func (o *output) SetWriter(w io.Writer) {
+	o.writer = w
+}
+
+// Write write the message to the defined output.
+//
+// TODO: Review complexity.
+//nolint:nestif
+func (o *output) Write(m message.IMessage) error {
+	processorsNames := strings.Join(o.GetProcessorsNames(), ",")
+
+	// Should allows to specify `Output`(s).
+	if len(m.GetProcessorsNames()) > 0 {
+		processorsNames = strings.Join(m.GetProcessorsNames(), ",")
+	}
+
+	// Executes processors in series.
+	o.processProcessors(m, processorsNames)
+
+	// Should print the message - regardless of the level, if flagged
+	// with `Force`.
+
+	if m.GetFlag() == flag.Force || m.GetFlag() == flag.SkipAndForce {
+		if err := o.write(m); err != nil {
+			log.Println(shared.ErrorPrefix, err)
+
+			return err
+		}
+	} else {
+		// Should only print if message `level` isn't above `MaxLevel`.
+		// Should only print if `level` isn't `None`.
+		// Should only print if not flagged with `Mute`.
+		if m.GetLevel() != level.None &&
+			m.GetLevel() <= o.GetMaxLevel() &&
+			m.GetFlag() != flag.Mute {
+			if err := o.write(m); err != nil {
+				log.Println(shared.ErrorPrefix, err)
+
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+//////
+// Helpers.
+//////
+
+// Detects (cross-OS) and removes any newline/line-break, at the end of the
+// content, ensuring text processing is done properly (e.g.: suffix).
+func recursiveLineBreakStripper(m message.IMessage) message.IMessage {
+	if strings.HasSuffix(m.GetContent().GetProcessed(), "\r\n") {
+		m.GetContent().SetProcessed(
+			strings.TrimSuffix(m.GetContent().GetProcessed(), "\r\n"),
+		)
+
+		m.SetRestoreLineBreak(true)
+
+		recursiveLineBreakStripper(m)
+	}
+
+	if strings.HasSuffix(m.GetContent().GetProcessed(), "\n") {
+		m.GetContent().SetProcessed(
+			strings.TrimSuffix(m.GetContent().GetProcessed(), "\n"),
+		)
+
+		m.SetRestoreLineBreak(true)
+
+		recursiveLineBreakStripper(m)
+	}
+
+	if strings.HasSuffix(m.GetContent().GetProcessed(), "\r") {
+		m.GetContent().SetProcessed(
+			strings.TrimSuffix(m.GetContent().GetProcessed(), "\r"),
+		)
+
+		m.SetRestoreLineBreak(true)
+
+		recursiveLineBreakStripper(m)
+	}
+
+	return m
+}
+
+// Processors logic of the Write method.
+func (o *output) processProcessors(m message.IMessage, processorsNames string) {
+	// Should not process if message is flagged with `Skip` or `SkipAndForce`.
+	if m.GetFlag() != flag.Skip && m.GetFlag() != flag.SkipAndForce {
+		for _, p := range o.processors {
+			// Should only use enabled Processors, and named (listed) ones.
+			//
+			// Note: `Enabled` status is checked in the `Run` method.
+			if strings.Contains(processorsNames, p.GetName()) {
+				m.SetProcessorName(p.GetName())
+
+				// Strips the last line break, which allows the content to be
+				// properly processed. It gets restore later.
+				// See: `Message.restoreLineBreak` documentation for more info.
+				m = recursiveLineBreakStripper(m)
+
+				if err := p.Run(m); err != nil {
+					log.Println(shared.ErrorPrefix,
+						processor.NewProcessingError(m, err))
+				}
+			}
+		}
+	}
+}
+
+// DRY for the writing step.
+func (o *output) write(m message.IMessage) error {
+	// Restore the line break, if needed.
+	if m.GetRestoreLineBreak() {
+		m.GetContent().SetProcessed(fmt.Sprintln(m.GetContent().GetProcessed()))
+	}
+
+	// Write to writer.
+	if err := o.GetBuiltinLogger().OutputBuiltin(
+		builtin.DefaultCallDepth,
+		m.GetContent().GetProcessed(),
+	); err != nil {
+		return fmt.Errorf(`"%s" output. Error: "%w"`, o.GetName(), err)
+	}
+
+	return nil
+}
+
+//////
+// Factory.
+//////
+
+// NewOutput is the Output factory.
+func NewOutput(name string,
+	maxLevel level.Level,
+	w io.Writer,
+	processors ...processor.IProcessor,
+) IOutput {
+	return &output{
+		builtinLogger: builtin.NewBuiltin(w, "", 0),
+		maxLevel:      maxLevel,
+
+		name:       name,
+		processors: processors,
+		status:     status.Enabled,
+		writer:     w,
+	}
+}

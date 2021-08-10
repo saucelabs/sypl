@@ -7,24 +7,19 @@ package sypl
 import (
 	"bufio"
 	"bytes"
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 	"time"
 
-	"github.com/saucelabs/sypl/flag"
 	"github.com/saucelabs/sypl/level"
+	"github.com/saucelabs/sypl/message"
+	"github.com/saucelabs/sypl/options"
+	"github.com/saucelabs/sypl/output"
+	"github.com/saucelabs/sypl/processor"
+	"github.com/saucelabs/sypl/shared"
 	"github.com/spf13/afero"
-)
-
-const (
-	defaultComponentNameOutput = "componentNameTest"
-	defaultContentOutput       = "contentTest"
-	defaultPrefixValue         = "My Prefix - "
-	defaultTimestampFormat     = "2006"
 )
 
 func TestNew(t *testing.T) {
@@ -40,38 +35,28 @@ func TestNew(t *testing.T) {
 	}
 
 	noneArgs := args{
-		component: defaultComponentNameOutput,
-		content:   defaultContentOutput,
+		component: shared.DefaultComponentNameOutput,
+		content:   shared.DefaultContentOutput,
 		level:     level.None,
 		maxLevel:  level.Trace,
 		run: func(a args) string {
-			var buf bytes.Buffer
-			bufWriter := bufio.NewWriter(&buf)
+			buf, o := output.SafeBuffer(a.maxLevel, processor.PrefixBasedOnMask(shared.DefaultTimestampFormat))
 
-			New(a.component).
-				AddOutput(NewOutput("buffer", a.maxLevel, bufWriter, PrefixBasedOnMask(defaultTimestampFormat))).
-				Print(a.level, a.content)
-
-			bufWriter.Flush()
+			New(a.component).AddOutputs(o).Print(a.level, a.content)
 
 			return buf.String()
 		},
 	}
 
 	infoArgs := args{
-		component: defaultComponentNameOutput,
-		content:   defaultContentOutput,
+		component: shared.DefaultComponentNameOutput,
+		content:   shared.DefaultContentOutput,
 		level:     level.Info,
 		maxLevel:  level.Debug,
 		run: func(a args) string {
-			var buf bytes.Buffer
-			bufWriter := bufio.NewWriter(&buf)
+			buf, o := output.SafeBuffer(a.maxLevel, processor.PrefixBasedOnMask(shared.DefaultTimestampFormat))
 
-			New(a.component).
-				AddOutput(NewOutput("buffer", a.maxLevel, bufWriter, PrefixBasedOnMask(defaultTimestampFormat))).
-				Print(a.level, a.content)
-
-			bufWriter.Flush()
+			New(a.component).AddOutputs(o).Print(a.level, a.content)
 
 			return buf.String()
 		},
@@ -81,14 +66,9 @@ func TestNew(t *testing.T) {
 		level:    level.Trace,
 		maxLevel: level.Debug,
 		run: func(a args) string {
-			var buf bytes.Buffer
-			bufWriter := bufio.NewWriter(&buf)
+			buf, o := output.SafeBuffer(a.maxLevel, processor.PrefixBasedOnMask(shared.DefaultTimestampFormat))
 
-			New(a.component).
-				AddOutput(NewOutput("buffer", a.maxLevel, bufWriter, PrefixBasedOnMask(defaultTimestampFormat))).
-				Print(a.level, a.content)
-
-			bufWriter.Flush()
+			New(a.component).AddOutputs(o).Print(a.level, a.content)
 
 			return buf.String()
 		},
@@ -98,23 +78,21 @@ func TestNew(t *testing.T) {
 		level:    level.Info, // Will not be used.
 		maxLevel: level.Trace,
 		run: func(a args) string {
-			var buf bytes.Buffer
-			bufWriter := bufio.NewWriter(&buf)
+			buf, o := output.SafeBuffer(a.maxLevel, processor.MuteBasedOnLevel(level.Info, level.Warn))
 
 			New(a.component).
-				AddOutput(NewOutput("buffer", a.maxLevel, bufWriter, MuteBasedOnLevel(level.Info, level.Warn))).
+				AddOutputs(o).
+				Printf(level.Info, "%s", a.content).
 				Printf(level.Info, "%s", a.content).
 				Printf(level.Warn, "%s", a.content)
-
-			bufWriter.Flush()
 
 			return buf.String()
 		},
 	}
 
 	fileArgs := args{
-		component: defaultComponentNameOutput,
-		content:   defaultContentOutput,
+		component: shared.DefaultComponentNameOutput,
+		content:   shared.DefaultContentOutput,
 		dir:       "/tmp",
 		filename:  "test.log",
 		level:     level.Info,
@@ -126,7 +104,7 @@ func TestNew(t *testing.T) {
 			f, err := appFs.OpenFile(
 				filePath,
 				os.O_APPEND|os.O_CREATE|os.O_WRONLY,
-				defaultFileMode)
+				shared.DefaultFileMode)
 			if err != nil {
 				t.Error("Failed to open virtal file", err)
 			}
@@ -134,7 +112,7 @@ func TestNew(t *testing.T) {
 			defer f.Close()
 
 			New(a.component).
-				AddOutput(FileBased("virtual", filePath, level.Debug, f, Prefixer("Test Prefix - "))).
+				AddOutputs(output.FileBased("virtual", filePath, level.Debug, f, processor.Prefixer("Test Prefix - "))).
 				Print(a.level, a.content)
 
 			b, err := afero.ReadFile(appFs, filePath)
@@ -147,248 +125,193 @@ func TestNew(t *testing.T) {
 	}
 
 	disableArgs := args{
-		component: defaultComponentNameOutput,
-		content:   defaultContentOutput,
+		component: shared.DefaultComponentNameOutput,
+		content:   shared.DefaultContentOutput,
 		level:     level.Info,
 		maxLevel:  level.Trace,
 		run: func(a args) string {
-			var buf bytes.Buffer
-			bufWriter := bufio.NewWriter(&buf)
+			buf, o := output.SafeBuffer(a.maxLevel, processor.PrefixBasedOnMask(shared.DefaultTimestampFormat))
 
-			New(a.component).
-				AddOutput(NewOutput("buffer", a.maxLevel, bufWriter).
-					AddProcessor(EnableDisableProcessors(false, "Prefixer", "Suffixer")).
-					AddProcessor(Prefixer("Testing prefix - ")).
-					AddProcessor(Suffixer(" - Testing suffix"))).
-				Print(a.level, a.content)
-
-			bufWriter.Flush()
+			New(a.component).AddOutputs(o).PrintWithOptions(&options.Options{
+				ProcessorsNames: []string{""},
+			}, a.level, a.content)
 
 			return buf.String()
 		},
 	}
 
 	errorArgs := args{
-		component: defaultComponentNameOutput,
-		content:   defaultContentOutput,
+		component: shared.DefaultComponentNameOutput,
+		content:   shared.DefaultContentOutput,
 		level:     level.None, // Will not be used.
 		maxLevel:  level.Trace,
 		run: func(a args) string {
-			var buf bytes.Buffer
-			bufWriter := bufio.NewWriter(&buf)
+			buf, o := output.SafeBuffer(a.maxLevel, processor.PrefixBasedOnMask(shared.DefaultTimestampFormat))
 
-			New(a.component).
-				AddOutput(NewOutput("buffer", a.maxLevel, bufWriter, PrefixBasedOnMask(defaultTimestampFormat))).
-				Errorf("%s", a.content)
-
-			bufWriter.Flush()
+			New(a.component).AddOutputs(o).Errorf("%s", a.content)
 
 			return buf.String()
 		},
 	}
 
 	info2Args := args{
-		component: defaultComponentNameOutput,
-		content:   defaultContentOutput,
+		component: shared.DefaultComponentNameOutput,
+		content:   shared.DefaultContentOutput,
 		level:     level.None, // Will not be used.
 		maxLevel:  level.Trace,
 		run: func(a args) string {
-			var buf bytes.Buffer
-			bufWriter := bufio.NewWriter(&buf)
+			buf, o := output.SafeBuffer(a.maxLevel, processor.PrefixBasedOnMask(shared.DefaultTimestampFormat))
 
-			New(a.component).
-				AddOutput(NewOutput("buffer", a.maxLevel, bufWriter, PrefixBasedOnMask(defaultTimestampFormat))).
-				Infof("%s", a.content)
-
-			bufWriter.Flush()
+			New(a.component).AddOutputs(o).Infof("%s", a.content)
 
 			return buf.String()
 		},
 	}
 
 	warnArgs := args{
-		component: defaultComponentNameOutput,
-		content:   defaultContentOutput,
+		component: shared.DefaultComponentNameOutput,
+		content:   shared.DefaultContentOutput,
 		level:     level.None, // Will not be used.
 		maxLevel:  level.Trace,
 		run: func(a args) string {
-			var buf bytes.Buffer
-			bufWriter := bufio.NewWriter(&buf)
+			buf, o := output.SafeBuffer(a.maxLevel, processor.PrefixBasedOnMask(shared.DefaultTimestampFormat))
 
-			New(a.component).
-				AddOutput(NewOutput("buffer", a.maxLevel, bufWriter, PrefixBasedOnMask(defaultTimestampFormat))).
-				Warnf("%s", a.content)
-
-			bufWriter.Flush()
+			New(a.component).AddOutputs(o).Warnf("%s", a.content)
 
 			return buf.String()
 		},
 	}
 
 	debugArgs := args{
-		component: defaultComponentNameOutput,
-		content:   defaultContentOutput,
+		component: shared.DefaultComponentNameOutput,
+		content:   shared.DefaultContentOutput,
 		level:     level.None, // Will not be used.
 		maxLevel:  level.Trace,
 		run: func(a args) string {
-			var buf bytes.Buffer
-			bufWriter := bufio.NewWriter(&buf)
+			buf, o := output.SafeBuffer(a.maxLevel, processor.PrefixBasedOnMask(shared.DefaultTimestampFormat))
 
-			New(a.component).
-				AddOutput(NewOutput("buffer", a.maxLevel, bufWriter, PrefixBasedOnMask(defaultTimestampFormat))).
-				Debugf("%s", a.content)
-
-			bufWriter.Flush()
+			New(a.component).AddOutputs(o).Debugf("%s", a.content)
 
 			return buf.String()
 		},
 	}
 
 	trace2Args := args{
-		component: defaultComponentNameOutput,
-		content:   defaultContentOutput,
+		component: shared.DefaultComponentNameOutput,
+		content:   shared.DefaultContentOutput,
 		level:     level.None, // Will not be used.
 		maxLevel:  level.Trace,
 		run: func(a args) string {
-			var buf bytes.Buffer
-			bufWriter := bufio.NewWriter(&buf)
+			buf, o := output.SafeBuffer(a.maxLevel, processor.PrefixBasedOnMask(shared.DefaultTimestampFormat))
 
-			New(a.component).
-				AddOutput(NewOutput("buffer", a.maxLevel, bufWriter, PrefixBasedOnMask(defaultTimestampFormat))).
-				Tracef("%s", a.content)
-
-			bufWriter.Flush()
+			New(a.component).AddOutputs(o).Tracef("%s", a.content)
 
 			return buf.String()
 		},
 	}
 
 	forceArgs := args{
-		component: defaultComponentNameOutput,
-		content:   defaultContentOutput,
+		component: shared.DefaultComponentNameOutput,
+		content:   shared.DefaultContentOutput,
 		level:     level.Error, // Will not be used.
 		maxLevel:  level.Fatal,
 		run: func(a args) string {
-			var buf bytes.Buffer
-			bufWriter := bufio.NewWriter(&buf)
+			buf, o := output.SafeBuffer(a.maxLevel, processor.ForceBasedOnLevel(level.Error, level.Warn))
 
-			New(a.component).
-				AddOutput(NewOutput("buffer", a.maxLevel, bufWriter, ForceBasedOnLevel(level.Error, level.Warn))).
-				Printf(level.Error, "%s", a.content).
-				Printf(level.Warn, "%s", a.content)
-
-			bufWriter.Flush()
+			New(a.component).AddOutputs(o).Printf(level.Error, "%s", a.content).Printf(level.Warn, "%s", a.content)
 
 			return buf.String()
 		},
 	}
 
 	printfArgs := args{
-		component: defaultComponentNameOutput,
-		content:   defaultContentOutput,
+		component: shared.DefaultComponentNameOutput,
+		content:   shared.DefaultContentOutput,
 		level:     level.Info,
 		maxLevel:  level.Trace,
 		run: func(a args) string {
-			var buf bytes.Buffer
-			bufWriter := bufio.NewWriter(&buf)
+			buf, o := output.SafeBuffer(a.maxLevel)
 
-			New(a.component).
-				AddOutput(NewOutput("buffer", a.maxLevel, bufWriter)).
-				Printf(a.level, "%s", a.content)
-
-			bufWriter.Flush()
+			New(a.component).AddOutputs(o).Printf(a.level, "%s", a.content)
 
 			return buf.String()
 		},
 	}
 
 	printfNewLineArgs := args{
-		component: defaultComponentNameOutput,
-		content:   defaultContentOutput,
+		component: shared.DefaultComponentNameOutput,
+		content:   shared.DefaultContentOutput,
 		level:     level.Info,
 		maxLevel:  level.Trace,
 		run: func(a args) string {
-			var buf bytes.Buffer
-			bufWriter := bufio.NewWriter(&buf)
+			buf, o := output.SafeBuffer(a.maxLevel)
 
-			New(a.component).
-				AddOutput(NewOutput("buffer", a.maxLevel, bufWriter)).
-				Printf(a.level, "%s\n", a.content)
-
-			bufWriter.Flush()
+			New(a.component).AddOutputs(o).Printf(a.level, "%s\n", a.content)
 
 			return buf.String()
 		},
 	}
 
 	printlnArgs := args{
-		component: defaultComponentNameOutput,
-		content:   defaultContentOutput,
+		component: shared.DefaultComponentNameOutput,
+		content:   shared.DefaultContentOutput,
 		level:     level.Info,
 		maxLevel:  level.Trace,
 		run: func(a args) string {
-			var buf bytes.Buffer
-			bufWriter := bufio.NewWriter(&buf)
+			buf, o := output.SafeBuffer(a.maxLevel)
 
-			New(a.component).
-				AddOutput(NewOutput("buffer", a.maxLevel, bufWriter)).
-				Println(a.level, a.content)
-
-			bufWriter.Flush()
+			New(a.component).AddOutputs(o).Println(a.level, a.content)
 
 			return buf.String()
 		},
 	}
 
 	prefixBasedOnMaskExceptForLevelsArgs := args{
-		component: defaultComponentNameOutput,
-		content:   defaultContentOutput,
+		component: shared.DefaultComponentNameOutput,
+		content:   shared.DefaultContentOutput,
 		level:     level.Info, // Will not be used.
 		maxLevel:  level.Trace,
 		run: func(a args) string {
-			var buf bytes.Buffer
-			bufWriter := bufio.NewWriter(&buf)
+			buf, o := output.SafeBuffer(
+				a.maxLevel,
+				processor.PrefixBasedOnMaskExceptForLevels(
+					shared.DefaultTimestampFormat,
+					level.Info,
+					level.Warn,
+				),
+			)
 
 			New(a.component).
-				AddOutput(NewOutput("buffer", a.maxLevel, bufWriter,
-					PrefixBasedOnMaskExceptForLevels(defaultTimestampFormat, level.Info, level.Warn),
-				)).
+				AddOutputs(o).
 				Printf(level.Info, "%s", a.content).
 				Printf(level.Warn, "%s", a.content)
-
-			bufWriter.Flush()
 
 			return buf.String()
 		},
 	}
 
 	prefixBasedOnMaskExceptForLevelsDontArgs := args{
-		component: defaultComponentNameOutput,
-		content:   defaultContentOutput,
+		component: shared.DefaultComponentNameOutput,
+		content:   shared.DefaultContentOutput,
 		level:     level.Info,
 		maxLevel:  level.Trace,
 		run: func(a args) string {
-			var buf bytes.Buffer
-			bufWriter := bufio.NewWriter(&buf)
+			buf, o := output.SafeBuffer(
+				a.maxLevel,
+				processor.PrefixBasedOnMaskExceptForLevels(
+					shared.DefaultTimestampFormat,
+					level.Warn),
+			)
 
-			New(a.component).
-				AddOutput(NewOutput(
-					"buffer",
-					a.maxLevel,
-					bufWriter,
-					PrefixBasedOnMaskExceptForLevels(defaultTimestampFormat, level.Warn)),
-				).
-				Printf(a.level, "%s", a.content)
-
-			bufWriter.Flush()
+			New(a.component).AddOutputs(o).Printf(a.level, "%s", a.content)
 
 			return buf.String()
 		},
 	}
 
 	printWithOptionsArgs := args{
-		component: defaultComponentNameOutput,
-		content:   defaultContentOutput,
+		component: shared.DefaultComponentNameOutput,
+		content:   shared.DefaultContentOutput,
 		level:     level.Info,
 		maxLevel:  level.Trace,
 		run: func(a args) string {
@@ -396,11 +319,11 @@ func TestNew(t *testing.T) {
 			bufWriter := bufio.NewWriter(&buf)
 
 			New(a.component).
-				AddOutput(NewOutput("buffer 1", a.maxLevel, bufWriter)).
-				AddOutput(NewOutput("buffer 2", a.maxLevel, bufWriter)).
-				PrintWithOptions(&Options{
+				AddOutputs(output.NewOutput("buffer 1", a.maxLevel, bufWriter)).
+				AddOutputs(output.NewOutput("buffer 2", a.maxLevel, bufWriter)).
+				PrintWithOptions(&options.Options{
 					OutputsNames: []string{"buffer 1"},
-				}, a.level, defaultContentOutput)
+				}, a.level, shared.DefaultContentOutput)
 
 			bufWriter.Flush()
 
@@ -409,29 +332,24 @@ func TestNew(t *testing.T) {
 	}
 
 	printWithOptionsDontArgs := args{
-		component: defaultComponentNameOutput,
-		content:   defaultContentOutput,
+		component: shared.DefaultComponentNameOutput,
+		content:   shared.DefaultContentOutput,
 		level:     level.Info,
 		maxLevel:  level.Trace,
 		run: func(a args) string {
-			var buf bytes.Buffer
-			bufWriter := bufio.NewWriter(&buf)
+			buf, o := output.SafeBuffer(a.maxLevel)
 
-			New(a.component).
-				AddOutput(NewOutput("buffer", a.maxLevel, bufWriter)).
-				PrintWithOptions(&Options{
-					OutputsNames: []string{"invalid"},
-				}, a.level, defaultContentOutput)
-
-			bufWriter.Flush()
+			New(a.component).AddOutputs(o).PrintWithOptions(&options.Options{
+				OutputsNames: []string{"invalid"},
+			}, a.level, shared.DefaultContentOutput)
 
 			return buf.String()
 		},
 	}
 
 	enableDisableOutputsArgs := args{
-		component: defaultComponentNameOutput,
-		content:   defaultContentOutput,
+		component: shared.DefaultComponentNameOutput,
+		content:   shared.DefaultContentOutput,
 		level:     level.Info,
 		maxLevel:  level.Trace,
 		run: func(a args) string {
@@ -439,9 +357,11 @@ func TestNew(t *testing.T) {
 			bufWriter := bufio.NewWriter(&buf)
 
 			New(a.component).
-				AddOutput(NewOutput("buffer 1", a.maxLevel, bufWriter, EnableDisableOutputs(false, "buffer 2"))).
-				AddOutput(NewOutput("buffer 2", a.maxLevel, bufWriter)).
-				Info(defaultContentOutput)
+				AddOutputs(output.NewOutput("buffer 1", a.maxLevel, bufWriter)).
+				AddOutputs(output.NewOutput("buffer 2", a.maxLevel, bufWriter)).
+				PrintWithOptions(&options.Options{
+					OutputsNames: []string{"buffer 2"},
+				}, level.Info, shared.DefaultContentOutput)
 
 			bufWriter.Flush()
 
@@ -450,8 +370,8 @@ func TestNew(t *testing.T) {
 	}
 
 	changeFirstCharCaseUpperArgs := args{
-		component: defaultComponentNameOutput,
-		content:   defaultContentOutput,
+		component: shared.DefaultComponentNameOutput,
+		content:   shared.DefaultContentOutput,
 		level:     level.Info,
 		maxLevel:  level.Trace,
 		run: func(a args) string {
@@ -459,8 +379,8 @@ func TestNew(t *testing.T) {
 			bufWriter := bufio.NewWriter(&buf)
 
 			New(a.component).
-				AddOutput(NewOutput("buffer 1", a.maxLevel, bufWriter, ChangeFirstCharCase(Uppercase))).
-				Info(defaultContentOutput)
+				AddOutputs(output.NewOutput("buffer 1", a.maxLevel, bufWriter, processor.ChangeFirstCharCase(processor.Uppercase))).
+				Info(shared.DefaultContentOutput)
 
 			bufWriter.Flush()
 
@@ -469,7 +389,7 @@ func TestNew(t *testing.T) {
 	}
 
 	changeFirstCharCaseLowerArgs := args{
-		component: defaultComponentNameOutput,
+		component: shared.DefaultComponentNameOutput,
 		content:   "ContentTest",
 		level:     level.Info,
 		maxLevel:  level.Trace,
@@ -478,8 +398,8 @@ func TestNew(t *testing.T) {
 			bufWriter := bufio.NewWriter(&buf)
 
 			New(a.component).
-				AddOutput(NewOutput("buffer 1", a.maxLevel, bufWriter, ChangeFirstCharCase(Lowercase))).
-				Info(defaultContentOutput)
+				AddOutputs(output.NewOutput("buffer 1", a.maxLevel, bufWriter, processor.ChangeFirstCharCase(processor.Lowercase))).
+				Info(shared.DefaultContentOutput)
 
 			bufWriter.Flush()
 
@@ -488,8 +408,8 @@ func TestNew(t *testing.T) {
 	}
 
 	nonChainedNewLoggerArgs := args{
-		component: defaultComponentNameOutput,
-		content:   defaultContentOutput,
+		component: shared.DefaultComponentNameOutput,
+		content:   shared.DefaultContentOutput,
 		level:     level.Info,
 		maxLevel:  level.Trace,
 		run: func(a args) string {
@@ -501,20 +421,22 @@ func TestNew(t *testing.T) {
 
 			// Creates an `Output`. In this case, called Console that will print to
 			// stdout and max print level @ Info.
-			ConsoleToStdOut := NewOutput("Console", level.Info, bufWriter)
+			ConsoleToStdOut := output.NewOutput("Console", level.Info, bufWriter)
 
 			// Creates a `Processor`. It will prefix all messages.
-			Prefixer := func(prefix string) *Processor {
-				return NewProcessor("Prefixer", func(message *Message) {
-					message.SetProcessedContent(prefix + message.GetProcessedContent())
+			Prefixer := func(prefix string) processor.IProcessor {
+				return processor.NewProcessor("Prefixer", func(message message.IMessage) error {
+					message.GetContent().SetProcessed(prefix + message.GetContent().GetProcessed())
+
+					return nil
 				})
 			}
 
 			// Adds `Processor` to `Output`.
-			ConsoleToStdOut.AddProcessor(Prefixer(defaultPrefixValue))
+			ConsoleToStdOut.AddProcessors(Prefixer(shared.DefaultPrefixValue))
 
 			// Adds `Output` to logger.
-			testingLogger.AddOutput(ConsoleToStdOut)
+			testingLogger.AddOutputs(ConsoleToStdOut)
 
 			// Prints: "My Prefix - Test message"
 			testingLogger.Print(level.Info, "Test message")
@@ -526,8 +448,8 @@ func TestNew(t *testing.T) {
 	}
 
 	printflnArgs := args{
-		component: defaultComponentNameOutput,
-		content:   defaultContentOutput,
+		component: shared.DefaultComponentNameOutput,
+		content:   shared.DefaultContentOutput,
 		level:     level.Info,
 		maxLevel:  level.Trace,
 		run: func(a args) string {
@@ -539,10 +461,10 @@ func TestNew(t *testing.T) {
 
 			// Creates an `Output`. In this case, called Buffer that will write
 			// to the specified buffer, and max print level @ Info.
-			BufferOutput := NewOutput("Buffer", level.Info, bufWriter)
+			BufferOutput := output.NewOutput("Buffer", level.Info, bufWriter)
 
 			// Adds `Output` to logger.
-			testingLogger.AddOutput(BufferOutput)
+			testingLogger.AddOutputs(BufferOutput)
 
 			testingLogger.
 				Printlnf(level.Info, "%s %s", "element 1", "element 2")
@@ -595,14 +517,14 @@ func TestNew(t *testing.T) {
 			name: "Should print - File based",
 			args: fileArgs,
 			want: func(a args) string {
-				return "Test Prefix - " + defaultContentOutput
+				return "Test Prefix - " + shared.DefaultContentOutput
 			},
 		},
 		{
 			name: "Should print - Only prefix (Disabler)",
 			args: disableArgs,
 			want: func(a args) string {
-				return defaultContentOutput
+				return shared.DefaultContentOutput
 			},
 		},
 		{
@@ -669,35 +591,35 @@ func TestNew(t *testing.T) {
 			name: "Should print - Force",
 			args: forceArgs,
 			want: func(a args) string {
-				return defaultContentOutput + defaultContentOutput
+				return shared.DefaultContentOutput + shared.DefaultContentOutput
 			},
 		},
 		{
 			name: "Should print - Printf - No newline",
 			args: printfArgs,
 			want: func(a args) string {
-				return defaultContentOutput
+				return shared.DefaultContentOutput
 			},
 		},
 		{
 			name: "Should print - Printf - Newline",
 			args: printfNewLineArgs,
 			want: func(a args) string {
-				return defaultContentOutput + "\n"
+				return shared.DefaultContentOutput + "\n"
 			},
 		},
 		{
 			name: "Should print - Println",
 			args: printlnArgs,
 			want: func(a args) string {
-				return defaultContentOutput + "\n"
+				return shared.DefaultContentOutput + "\n"
 			},
 		},
 		{
 			name: "Should print not prefixed - PrefixBasedOnMaskExceptForLevels",
 			args: prefixBasedOnMaskExceptForLevelsArgs,
 			want: func(a args) string {
-				return defaultContentOutput + defaultContentOutput
+				return shared.DefaultContentOutput + shared.DefaultContentOutput
 			},
 		},
 		{
@@ -716,7 +638,7 @@ func TestNew(t *testing.T) {
 			name: "Should print - printWithOptions",
 			args: printWithOptionsArgs,
 			want: func(a args) string {
-				return defaultContentOutput
+				return shared.DefaultContentOutput
 			},
 		},
 		{
@@ -730,7 +652,7 @@ func TestNew(t *testing.T) {
 			name: "Should print - enableDisableOutputsArgs",
 			args: enableDisableOutputsArgs,
 			want: func(a args) string {
-				return defaultContentOutput
+				return shared.DefaultContentOutput
 			},
 		},
 		{
@@ -744,7 +666,7 @@ func TestNew(t *testing.T) {
 			name: "Should print - changeFirstCharCaseLowerArgs",
 			args: changeFirstCharCaseLowerArgs,
 			want: func(a args) string {
-				return defaultContentOutput
+				return shared.DefaultContentOutput
 			},
 		},
 		{
@@ -772,275 +694,4 @@ func TestNew(t *testing.T) {
 			}
 		})
 	}
-}
-
-// NonChained is a non-chained example of creating, and setting up a `sypl`
-// logger. It writes to a custom buffer.
-func ExampleNew_notChained() {
-	buf := new(strings.Builder)
-
-	// Creates logger, and name it.
-	testingLogger := New("Testing Logger")
-
-	// Creates an `Output`. In this case, called "Console" that will print to
-	// `stdout` and max print level @ `Info`.
-	ConsoleToStdOut := NewOutput("Console", level.Info, buf)
-
-	// Creates a `Processor`. It will prefix all messages.
-	Prefixer := func(prefix string) *Processor {
-		return NewProcessor("Prefixer", func(message *Message) {
-			message.SetProcessedContent(prefix + message.GetProcessedContent())
-		})
-	}
-
-	// Adds `Processor` to `Output`.
-	ConsoleToStdOut.AddProcessor(Prefixer(defaultPrefixValue))
-
-	// Adds `Output` to logger.
-	testingLogger.AddOutput(ConsoleToStdOut)
-
-	// Writes: "My Prefix - Test message"
-	testingLogger.Print(level.Info, "Test info message")
-
-	fmt.Println(buf.String())
-
-	// Output:
-	// My Prefix - Test info message
-}
-
-// Chained is the chained example of creating, and setting up a `sypl` logger.
-// It writes to both `stdout` and `stderr`.
-func ExampleNew_chained() {
-	// Creates logger, and name it.
-	New("Testing Logger").
-		// Creates two `Output`s. "Console" and "Error". "Console" will print to
-		// `Fatal`, `Error`, and `Info`. "Error" will only print `Fatal`, and
-		// `Error` levels.
-		AddOutput(NewOutput("Console", level.Info, os.Stdout)).
-		// Creates a `Processor`. It will prefix all messages. It will only
-		// prefix messages for this specific `Output`, and @ `Error` level.
-		AddOutput(NewOutput("Error", level.Error, os.Stderr).
-			AddProcessor(func(prefix string) *Processor {
-				return NewProcessor("Prefixer", func(message *Message) {
-					if message.GetLevel() == level.Error {
-						message.SetProcessedContent(prefix + message.GetProcessedContent())
-					}
-				})
-			}(defaultPrefixValue))).
-		// Prints:
-		// Test info message
-		Println(level.Info, "Test info message").
-		// Prints:
-		// Test error message
-		// My Prefix - Test error message
-		Println(level.Error, "Test error message")
-
-	// Output:
-	// My Prefix - Test error message
-
-	// Note: Go "example" parser only captured the last message.
-}
-
-// ChainedUsingBuiltin is the chained example of creating, and setting up a
-// `sypl` logger using built-in `Output`, and `Processor`. It writes to
-// `stdout`, and `stderr`.
-func ExampleNew_chainedUsingBuiltin() {
-	// Creates logger, and name it.
-	New("Testing Logger").
-		// Adds an `Output`. In this case, called "Console" that will print to
-		// `stdout` and max print level @ `Info`.
-		//
-		// Adds a `Processor`. It will prefix all messages.
-		AddOutput(Console(level.Info).AddProcessor(Prefixer(defaultPrefixValue))).
-		// Prints: My Prefix - Test info message
-		Infoln("Test info message")
-
-	// output:
-	// My Prefix - Test info message
-}
-
-// inlineUsingBuiltin same as `ChainedUsingBuiltin` but using inline form.
-func ExampleNew_inlineUsingBuiltin() {
-	New("Testing Logger", Console(level.Info).AddProcessor(Prefixer(defaultPrefixValue))).Infoln("Test info message")
-
-	// output:
-	// My Prefix - Test info message
-}
-
-// printWithOptions demonstrates `sypl` flexibility. `Options` enhances the
-// usual `PrintX` methods allowing to specify flags, and tags.
-func ExampleNew_printWithOptions() {
-	// Creates logger, and name it.
-	testingLogger := New("Testing Logger")
-
-	// Creates 3 `Output`s, all called "Console" that will print to `stdout`, and
-	// max print level @ `Info`.
-	Console1ToStdOut := NewOutput("Console 1", level.Info, os.Stdout)
-	Console2ToStdOut := NewOutput("Console 2", level.Info, os.Stdout)
-	Console3ToStdOut := NewOutput("Console 3", level.Info, os.Stdout)
-
-	// Creates a `Processor`. It will `prefix` all messages with the Output, and
-	// Processor names.
-	Prefixer := func() *Processor {
-		return NewProcessor("Prefixer", func(message *Message) {
-			prefix := fmt.Sprintf("Output: %s Processor: %s Content: ",
-				message.GetOutput().GetName(),
-				message.GetProcessor().GetName(),
-			)
-
-			message.SetProcessedContent(prefix + message.GetProcessedContent())
-		})
-	}
-
-	// Creates a `Processor`. It will `suffix` all messages with the specified
-	// `tag`.
-	SuffixBasedOnTag := func(tag string) *Processor {
-		return NewProcessor("SuffixBasedOnTag", func(message *Message) {
-			if message.ContainTag(tag) {
-				message.SetProcessedContent(message.GetProcessedContent() + " - My Suffix")
-			}
-		})
-	}
-
-	// Adds `Processor`s to `Output`s.
-	Console1ToStdOut.
-		AddProcessor(Prefixer()).
-		AddProcessor(SuffixBasedOnTag("SuffixIt"))
-	Console2ToStdOut.
-		AddProcessor(Prefixer()).
-		AddProcessor(SuffixBasedOnTag("SuffixIt"))
-	Console3ToStdOut.
-		AddProcessor(Prefixer()).
-		AddProcessor(SuffixBasedOnTag("SuffixIt"))
-
-	// Adds all `Output`s to logger.
-	testingLogger.
-		AddOutput(Console1ToStdOut).
-		AddOutput(Console2ToStdOut).
-		AddOutput(Console3ToStdOut)
-
-	// Prints with prefix, without suffix.
-	testingLogger.Println(level.Info, defaultContentOutput)
-
-	// Prints with prefix, and suffix.
-	testingLogger.PrintWithOptions(&Options{
-		OutputsNames:    []string{"Console 1"},
-		ProcessorsNames: []string{"Prefixer", "SuffixBasedOnTag"},
-		Tags:            []string{"SuffixIt"},
-	}, level.Info, defaultContentOutput)
-
-	// output:
-	// Output: Console 1 Processor: Prefixer Content: contentTest
-	// Output: Console 2 Processor: Prefixer Content: contentTest
-	// Output: Console 3 Processor: Prefixer Content: contentTest
-	// Output: Console 1 Processor: Prefixer Content: contentTest - My Suffix
-}
-
-// PrintPretty example.
-func ExampleNew_printPretty() {
-	type TestType struct {
-		Key1 string
-		Key2 int
-	}
-
-	New("Testing Logger", Console(level.Info)).PrintPretty(&TestType{
-		Key1: "text",
-		Key2: 12,
-	})
-
-	// output:
-	// {
-	// 	"Key1": "text",
-	// 	"Key2": 12
-	// }
-}
-
-// Flags example.
-func ExampleNew_flags() {
-	// Creates logger, and name it.
-	New("Testing Logger", Console(level.Info, Prefixer(defaultPrefixValue))).
-		// Message will be processed, and printed independent of `Level`
-		// restrictions.
-		PrintlnWithOptions(&Options{
-			Flag: flag.Force,
-		}, level.Debug, defaultContentOutput).
-
-		// Message will be processed, but not printed.
-		PrintlnWithOptions(&Options{
-			Flag: flag.Mute,
-		}, level.Info, defaultContentOutput).
-
-		// Message will not be processed, but printed.
-		PrintlnWithOptions(&Options{
-			Flag: flag.Skip,
-		}, level.Info, defaultContentOutput).
-
-		// Should not print - restricted by level.
-		Debugln(defaultContentOutput).
-
-		// SkipAndForce message will not be processed, but will be printed
-		// independent of `Level` restrictions.
-		PrintlnWithOptions(&Options{
-			Flag: flag.SkipAndForce,
-		}, level.Debug, defaultContentOutput).
-
-		// Message will not be processed, neither printed.
-		PrintlnWithOptions(&Options{
-			Flag: flag.SkipAndMute,
-		}, level.Debug, defaultContentOutput)
-
-	// output:
-	// My Prefix - contentTest
-	// contentTest
-	// contentTest
-}
-
-// Sinfo{f|lnf|ln} example.
-func ExampleNew_sinfoX() {
-	// Creates logger, and name it.
-	testingLogger := New("Testing Logger", Console(level.Info, Prefixer(defaultPrefixValue)))
-
-	sInfoResult := testingLogger.Sinfo(defaultContentOutput)
-	sInfofResult := testingLogger.Sinfof("%s", defaultContentOutput)
-	sInfolnfResult := testingLogger.Sinfolnf("%s", defaultContentOutput)
-	sInfolnResult := testingLogger.Sinfoln(defaultContentOutput)
-
-	fmt.Print(
-		defaultContentOutput == sInfoResult,
-		defaultContentOutput == sInfofResult,
-		defaultContentOutput+"\n" == sInfolnfResult,
-		defaultContentOutput == sInfolnResult,
-	)
-
-	// output:
-	// My Prefix - contentTestMy Prefix - contentTestMy Prefix - contentTest
-	// My Prefix - contentTest
-	// true true true true
-}
-
-// Serror{f|lnf|ln} example.
-//nolint:goerr113,lll
-func ExampleNew_serrorX() {
-	// Creates logger, and name it.
-	testingLogger := New("Testing Logger", Console(level.Info, Prefixer(defaultPrefixValue)))
-
-	sErrorResult := testingLogger.Serror(defaultContentOutput)
-
-	errExample := errors.New("Failed to reach something")
-	sErrorfResult := testingLogger.Serrorf("Failed to do something, %s", errExample)
-	sErrorlnfResult := testingLogger.Serrorlnf("Failed to do something, %s", errExample)
-
-	sErrorlnResult := testingLogger.Serrorln(defaultContentOutput)
-
-	fmt.Print(
-		sErrorResult.Error() == defaultContentOutput,
-		sErrorfResult.Error() == "Failed to do something, Failed to reach something",
-		sErrorlnfResult.Error() == "Failed to do something, Failed to reach something"+"\n",
-		sErrorlnResult.Error() == defaultContentOutput,
-	)
-
-	// output:
-	// 	My Prefix - contentTestMy Prefix - Failed to do something, Failed to reach somethingMy Prefix - Failed to do something, Failed to reach something
-	// My Prefix - contentTest
-	// true true true true
 }

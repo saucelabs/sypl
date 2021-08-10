@@ -2,14 +2,19 @@
 // Use of this source code is governed by a MIT
 // license that can be found in the LICENSE file.
 
-package sypl
+package output
 
 import (
 	"bufio"
 	"bytes"
 	"testing"
 
+	"github.com/saucelabs/sypl/internal/builtin"
 	"github.com/saucelabs/sypl/level"
+	"github.com/saucelabs/sypl/message"
+	"github.com/saucelabs/sypl/processor"
+	"github.com/saucelabs/sypl/shared"
+	"github.com/saucelabs/sypl/status"
 )
 
 func TestNewOutput(t *testing.T) {
@@ -28,7 +33,7 @@ func TestNewOutput(t *testing.T) {
 				name:     "Buffer",
 				maxLevel: level.Trace,
 			},
-			want: defaultPrefixValue + defaultContentOutput,
+			want: shared.DefaultPrefixValue + shared.DefaultContentOutput,
 		},
 	}
 	for _, tt := range tests {
@@ -36,24 +41,24 @@ func TestNewOutput(t *testing.T) {
 			var buf bytes.Buffer
 			bufWriter := bufio.NewWriter(&buf)
 
-			output := NewOutput(tt.args.name, tt.args.maxLevel, bufWriter, Prefixer(defaultPrefixValue))
+			output := NewOutput(tt.args.name, tt.args.maxLevel, bufWriter, processor.Prefixer(shared.DefaultPrefixValue))
 
-			message := NewMessage(&Sypl{}, &Output{}, &Processor{}, level.Info, defaultContentOutput)
-			message.SetSypl(nil)
-			message.SetOutput(nil)
-			message.SetProcessor(nil)
+			message := message.NewMessage(level.Info, shared.DefaultContentOutput)
 
-			if message.GetSypl() != nil &&
-				message.GetOutput() != nil &&
-				message.GetProcessor() != nil {
+			if message.GetComponentName() != "" &&
+				message.GetOutputName() != "" &&
+				message.GetProcessorName() != "" {
 				t.Error("Message should not have sypl, output, and processor")
 			}
 
-			for _, processor := range output.processors {
-				processor.Run(message)
+			for _, processor := range output.GetProcessors() {
+				_ = processor.Run(message)
 			}
 
-			if err := output.GetBuiltinLogger().OutputBuiltin(defaultCallDepth, message.GetProcessedContent()); err != nil {
+			if err := output.GetBuiltinLogger().OutputBuiltin(
+				builtin.DefaultCallDepth,
+				message.GetContent().GetProcessed(),
+			); err != nil {
 				t.Errorf("Failed to log to output: %w", err)
 			}
 
@@ -74,7 +79,7 @@ func TestOutput_GetStatus(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want bool
+		want status.Status
 	}{
 		{
 			name: "Should work",
@@ -82,13 +87,13 @@ func TestOutput_GetStatus(t *testing.T) {
 				name:     "Buffer",
 				maxLevel: level.Trace,
 			},
-			want: false,
+			want: status.Disabled,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			output := Console(level.Trace)
-			output.SetStatus(false)
+			output.SetStatus(status.Disabled)
 
 			if output.GetStatus() != tt.want {
 				t.Errorf("Got %v, want %v", output.GetStatus(), tt.want)

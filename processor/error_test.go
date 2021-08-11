@@ -40,7 +40,6 @@ func TestNewProcessingError(t *testing.T) {
 	}
 }
 
-// nolint:lll
 func TestProcessingError_Error(t *testing.T) {
 	type fields struct {
 		Cause         error
@@ -61,7 +60,7 @@ func TestProcessingError_Error(t *testing.T) {
 				OutputName:    "Test Output",
 				ProcessorName: "Test Processor",
 			},
-			want: `"Test Processor" processor of "Test Output" output. Error: "Error content". Original Message: "Message content"`,
+			want: `Output: "Test Output" Processor: "Test Processor" Error: "Error content" Original Message: "Message content"`,
 		},
 	}
 	for _, tt := range tests {

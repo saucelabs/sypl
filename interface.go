@@ -186,6 +186,9 @@ type ISypl interface {
 	meta.IMeta
 	Printers
 
+	// String interface.
+	String() string
+
 	// AddOutputs adds one or more outputs.
 	AddOutputs(outputs ...output.IOutput) ISypl
 
@@ -200,6 +203,9 @@ type ISypl interface {
 
 	// GetOutputsNames returns the names of the registered outputs.
 	GetOutputsNames() []string
+
+	// New creates a child logger.
+	New(name string) ISypl
 
 	// Process the message, per output, process accordingly.
 	Process(m message.IMessage)

@@ -7,6 +7,7 @@ package output
 import (
 	"io"
 
+	"github.com/saucelabs/sypl/formatter"
 	"github.com/saucelabs/sypl/internal/builtin"
 	"github.com/saucelabs/sypl/level"
 	"github.com/saucelabs/sypl/message"
@@ -18,11 +19,20 @@ import (
 type IOutput interface {
 	meta.IMeta
 
+	// String interface.
+	String() string
+
 	// GetBuiltinLogger returns the Golang's builtin logger.
 	GetBuiltinLogger() *builtin.Builtin
 
 	// SetBuiltinLogger sets the Golang's builtin logger.
 	SetBuiltinLogger(builtinLogger *builtin.Builtin)
+
+	// GetFormatter returns the formatter.
+	GetFormatter() formatter.IFormatter
+
+	// SetFormatter sets the formatter.
+	SetFormatter(fmtr formatter.IFormatter) IOutput
 
 	// GetMaxLevel returns the max level.
 	GetMaxLevel() level.Level

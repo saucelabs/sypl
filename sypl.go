@@ -5,11 +5,8 @@
 package sypl
 
 import (
-	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"strings"
 
@@ -152,7 +149,7 @@ func (sypl *sypl) Println(l level.Level, args ...interface{}) ISypl {
 // - Only exported fields of the data structure will be printed.
 // - Message isn't processed.
 func (sypl *sypl) PrintPretty(l level.Level, data interface{}) ISypl {
-	msg := message.NewMessage(l, fmt.Sprint(prettify(data)))
+	msg := message.NewMessage(l, fmt.Sprint(shared.Prettify(data)))
 	msg.SetFlag(flag.Skip)
 
 	return sypl.PrintMessage(msg)
@@ -165,7 +162,7 @@ func (sypl *sypl) PrintPretty(l level.Level, data interface{}) ISypl {
 // - Only exported fields of the data structure will be printed.
 // - Message isn't processed.
 func (sypl *sypl) PrintlnPretty(l level.Level, data interface{}) ISypl {
-	msg := message.NewMessage(l, fmt.Sprintln(prettify(data)))
+	msg := message.NewMessage(l, fmt.Sprintln(shared.Prettify(data)))
 	msg.SetFlag(flag.Skip)
 
 	return sypl.PrintMessage(msg)
@@ -383,6 +380,13 @@ func (sypl *sypl) GetOutputsNames() []string {
 	return outputsNames
 }
 
+// New creates a child logger. The child logger is an accurate, efficient and
+// shallow copy of the parent logger. Changes to internals, such as the state of
+// outputs, and processors, are reflected cross all other loggers.
+func (sypl *sypl) New(name string) ISypl {
+	return New(name, sypl.outputs...)
+}
+
 // Process the message, per output, process accordingly.
 func (sypl *sypl) Process(m message.IMessage) {
 	// Do nothing if message as no context, or flagged with `SkipAndMute`.
@@ -391,14 +395,24 @@ func (sypl *sypl) Process(m message.IMessage) {
 		return
 	}
 
-	outputsNames := strings.Join(sypl.GetOutputsNames(), ",")
+	// Should allows to filter logging by components names.
+	allowedComponents := os.Getenv("SYPL_DEBUG")
 
-	// Should allows to specify `Output`(s).
-	if len(m.GetOutputsNames()) > 0 {
-		outputsNames = strings.Join(m.GetOutputsNames(), ",")
+	if allowedComponents != "" &&
+		!strings.Contains(allowedComponents, sypl.GetName()) {
+		return
 	}
 
-	sypl.processOutputs(m, outputsNames)
+	// Should allows to specify `Output`(s).
+	outputsNames := sypl.GetOutputsNames()
+
+	if len(m.GetOutputsNames()) > 0 {
+		outputsNames = m.GetOutputsNames()
+	}
+
+	m.SetOutputsNames(outputsNames)
+
+	sypl.processOutputs(m, strings.Join(outputsNames, ","))
 
 	// Should exit if `level` is `Fatal`.
 	if m.GetLevel() == level.Fatal {
@@ -468,24 +482,6 @@ func (sypl *sypl) processOutputs(m message.IMessage, outputsNames string) {
 	}
 
 	_ = g.Wait()
-}
-
-// prettify encodes data returning its JSON-stringified version.
-//
-// Note: Only exported fields of the data structure will be printed.
-func prettify(data interface{}) string {
-	buf := new(bytes.Buffer)
-
-	enc := json.NewEncoder(buf)
-	enc.SetIndent("", "\t")
-
-	if err := enc.Encode(data); err != nil {
-		log.Println(shared.ErrorPrefix, "prettify: Failed to encode data.", err)
-
-		return ""
-	}
-
-	return buf.String()
 }
 
 //////

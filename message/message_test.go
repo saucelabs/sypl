@@ -5,9 +5,9 @@
 package message
 
 import (
-	"reflect"
 	"testing"
 
+	"github.com/go-test/deep"
 	"github.com/saucelabs/sypl/flag"
 	"github.com/saucelabs/sypl/level"
 	"github.com/saucelabs/sypl/shared"
@@ -92,8 +92,10 @@ func TestCopy(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			m := NewMessage(level.Info, shared.DefaultContentOutput)
 
-			if got := Copy(m); !reflect.DeepEqual(got, m) {
-				t.Errorf("Copy() = %v, want %v", got, m)
+			if res := deep.Equal(Copy(m), m); len(res) > 0 {
+				t.Log("Expected:", shared.Prettify(m))
+				t.Log("Got:", shared.Prettify(Copy(m)))
+				t.Error("Diff:", res)
 			}
 		})
 	}

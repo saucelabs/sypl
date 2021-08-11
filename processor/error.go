@@ -28,13 +28,13 @@ type ProcessingError struct {
 
 // Error interface implementation.
 func (p *ProcessingError) Error() string {
-	errMsg := fmt.Sprintf(`"%s" processor of "%s" output.`,
-		p.ProcessorName,
+	errMsg := fmt.Sprintf(`Output: "%s" Processor: "%s"`,
 		p.OutputName,
+		p.ProcessorName,
 	)
 
 	if p.Cause != nil {
-		errMsg = fmt.Sprintf(`%s Error: "%s".`, errMsg, p.Cause)
+		errMsg = fmt.Sprintf(`%s Error: "%s"`, errMsg, p.Cause)
 	}
 
 	if p.Message != nil {

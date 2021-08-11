@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/saucelabs/sypl/flag"
+	"github.com/saucelabs/sypl/formatter"
 	"github.com/saucelabs/sypl/internal/builtin"
 	"github.com/saucelabs/sypl/level"
 	"github.com/saucelabs/sypl/message"
@@ -28,6 +29,9 @@ import (
 type output struct {
 	// Golang's builtin logger.
 	builtinLogger *builtin.Builtin
+
+	// Formats the message.
+	formatter formatter.IFormatter
 
 	// Any message above the max level will not be written.
 	maxLevel level.Level
@@ -86,6 +90,18 @@ func (o *output) GetBuiltinLogger() *builtin.Builtin {
 // SetBuiltinLogger sets the Golang's builtin logger.
 func (o *output) SetBuiltinLogger(builtinLogger *builtin.Builtin) {
 	o.builtinLogger = builtinLogger
+}
+
+// GetFormatter returns the formatter.
+func (o *output) GetFormatter() formatter.IFormatter {
+	return o.formatter
+}
+
+// SetFormatter sets the formatter.
+func (o *output) SetFormatter(fmtr formatter.IFormatter) IOutput {
+	o.formatter = fmtr
+
+	return o
 }
 
 // GetMaxLevel returns the max level.
@@ -159,15 +175,22 @@ func (o *output) SetWriter(w io.Writer) {
 // TODO: Review complexity.
 //nolint:nestif
 func (o *output) Write(m message.IMessage) error {
-	processorsNames := strings.Join(o.GetProcessorsNames(), ",")
-
 	// Should allows to specify `Output`(s).
+	processorsNames := o.GetProcessorsNames()
+
 	if len(m.GetProcessorsNames()) > 0 {
-		processorsNames = strings.Join(m.GetProcessorsNames(), ",")
+		processorsNames = m.GetProcessorsNames()
 	}
 
+	m.SetProcessorsNames(processorsNames)
+
+	// Strips the last line break, which allows the content to be
+	// properly processed. It gets restore later.
+	// See: `Message.restoreLineBreak` documentation for more info.
+	m = recursiveLineBreakStripper(m)
+
 	// Executes processors in series.
-	o.processProcessors(m, processorsNames)
+	o.processProcessors(m, strings.Join(processorsNames, ","))
 
 	// Should print the message - regardless of the level, if flagged
 	// with `Force`.
@@ -247,11 +270,6 @@ func (o *output) processProcessors(m message.IMessage, processorsNames string) {
 			if strings.Contains(processorsNames, p.GetName()) {
 				m.SetProcessorName(p.GetName())
 
-				// Strips the last line break, which allows the content to be
-				// properly processed. It gets restore later.
-				// See: `Message.restoreLineBreak` documentation for more info.
-				m = recursiveLineBreakStripper(m)
-
 				if err := p.Run(m); err != nil {
 					log.Println(shared.ErrorPrefix,
 						processor.NewProcessingError(m, err))
@@ -263,6 +281,13 @@ func (o *output) processProcessors(m message.IMessage, processorsNames string) {
 
 // DRY for the writing step.
 func (o *output) write(m message.IMessage) error {
+	// Should only format if any.
+	if o.GetFormatter() != nil {
+		if err := o.GetFormatter().Run(m); err != nil {
+			log.Println(shared.ErrorPrefix, processor.NewProcessingError(m, err))
+		}
+	}
+
 	// Restore the line break, if needed.
 	if m.GetRestoreLineBreak() {
 		m.GetContent().SetProcessed(fmt.Sprintln(m.GetContent().GetProcessed()))

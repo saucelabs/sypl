@@ -12,6 +12,7 @@ import (
 
 	"github.com/saucelabs/sypl"
 	"github.com/saucelabs/sypl/flag"
+	"github.com/saucelabs/sypl/formatter"
 	"github.com/saucelabs/sypl/level"
 	"github.com/saucelabs/sypl/message"
 	"github.com/saucelabs/sypl/options"
@@ -19,6 +20,7 @@ import (
 	"github.com/saucelabs/sypl/processor"
 	"github.com/saucelabs/sypl/safebuffer"
 	"github.com/saucelabs/sypl/shared"
+	"github.com/saucelabs/sypl/status"
 )
 
 // NonChained is a non-chained example of creating, and setting up a `sypl`
@@ -192,8 +194,6 @@ func ExampleNew_printWithOptions() {
 
 	fmt.Println(strings.EqualFold(c1buf.String(), "Output: Buffer 1 Processor: Prefixer Content: contentTest - My Suffix"))
 
-	// fmt.Print(c1buf.String(), c2buf.String(), c3buf.String())
-
 	// output:
 	// true
 	// true
@@ -284,4 +284,142 @@ func ExampleNew_serrorX() {
 	// contentTestFailed to do something, Failed to reach somethingFailed to do something, Failed to reach something
 	// contentTest
 	// true true true true
+}
+
+// SYPL_DEBUG (filter) example.
+func ExampleNew_syplDebug() {
+	os.Setenv("SYPL_DEBUG", "pod,svc")
+
+	// Creates loggers, and name it.
+	sypl.New("pod").AddOutputs(output.Console(level.Info)).Infoln("pod created")
+	sypl.New("svc").AddOutputs(output.Console(level.Info)).Infoln("svc created")
+	sypl.New("vs").AddOutputs(output.Console(level.Info)).Infoln("vs created")
+	sypl.New("np").AddOutputs(output.Console(level.Info)).Infoln("np created")
+	sypl.New("cm").AddOutputs(output.Console(level.Info)).Infoln("cm created")
+
+	os.Unsetenv("SYPL_DEBUG")
+
+	// output:
+	// pod created
+	// svc created
+}
+
+// Text formatter example.
+func ExampleNew_textFormatter() {
+	buf, o := output.SafeBuffer(level.Info)
+	o.SetFormatter(formatter.Text())
+
+	// Creates logger, and name it.
+	sypl.New(shared.DefaultComponentNameOutput).
+		AddOutputs(o).
+		PrintWithOptionsln(&options.Options{
+			Fields: options.Fields{
+				"field1": "value1",
+				"field2": "value2",
+				"field3": "value3",
+			},
+		}, level.Info, shared.DefaultContentOutput)
+
+	s := buf.String()
+
+	fmt.Print(
+		strings.Contains(s, shared.DefaultContentOutput),
+		strings.Contains(s, "field1=value1"),
+		strings.Contains(s, "field2=value2"),
+		strings.Contains(s, "field3=value3"),
+		strings.Contains(s, "component="),
+		strings.Contains(s, "level="),
+		strings.Contains(s, "timestamp="),
+	)
+
+	// Prints:
+	//
+	// component=componentNameTest level=info field1=value1 field2=value2 field3=value3 timestamp=2021-08-10T22:50:36-07:00
+
+	// output:
+	// true true true true true true true
+}
+
+// JSON formatter example.
+func ExampleNew_jsonFormatter() {
+	buf, o := output.SafeBuffer(level.Info)
+	o.SetFormatter(formatter.JSON())
+
+	sypl.New(shared.DefaultComponentNameOutput).
+		AddOutputs(o).
+		PrintWithOptions(&options.Options{
+			Fields: options.Fields{
+				"field1": "value1",
+				"field2": 1,
+				"field3": true,
+				"field4": []string{"1", "2"},
+			},
+		}, level.Info, shared.DefaultContentOutput)
+
+	s := buf.String()
+
+	fmt.Print(
+		strings.Contains(s, `"component"`),
+		strings.Contains(s, `"content"`),
+		strings.Contains(s, `"field1"`),
+		strings.Contains(s, `"field2"`),
+		strings.Contains(s, `"field3"`),
+		strings.Contains(s, `"field4"`),
+		strings.Contains(s, `"level"`),
+		strings.Contains(s, `"timestamp"`),
+	)
+
+	// Prints:
+	//
+	// {
+	// 	"component": "componentNameTest",
+	// 	"content": "contentTest",
+	// 	"field1": "value1",
+	// 	"field2": 1,
+	// 	"field3": true,
+	// 	"field4": [
+	// 		"1",
+	// 		"2"
+	// 	],
+	// 	"level": "info",
+	// 	"timestamp": "2021-08-10T23:27:25-07:00"
+	// }
+
+	// output:
+	// true true true true true true true true
+}
+
+// Simulates a problematic processor.
+//nolint:lll
+func ExampleNew_errorSimulator() {
+	// Creates logger, and name it.
+	sypl.New(shared.DefaultComponentNameOutput).
+		AddOutputs(output.Console(level.Info, processor.ErrorSimulator("Test"))).
+		Infoln(shared.DefaultContentOutput)
+
+	// Prints:
+	//
+	// 2021/08/10 20:00:56 [sypl] [Error] Output: "Console" Processor: "ErrorSimulator" Error: "Test" Original Message: "contentTest"
+}
+
+// Child loggers example.
+func ExampleNew_childLoggers() {
+	// Creates loggers, and name it.
+	k8Logger := sypl.New("k8").
+		AddOutputs(output.Console(level.Info).SetFormatter(formatter.Text()))
+
+	k8Logger.Infoln("k8 connected")
+
+	podLogger := k8Logger.New("pod")
+	podLogger.Infoln("pod created")
+
+	k8Logger.GetOutput("Console").SetStatus(status.Disabled)
+
+	k8Logger.Infoln("k8 connected")
+	podLogger.Infoln("pod created")
+
+	// Prints:
+	//
+	// k8 connected component=k8 level=info timestamp=2021-08-11T09:24:13-07:00
+	// pod created component=pod level=info timestamp=2021-08-11T09:24:13-07:00
 }

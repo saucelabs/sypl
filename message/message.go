@@ -34,10 +34,10 @@ type message struct {
 	Level level.Level
 
 	// Output in use.
-	OutputName string
+	OutputName string `json:"-"`
 
 	// Processor in use.
-	ProcessorName string
+	ProcessorName string `json:"-"`
 
 	// If set to true, a new line break will be added before printing.
 	//
@@ -46,7 +46,7 @@ type message struct {
 	// the final stage - before printing, the line break is restored, if needed.
 	// (see: `write`). This flag controls/indicates if the line break should be
 	// restored or not.
-	RestoreLineBreak bool
+	RestoreLineBreak bool `json:"-"`
 
 	// tags are indicators consumed by `Output`s and `Processor`s.
 	tags *treeset.Set

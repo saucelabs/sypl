@@ -13,6 +13,9 @@ import (
 type IProcessor interface {
 	meta.IMeta
 
+	// String interface.
+	String() string
+
 	// Run the processor, if enabled.
 	Run(m message.IMessage) error
 }

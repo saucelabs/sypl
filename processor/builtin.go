@@ -121,33 +121,6 @@ func ErrorSimulator(msg string) IProcessor {
 	})
 }
 
-// FieldsToTextProcessor is a text fields processor.
-func FieldsToTextProcessor() IProcessor {
-	return NewProcessor("FieldsToText", func(m message.IMessage) error {
-		if len(m.GetFields()) == 0 {
-			return nil
-		}
-
-		finalMessage := m.GetContent().GetProcessed()
-
-		buf := new(strings.Builder)
-
-		for k, v := range m.GetFields() {
-			fmt.Fprintf(buf, "%s=%v ", k, v)
-		}
-
-		processedField := strings.TrimSuffix(buf.String(), " ")
-
-		if m.GetFields() != nil {
-			finalMessage = fmt.Sprintf("%s %s", finalMessage, processedField)
-		}
-
-		m.GetContent().SetProcessed(finalMessage)
-
-		return nil
-	})
-}
-
 // ForceBasedOnLevel force messages to be printed based on the specified levels.
 func ForceBasedOnLevel(levels ...level.Level) IProcessor {
 	return NewProcessor("ForceBasedOnLevel", func(m message.IMessage) error {

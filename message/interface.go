@@ -15,6 +15,9 @@ import (
 
 // IMessage specifies what a message does.
 type IMessage interface {
+	// String interface.
+	String() string
+
 	// GetComponentName returns the component name.
 	GetComponentName() string
 

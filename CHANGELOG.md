@@ -11,6 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Add `doc.go` for all packages.
     - Update `README.md` to point to these new `doc.go`.
 
+
+## [1.3.2] - 2021-08-13
+## Added
+- Adds `PrintMessagerPerOutput` which allows you to concurrently print messages, each one, at the specified level and to the specified output. If the named output doesn't exits, the message will not be printed.
+    - Cover with test.
+
+## Changed
+- Adds `output` field to `Text` and `JSON` formatters.
+
 ## [1.3.1] - 2021-08-11
 ## Added
 - Adds the ability to create child loggers (`New`). The child logger is an accurate, and efficient shallow copy of the parent logger. Changes to internals, such as the state of outputs, and processors, are reflected cross all other loggers.
@@ -20,12 +29,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Timestamp (RFC3339).
 - Add more tests. Covered `ErrorSimulator` processor.
 - Adds ability to filter logging message. See `example_test.go/ExampleNew_childLoggers` for example. Having many loggers can be, sometimes, noisy. Also, sometimes - for debugging reason, you may want to see only `componentA`, and `componentC`. Now, it's possible. Just specify the name of the components (comma-separated list) in the `SYPL_DEBUG` env var.
-
-## Changed
-- Updates `FieldsToText`. Now it automatically adds:
-    - Component name
-    - Level
-    - Timestamp (RFC3339).
 
 ## [1.3.0] - 2021-08-10
 ### Added

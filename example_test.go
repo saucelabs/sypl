@@ -226,17 +226,17 @@ func ExampleNew_flags() {
 	sypl.New("Testing Logger", output.Console(level.Info, processor.Prefixer(shared.DefaultPrefixValue))).
 		// Message will be processed, and printed independent of `Level`
 		// restrictions.
-		PrintWithOptionsln(&options.Options{
+		PrintlnWithOptions(&options.Options{
 			Flag: flag.Force,
 		}, level.Debug, shared.DefaultContentOutput).
 
 		// Message will be processed, but not printed.
-		PrintWithOptionsln(&options.Options{
+		PrintlnWithOptions(&options.Options{
 			Flag: flag.Mute,
 		}, level.Info, shared.DefaultContentOutput).
 
 		// Message will not be processed, but printed.
-		PrintWithOptionsln(&options.Options{
+		PrintlnWithOptions(&options.Options{
 			Flag: flag.Skip,
 		}, level.Info, shared.DefaultContentOutput).
 
@@ -245,12 +245,12 @@ func ExampleNew_flags() {
 
 		// SkipAndForce message will not be processed, but will be printed
 		// independent of `Level` restrictions.
-		PrintWithOptionsln(&options.Options{
+		PrintlnWithOptions(&options.Options{
 			Flag: flag.SkipAndForce,
 		}, level.Debug, shared.DefaultContentOutput).
 
 		// Message will not be processed, neither printed.
-		PrintWithOptionsln(&options.Options{
+		PrintlnWithOptions(&options.Options{
 			Flag: flag.SkipAndMute,
 		}, level.Debug, shared.DefaultContentOutput)
 
@@ -288,9 +288,9 @@ func ExampleNew_serrorX() {
 
 // SYPL_DEBUG (filter) example.
 func ExampleNew_syplDebug() {
+	// Creates logger, and name it.
 	os.Setenv("SYPL_DEBUG", "pod,svc")
 
-	// Creates loggers, and name it.
 	sypl.New("pod").AddOutputs(output.Console(level.Info)).Infoln("pod created")
 	sypl.New("svc").AddOutputs(output.Console(level.Info)).Infoln("svc created")
 	sypl.New("vs").AddOutputs(output.Console(level.Info)).Infoln("vs created")
@@ -312,7 +312,7 @@ func ExampleNew_textFormatter() {
 	// Creates logger, and name it.
 	sypl.New(shared.DefaultComponentNameOutput).
 		AddOutputs(o).
-		PrintWithOptionsln(&options.Options{
+		PrintlnWithOptions(&options.Options{
 			Fields: options.Fields{
 				"field1": "value1",
 				"field2": "value2",
@@ -345,6 +345,7 @@ func ExampleNew_jsonFormatter() {
 	buf, o := output.SafeBuffer(level.Info)
 	o.SetFormatter(formatter.JSON())
 
+	// Creates logger, and name it.
 	sypl.New(shared.DefaultComponentNameOutput).
 		AddOutputs(o).
 		PrintWithOptions(&options.Options{
@@ -360,7 +361,7 @@ func ExampleNew_jsonFormatter() {
 
 	fmt.Print(
 		strings.Contains(s, `"component"`),
-		strings.Contains(s, `"content"`),
+		strings.Contains(s, `"message"`),
 		strings.Contains(s, `"field1"`),
 		strings.Contains(s, `"field2"`),
 		strings.Contains(s, `"field3"`),
@@ -404,7 +405,7 @@ func ExampleNew_errorSimulator() {
 
 // Child loggers example.
 func ExampleNew_childLoggers() {
-	// Creates loggers, and name it.
+	// Creates logger, and name it.
 	k8Logger := sypl.New("k8").
 		AddOutputs(output.Console(level.Info).SetFormatter(formatter.Text()))
 
@@ -422,4 +423,25 @@ func ExampleNew_childLoggers() {
 	//
 	// k8 connected component=k8 level=info timestamp=2021-08-11T09:24:13-07:00
 	// pod created component=pod level=info timestamp=2021-08-11T09:24:13-07:00
+}
+
+// PrintMessagesToOutputs example.
+func ExampleNew_printMessagesToOutputs() {
+	// Creates logger, and name it.
+	sypl.New("pod").AddOutputs(
+		output.NewOutput("Console 1", level.Trace, os.Stdout).SetFormatter(formatter.Text()),
+		output.NewOutput("Console 2", level.Trace, os.Stdout).SetFormatter(formatter.Text()),
+		output.NewOutput("Console 3", level.Trace, os.Stdout).SetFormatter(formatter.Text()),
+	).PrintMessagesToOutputs(
+		sypl.MessageToOutput{OutputName: "Console 1", Level: level.Info, Content: "Test 1\n"},
+		sypl.MessageToOutput{OutputName: "Console 1", Level: level.Debug, Content: "Test 2\n"},
+		sypl.MessageToOutput{OutputName: "Console 2", Level: level.Info, Content: "Test 3\n"},
+		sypl.MessageToOutput{OutputName: "Console 4", Level: level.Info, Content: "Test 4\n"},
+	)
+
+	// Prints:
+	//
+	// output=Console 2 level=Info message=Test 3
+	// output=Console 1 level=Debug message=Test 2
+	// output=Console 1 level=Info message=Test 1
 }

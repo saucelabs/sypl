@@ -3,6 +3,7 @@ package formatter
 import (
 	"fmt"
 	"strings"
+	"text/tabwriter"
 	"time"
 
 	"github.com/saucelabs/sypl/message"
@@ -22,8 +23,10 @@ func JSON() IFormatter {
 		mM := map[string]interface{}{}
 
 		mM["component"] = m.GetComponentName()
-		mM["content"] = m.GetContent().GetProcessed()
+		mM["output"] = m.GetOutputName()
 		mM["level"] = strings.ToLower(m.GetLevel().String())
+		mM["timestamp"] = m.GetTimestamp().Format(time.RFC3339)
+		mM["message"] = m.GetContent().GetProcessed()
 
 		// Should only process fields if any.
 		if len(m.GetFields()) != 0 {
@@ -31,8 +34,6 @@ func JSON() IFormatter {
 				mM[k] = v
 			}
 		}
-
-		mM["timestamp"] = m.GetTimestamp().Format(time.RFC3339)
 
 		m.GetContent().SetProcessed(shared.Prettify(mM))
 
@@ -46,27 +47,28 @@ func JSON() IFormatter {
 // - Timestamp (RFC3339).
 func Text() IFormatter {
 	return processor.NewProcessor("Text", func(m message.IMessage) error {
-		finalMessage := m.GetContent().GetProcessed()
-
 		buf := new(strings.Builder)
 
-		fmt.Fprintf(buf, "component=%v ", m.GetComponentName())
-		fmt.Fprintf(buf, "level=%v ", strings.ToLower(m.GetLevel().String()))
+		// Observe that the third line has no trailing tab,
+		// so its final cell is not part of an aligned column.
+		w := tabwriter.NewWriter(buf, 0, 0, 1, ' ', 0)
+
+		fmt.Fprintf(w, "component=%s\t", m.GetComponentName())
+		fmt.Fprintf(w, "output=%s\t", strings.ToLower(m.GetOutputName()))
+		fmt.Fprintf(w, "level=%s\t", strings.ToLower(m.GetLevel().String()))
+		fmt.Fprintf(w, "timestamp=%s\t", m.GetTimestamp().Format(time.RFC3339))
+		fmt.Fprintf(w, "message=%s\t", m.GetContent().GetProcessed())
 
 		// Should only process fields if any.
 		if len(m.GetFields()) != 0 {
 			for k, v := range m.GetFields() {
-				fmt.Fprintf(buf, "%s=%v ", k, v)
+				fmt.Fprintf(w, "%s=%v\t", k, v)
 			}
 		}
 
-		fmt.Fprintf(buf, "timestamp=%v ", m.GetTimestamp().Format(time.RFC3339))
+		w.Flush()
 
-		processedField := strings.TrimSuffix(buf.String(), " ")
-
-		finalMessage = fmt.Sprintf("%s %s", finalMessage, processedField)
-
-		m.GetContent().SetProcessed(finalMessage)
+		m.GetContent().SetProcessed(buf.String())
 
 		return nil
 	})

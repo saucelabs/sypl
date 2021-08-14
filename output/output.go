@@ -58,22 +58,22 @@ func (o output) String() string {
 // IMeta interface implementation.
 //////
 
-// Returns the processor name.
+// GetName returns the processor name.
 func (o *output) GetName() string {
 	return o.name
 }
 
-// Sets the processor name.
+// SetName sets the processor name.
 func (o *output) SetName(name string) {
 	o.name = name
 }
 
-// Returns the processor status.
+// GetStatus returns the processor status.
 func (o *output) GetStatus() status.Status {
 	return o.status
 }
 
-// Sets the processor status.
+// SetStatus sets the processor status.
 func (o *output) SetStatus(s status.Status) {
 	o.status = s
 }

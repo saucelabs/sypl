@@ -14,31 +14,30 @@ import (
 
 // IBasePrinter specifies the foundation for other printers.
 type IBasePrinter interface {
-	// PrintMessage prints the specified message. It's a powerful option because
-	// it gives full-control over the message. Use `NewMessage` to create the
-	// message.
-	PrintMessage(m message.IMessage) ISypl
+	// PrintMessage prints messages. It's a powerful option because it gives
+	// full-control over the message. Use `NewMessage` to create the message.
+	PrintMessage(messages ...message.IMessage) ISypl
 
 	// PrintWithOptions is a more flexible way of printing, allowing to specify
 	// a few message's options. For full-control over the message is possible
 	// via `PrintMessage`.
 	PrintWithOptions(o *options.Options, l level.Level, args ...interface{}) ISypl
 
-	// PrintWithOptionsf prints according with the specified format. It's a more
+	// PrintfWithOptions prints according with the specified format. It's a more
 	// flexible way of printing, allowing to specify a few message's options.
 	// For full-control over the message is possible via `PrintMessage`.
-	PrintWithOptionsf(o *options.Options, l level.Level, format string, args ...interface{}) ISypl
+	PrintfWithOptions(o *options.Options, l level.Level, format string, args ...interface{}) ISypl
 
-	// PrintWithOptionsf prints according with the specified format, also adding
+	// PrintfWithOptions prints according with the specified format, also adding
 	// a new line to the end. It's a more flexible way of printing, allowing to
 	// specify a few message's options. For full-control over the message is
 	// possible via `PrintMessage`.
-	PrintWithOptionslnf(o *options.Options, l level.Level, format string, args ...interface{}) ISypl
+	PrintlnfWithOptions(o *options.Options, l level.Level, format string, args ...interface{}) ISypl
 
-	// PrintWithOptionsf prints, also adding a new line to the end. It's a more
+	// PrintfWithOptions prints, also adding a new line to the end. It's a more
 	// flexible way of printing, allowing to specify a few message's options.
 	// For full-control over the message is possible via `PrintMessage`.
-	PrintWithOptionsln(o *options.Options, l level.Level, args ...interface{}) ISypl
+	PrintlnWithOptions(o *options.Options, l level.Level, args ...interface{}) ISypl
 }
 
 // IBasicPrinter specifies the basic printers.
@@ -73,6 +72,12 @@ type IConvenientPrinter interface {
 	// - Only exported fields of the data structure will be printed.
 	// - Message isn't processed.
 	PrintlnPretty(l level.Level, data interface{}) ISypl
+
+	// PrintMessagerPerOutput allows you to concurrently print messages, each
+	// one, at the specified level and to the specified output.
+	//
+	// Note: If the named output doesn't exits, the message will not be printed.
+	PrintMessagesToOutputs(messagesToOutputs ...MessageToOutput) ISypl
 }
 
 // ILeveledPrinter specifies the leveled printers.
@@ -173,18 +178,18 @@ type ILeveledPrinter interface {
 	Traceln(args ...interface{}) ISypl
 }
 
-// Printers is all available printers.
-type Printers interface {
+// IPrinters is all available printers.
+type IPrinters interface {
 	IBasePrinter
 	IBasicPrinter
 	IConvenientPrinter
 	ILeveledPrinter
 }
 
-// ISypl specified what a Sypl does.
+// ISypl specified what a Sypl logger does.
 type ISypl interface {
 	meta.IMeta
-	Printers
+	IPrinters
 
 	// String interface.
 	String() string
@@ -192,10 +197,10 @@ type ISypl interface {
 	// AddOutputs adds one or more outputs.
 	AddOutputs(outputs ...output.IOutput) ISypl
 
-	// Returns the registered output by its name. If not found, will be nil.
+	// GetOutput returns the registered output by its name. If not found, will be nil.
 	GetOutput(name string) output.IOutput
 
-	// Sets one or more outputs.
+	// SetOutputs sets one or more outputs. Use to update output(s).
 	SetOutputs(outputs ...output.IOutput)
 
 	// GetOutputs returns registered outputs.
@@ -207,6 +212,6 @@ type ISypl interface {
 	// New creates a child logger.
 	New(name string) ISypl
 
-	// Process the message, per output, process accordingly.
-	Process(m message.IMessage)
+	// Process messages, per output, and process accordingly.
+	process(messages ...message.IMessage)
 }

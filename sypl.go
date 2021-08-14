@@ -20,15 +20,28 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
+// MessageToOutput defines a `Message` to printed at the specified `Level`, and
+// to the specified `Output`.
+type MessageToOutput struct {
+	// Content to be printed.
+	Content string
+
+	// Level of the message.
+	Level level.Level
+
+	// OutputName name of the output.
+	OutputName string
+}
+
 // Sypl logger definition.
-type sypl struct {
+type Sypl struct {
 	name    string
 	outputs []output.IOutput
 	status  status.Status
 }
 
 // String interface implementation.
-func (sypl sypl) String() string {
+func (sypl Sypl) String() string {
 	return sypl.name
 }
 
@@ -36,23 +49,23 @@ func (sypl sypl) String() string {
 // IMeta interface implementation.
 //////
 
-// Returns the sypl name.
-func (sypl *sypl) GetName() string {
+// GetName returns the sypl name.
+func (sypl *Sypl) GetName() string {
 	return sypl.name
 }
 
-// Returns the sypl status.
-func (sypl *sypl) GetStatus() status.Status {
-	return sypl.status
-}
-
-// Sets the sypl name.
-func (sypl *sypl) SetName(name string) {
+// SetName sets the sypl name.
+func (sypl *Sypl) SetName(name string) {
 	sypl.name = name
 }
 
-// Sets the sypl status.
-func (sypl *sypl) SetStatus(s status.Status) {
+// GetStatus returns the sypl status.
+func (sypl *Sypl) GetStatus() status.Status {
+	return sypl.status
+}
+
+// SetStatus sets the sypl status.
+func (sypl *Sypl) SetStatus(s status.Status) {
 	sypl.status = s
 }
 
@@ -60,11 +73,12 @@ func (sypl *sypl) SetStatus(s status.Status) {
 // IBasePrinter interface implementation.
 //////
 
-// PrintMessage prints the specified message. It's a powerful option because
+// PrintMessage prints messages. It's a powerful option because it gives
+// full-control over the message. Use `NewMessage` to create the message.
 // it gives full-control over the message. Use `NewMessage` to create the
 // message.
-func (sypl *sypl) PrintMessage(m message.IMessage) ISypl {
-	sypl.Process(m)
+func (sypl *Sypl) PrintMessage(messages ...message.IMessage) ISypl {
+	sypl.process(messages...)
 
 	return sypl
 }
@@ -72,7 +86,7 @@ func (sypl *sypl) PrintMessage(m message.IMessage) ISypl {
 // PrintWithOptions is a more flexible way of printing, allowing to specify
 // a few message's options. For full-control over the message is possible
 // via `PrintMessage`.
-func (sypl *sypl) PrintWithOptions(o *options.Options, l level.Level, args ...interface{}) ISypl {
+func (sypl *Sypl) PrintWithOptions(o *options.Options, l level.Level, args ...interface{}) ISypl {
 	m := message.NewMessage(l, fmt.Sprint(args...))
 
 	sypl.PrintMessage(mergeOptions(m, o))
@@ -80,10 +94,10 @@ func (sypl *sypl) PrintWithOptions(o *options.Options, l level.Level, args ...in
 	return sypl
 }
 
-// PrintWithOptionsf prints according with the specified format. It's a more
+// PrintfWithOptions prints according with the specified format. It's a more
 // flexible way of printing, allowing to specify a few message's options.
 // For full-control over the message is possible via `PrintMessage`.
-func (sypl *sypl) PrintWithOptionsf(o *options.Options, l level.Level, format string, args ...interface{}) ISypl {
+func (sypl *Sypl) PrintfWithOptions(o *options.Options, l level.Level, format string, args ...interface{}) ISypl {
 	m := message.NewMessage(l, fmt.Sprintf(format, args...))
 
 	sypl.PrintMessage(mergeOptions(m, o))
@@ -91,11 +105,11 @@ func (sypl *sypl) PrintWithOptionsf(o *options.Options, l level.Level, format st
 	return sypl
 }
 
-// PrintWithOptionsf prints according with the specified format, also adding
+// PrintfWithOptions prints according with the specified format, also adding
 // a new line to the end. It's a more flexible way of printing, allowing to
 // specify a few message's options. For full-control over the message is
 // possible via `PrintMessage`.
-func (sypl *sypl) PrintWithOptionslnf(o *options.Options, l level.Level, format string, args ...interface{}) ISypl {
+func (sypl *Sypl) PrintlnfWithOptions(o *options.Options, l level.Level, format string, args ...interface{}) ISypl {
 	m := message.NewMessage(l, fmt.Sprintf(format+"\n", args...))
 
 	sypl.PrintMessage(mergeOptions(m, o))
@@ -103,10 +117,10 @@ func (sypl *sypl) PrintWithOptionslnf(o *options.Options, l level.Level, format 
 	return sypl
 }
 
-// PrintWithOptionsf prints, also adding a new line to the end. It's a more
+// PrintfWithOptions prints, also adding a new line to the end. It's a more
 // flexible way of printing, allowing to specify a few message's options.
 // For full-control over the message is possible via `PrintMessage`.
-func (sypl *sypl) PrintWithOptionsln(o *options.Options, l level.Level, args ...interface{}) ISypl {
+func (sypl *Sypl) PrintlnWithOptions(o *options.Options, l level.Level, args ...interface{}) ISypl {
 	m := message.NewMessage(l, fmt.Sprintln(args...))
 
 	sypl.PrintMessage(mergeOptions(m, o))
@@ -119,24 +133,24 @@ func (sypl *sypl) PrintWithOptionsln(o *options.Options, l level.Level, args ...
 //////
 
 // Print just prints.
-func (sypl *sypl) Print(l level.Level, args ...interface{}) ISypl {
+func (sypl *Sypl) Print(l level.Level, args ...interface{}) ISypl {
 	return sypl.PrintWithOptions(options.NewDefaultOptions(), l, args...)
 }
 
 // Printf prints according with the specified format.
-func (sypl *sypl) Printf(l level.Level, format string, args ...interface{}) ISypl {
-	return sypl.PrintWithOptionsf(options.NewDefaultOptions(), l, format, args...)
+func (sypl *Sypl) Printf(l level.Level, format string, args ...interface{}) ISypl {
+	return sypl.PrintfWithOptions(options.NewDefaultOptions(), l, format, args...)
 }
 
 // Printlnf prints according with the specified format, also adding a new line
 // to the end.
-func (sypl *sypl) Printlnf(l level.Level, format string, args ...interface{}) ISypl {
-	return sypl.PrintWithOptionslnf(options.NewDefaultOptions(), l, format, args...)
+func (sypl *Sypl) Printlnf(l level.Level, format string, args ...interface{}) ISypl {
+	return sypl.PrintlnfWithOptions(options.NewDefaultOptions(), l, format, args...)
 }
 
 // Println prints, also adding a new line to the end.
-func (sypl *sypl) Println(l level.Level, args ...interface{}) ISypl {
-	return sypl.PrintWithOptionsln(options.NewDefaultOptions(), l, args...)
+func (sypl *Sypl) Println(l level.Level, args ...interface{}) ISypl {
+	return sypl.PrintlnWithOptions(options.NewDefaultOptions(), l, args...)
 }
 
 //////
@@ -148,7 +162,7 @@ func (sypl *sypl) Println(l level.Level, args ...interface{}) ISypl {
 // Notes:
 // - Only exported fields of the data structure will be printed.
 // - Message isn't processed.
-func (sypl *sypl) PrintPretty(l level.Level, data interface{}) ISypl {
+func (sypl *Sypl) PrintPretty(l level.Level, data interface{}) ISypl {
 	msg := message.NewMessage(l, fmt.Sprint(shared.Prettify(data)))
 	msg.SetFlag(flag.Skip)
 
@@ -161,11 +175,30 @@ func (sypl *sypl) PrintPretty(l level.Level, data interface{}) ISypl {
 // Notes:
 // - Only exported fields of the data structure will be printed.
 // - Message isn't processed.
-func (sypl *sypl) PrintlnPretty(l level.Level, data interface{}) ISypl {
+func (sypl *Sypl) PrintlnPretty(l level.Level, data interface{}) ISypl {
 	msg := message.NewMessage(l, fmt.Sprintln(shared.Prettify(data)))
 	msg.SetFlag(flag.Skip)
 
 	return sypl.PrintMessage(msg)
+}
+
+// PrintMessagerPerOutput allows you to concurrently print messages, each one,
+// at the specified level and to the specified output.
+//
+// Note: If the named output doesn't exits, the message will not be printed.
+func (sypl *Sypl) PrintMessagesToOutputs(messagesToOutputs ...MessageToOutput) ISypl {
+	messages := []message.IMessage{}
+
+	for _, mto := range messagesToOutputs {
+		m := message.NewMessage(mto.Level, mto.Content)
+		m.SetOutputsNames([]string{mto.OutputName})
+
+		messages = append(messages, m)
+	}
+
+	sypl.process(messages...)
+
+	return sypl
 }
 
 //////
@@ -173,50 +206,50 @@ func (sypl *sypl) PrintlnPretty(l level.Level, data interface{}) ISypl {
 //////
 
 // Fatal prints, and exit with os.Exit(1).
-func (sypl *sypl) Fatal(args ...interface{}) ISypl {
+func (sypl *Sypl) Fatal(args ...interface{}) ISypl {
 	return sypl.Print(level.Fatal, args...)
 }
 
 // Fatalf prints according with the format, and exit with os.Exit(1).
-func (sypl *sypl) Fatalf(format string, args ...interface{}) ISypl {
+func (sypl *Sypl) Fatalf(format string, args ...interface{}) ISypl {
 	return sypl.Printf(level.Fatal, format, args...)
 }
 
 // Fatallnf prints according with the format, also adding a new line to the
 // end, and exit with os.Exit(1).
-func (sypl *sypl) Fatallnf(format string, args ...interface{}) ISypl {
+func (sypl *Sypl) Fatallnf(format string, args ...interface{}) ISypl {
 	return sypl.Printlnf(level.Fatal, format, args...)
 }
 
 // Fatalln prints, also adding a new line and the end, and exit with os.Exit(1).
-func (sypl *sypl) Fatalln(args ...interface{}) ISypl {
+func (sypl *Sypl) Fatalln(args ...interface{}) ISypl {
 	return sypl.Println(level.Fatal, args...)
 }
 
 // Error prints @ the Error level.
-func (sypl *sypl) Error(args ...interface{}) ISypl {
+func (sypl *Sypl) Error(args ...interface{}) ISypl {
 	return sypl.Print(level.Error, args...)
 }
 
 // Errorf prints according with the format @ the Error level.
-func (sypl *sypl) Errorf(format string, args ...interface{}) ISypl {
+func (sypl *Sypl) Errorf(format string, args ...interface{}) ISypl {
 	return sypl.Printf(level.Error, format, args...)
 }
 
 // Errorlnf prints according with the format @ the Error level, also adding
 // a new line to the end.
-func (sypl *sypl) Errorlnf(format string, args ...interface{}) ISypl {
+func (sypl *Sypl) Errorlnf(format string, args ...interface{}) ISypl {
 	return sypl.Printlnf(level.Error, format, args...)
 }
 
 // Errorln prints, also adding a new line to the end @ the Error level.
-func (sypl *sypl) Errorln(args ...interface{}) ISypl {
+func (sypl *Sypl) Errorln(args ...interface{}) ISypl {
 	return sypl.Println(level.Error, args...)
 }
 
 // Serror prints like Error, and returns an error with the non-processed
 // content.
-func (sypl *sypl) Serror(args ...interface{}) error {
+func (sypl *Sypl) Serror(args ...interface{}) error {
 	sypl.Print(level.Error, args...)
 
 	return errors.New(fmt.Sprint(args...))
@@ -224,7 +257,7 @@ func (sypl *sypl) Serror(args ...interface{}) error {
 
 // Serrorf prints like Errorf, and returns an error with the non-processed
 // content.
-func (sypl *sypl) Serrorf(format string, args ...interface{}) error {
+func (sypl *Sypl) Serrorf(format string, args ...interface{}) error {
 	sypl.Printf(level.Error, format, args...)
 
 	return fmt.Errorf(format, args...)
@@ -232,7 +265,7 @@ func (sypl *sypl) Serrorf(format string, args ...interface{}) error {
 
 // Serrorlnf prints like Errorlnf, and returns an error with the
 // non-processed content.
-func (sypl *sypl) Serrorlnf(format string, args ...interface{}) error {
+func (sypl *Sypl) Serrorlnf(format string, args ...interface{}) error {
 	sypl.Printlnf(level.Error, format, args...)
 
 	return fmt.Errorf(format+"\n", args...)
@@ -240,93 +273,93 @@ func (sypl *sypl) Serrorlnf(format string, args ...interface{}) error {
 
 // Serrorln prints like Errorln, and returns an error with the non-processed
 // content.
-func (sypl *sypl) Serrorln(args ...interface{}) error {
+func (sypl *Sypl) Serrorln(args ...interface{}) error {
 	sypl.Println(level.Error, args...)
 
 	return errors.New(fmt.Sprintln(args...))
 }
 
 // Info prints @ the Info level.
-func (sypl *sypl) Info(args ...interface{}) ISypl {
+func (sypl *Sypl) Info(args ...interface{}) ISypl {
 	return sypl.Print(level.Info, args...)
 }
 
 // Infof prints according with the specified format @ the Info level.
-func (sypl *sypl) Infof(format string, args ...interface{}) ISypl {
+func (sypl *Sypl) Infof(format string, args ...interface{}) ISypl {
 	return sypl.Printf(level.Info, format, args...)
 }
 
 // Infolnf prints according with the specified format @ the Info level, also
 // adding a new line to the end.
-func (sypl *sypl) Infolnf(format string, args ...interface{}) ISypl {
+func (sypl *Sypl) Infolnf(format string, args ...interface{}) ISypl {
 	return sypl.Printlnf(level.Info, format, args...)
 }
 
 // Infoln prints, also adding a new line to the end @ the Info level.
-func (sypl *sypl) Infoln(args ...interface{}) ISypl {
+func (sypl *Sypl) Infoln(args ...interface{}) ISypl {
 	return sypl.Println(level.Info, args...)
 }
 
 // Warn prints @ the Warn level.
-func (sypl *sypl) Warn(args ...interface{}) ISypl {
+func (sypl *Sypl) Warn(args ...interface{}) ISypl {
 	return sypl.Print(level.Warn, args...)
 }
 
 // Warnf prints according with the specified format @ the Warn level.
-func (sypl *sypl) Warnf(format string, args ...interface{}) ISypl {
+func (sypl *Sypl) Warnf(format string, args ...interface{}) ISypl {
 	return sypl.Printf(level.Warn, format, args...)
 }
 
 // Warnlnf prints according with the specified format @ the Warn level, also
 // adding a new line to the end.
-func (sypl *sypl) Warnlnf(format string, args ...interface{}) ISypl {
+func (sypl *Sypl) Warnlnf(format string, args ...interface{}) ISypl {
 	return sypl.Printlnf(level.Warn, format, args...)
 }
 
 // Warnln prints, also adding a new line to the end @ the Warn level.
-func (sypl *sypl) Warnln(args ...interface{}) ISypl {
+func (sypl *Sypl) Warnln(args ...interface{}) ISypl {
 	return sypl.Println(level.Warn, args...)
 }
 
 // Debug prints @ the Debug level.
-func (sypl *sypl) Debug(args ...interface{}) ISypl {
+func (sypl *Sypl) Debug(args ...interface{}) ISypl {
 	return sypl.Print(level.Debug, args...)
 }
 
 // Debugf prints according with the specified format @ the Debug level.
-func (sypl *sypl) Debugf(format string, args ...interface{}) ISypl {
+func (sypl *Sypl) Debugf(format string, args ...interface{}) ISypl {
 	return sypl.Printf(level.Debug, format, args...)
 }
 
 // Debuglnf prints according with the specified format @ the Debug level,
 // also adding a new line to the end.
-func (sypl *sypl) Debuglnf(format string, args ...interface{}) ISypl {
+func (sypl *Sypl) Debuglnf(format string, args ...interface{}) ISypl {
 	return sypl.Printlnf(level.Debug, format, args...)
 }
 
 // Debugln prints, also adding a new line to the end @ the Debug level.
-func (sypl *sypl) Debugln(args ...interface{}) ISypl {
+func (sypl *Sypl) Debugln(args ...interface{}) ISypl {
 	return sypl.Println(level.Debug, args...)
 }
 
 // Trace prints @ the Trace level.
-func (sypl *sypl) Trace(args ...interface{}) ISypl {
+func (sypl *Sypl) Trace(args ...interface{}) ISypl {
 	return sypl.Print(level.Trace, args...)
 }
 
 // Tracef prints according with the specified format @ the Trace level.
-func (sypl *sypl) Tracef(format string, args ...interface{}) ISypl {
+func (sypl *Sypl) Tracef(format string, args ...interface{}) ISypl {
 	return sypl.Printf(level.Trace, format, args...)
 }
 
 // Tracelnf prints according with the specified format @ the Trace level,
 // also adding a new line to the end.
-func (sypl *sypl) Tracelnf(format string, args ...interface{}) ISypl {
+func (sypl *Sypl) Tracelnf(format string, args ...interface{}) ISypl {
 	return sypl.Printlnf(level.Trace, format, args...)
 }
 
 // Traceln prints, also adding a new line to the end @ the Trace level.
-func (sypl *sypl) Traceln(args ...interface{}) ISypl {
+func (sypl *Sypl) Traceln(args ...interface{}) ISypl {
 	return sypl.Println(level.Trace, args...)
 }
 
@@ -335,7 +368,7 @@ func (sypl *sypl) Traceln(args ...interface{}) ISypl {
 //////
 
 // AddOutputs adds one or more outputs.
-func (sypl *sypl) AddOutputs(outputs ...output.IOutput) ISypl {
+func (sypl *Sypl) AddOutputs(outputs ...output.IOutput) ISypl {
 	sypl.outputs = append(sypl.outputs, outputs...)
 
 	return sypl
@@ -343,7 +376,7 @@ func (sypl *sypl) AddOutputs(outputs ...output.IOutput) ISypl {
 
 // GetOutput returns the registered output by its name. If not found, will be
 // nil.
-func (sypl *sypl) GetOutput(name string) output.IOutput {
+func (sypl *Sypl) GetOutput(name string) output.IOutput {
 	for _, o := range sypl.outputs {
 		if strings.EqualFold(o.GetName(), name) {
 			return o
@@ -353,8 +386,8 @@ func (sypl *sypl) GetOutput(name string) output.IOutput {
 	return nil
 }
 
-// SetOutputs sets one or more outputs.
-func (sypl *sypl) SetOutputs(outputs ...output.IOutput) {
+// SetOutputs sets one or more outputs. Use to update output(s).
+func (sypl *Sypl) SetOutputs(outputs ...output.IOutput) {
 	for _, output := range outputs {
 		for i, o := range sypl.outputs {
 			if strings.EqualFold(o.GetName(), output.GetName()) {
@@ -365,12 +398,12 @@ func (sypl *sypl) SetOutputs(outputs ...output.IOutput) {
 }
 
 // GetOutputs returns registered outputs.
-func (sypl *sypl) GetOutputs() []output.IOutput {
+func (sypl *Sypl) GetOutputs() []output.IOutput {
 	return sypl.outputs
 }
 
 // GetOutputsNames returns the names of the registered outputs.
-func (sypl *sypl) GetOutputsNames() []string {
+func (sypl *Sypl) GetOutputsNames() []string {
 	outputsNames := []string{}
 
 	for _, output := range sypl.outputs {
@@ -383,39 +416,58 @@ func (sypl *sypl) GetOutputsNames() []string {
 // New creates a child logger. The child logger is an accurate, efficient and
 // shallow copy of the parent logger. Changes to internals, such as the state of
 // outputs, and processors, are reflected cross all other loggers.
-func (sypl *sypl) New(name string) ISypl {
+func (sypl *Sypl) New(name string) ISypl {
 	return New(name, sypl.outputs...)
 }
 
-// Process the message, per output, process accordingly.
-func (sypl *sypl) Process(m message.IMessage) {
-	// Do nothing if message as no context, or flagged with `SkipAndMute`.
-	if m.GetContent().GetOriginal() == "" &&
-		m.GetFlag() == flag.SkipAndMute {
-		return
+// Process messages, per output, and process accordingly.
+func (sypl *Sypl) process(messages ...message.IMessage) {
+	shouldExit := false
+
+	g := new(errgroup.Group)
+
+	for _, m := range messages {
+		// https://golang.org/doc/faq#closures_and_goroutines
+		m := m
+
+		g.Go(func() error {
+			// Do nothing if message as no context, or flagged with `SkipAndMute`.
+			if m.GetContent().GetOriginal() == "" &&
+				m.GetFlag() == flag.SkipAndMute {
+				return nil
+			}
+
+			// Should allows to filter logging by components names.
+			allowedComponents := os.Getenv("SYPL_DEBUG")
+
+			if allowedComponents != "" &&
+				!strings.Contains(allowedComponents, sypl.GetName()) {
+				return nil
+			}
+
+			// Should allows to specify `Output`(s).
+			outputsNames := sypl.GetOutputsNames()
+
+			if len(m.GetOutputsNames()) > 0 {
+				outputsNames = m.GetOutputsNames()
+			}
+
+			m.SetOutputsNames(outputsNames)
+
+			sypl.processOutputs(m, strings.Join(outputsNames, ","))
+
+			if m.GetLevel() == level.Fatal {
+				shouldExit = true
+			}
+
+			return nil
+		})
 	}
 
-	// Should allows to filter logging by components names.
-	allowedComponents := os.Getenv("SYPL_DEBUG")
-
-	if allowedComponents != "" &&
-		!strings.Contains(allowedComponents, sypl.GetName()) {
-		return
-	}
-
-	// Should allows to specify `Output`(s).
-	outputsNames := sypl.GetOutputsNames()
-
-	if len(m.GetOutputsNames()) > 0 {
-		outputsNames = m.GetOutputsNames()
-	}
-
-	m.SetOutputsNames(outputsNames)
-
-	sypl.processOutputs(m, strings.Join(outputsNames, ","))
+	_ = g.Wait()
 
 	// Should exit if `level` is `Fatal`.
-	if m.GetLevel() == level.Fatal {
+	if shouldExit {
 		os.Exit(1)
 	}
 }
@@ -459,7 +511,7 @@ func mergeOptions(m message.IMessage, o *options.Options) message.IMessage {
 }
 
 // Outputs logic of the Process method.
-func (sypl *sypl) processOutputs(m message.IMessage, outputsNames string) {
+func (sypl *Sypl) processOutputs(m message.IMessage, outputsNames string) {
 	g := new(errgroup.Group)
 
 	for _, o := range sypl.outputs {
@@ -489,8 +541,8 @@ func (sypl *sypl) processOutputs(m message.IMessage, outputsNames string) {
 //////
 
 // New is the Sypl factory.
-func New(name string, outputs ...output.IOutput) ISypl {
-	return &sypl{
+func New(name string, outputs ...output.IOutput) *Sypl {
+	return &Sypl{
 		name:    name,
 		outputs: outputs,
 	}

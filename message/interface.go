@@ -13,8 +13,21 @@ import (
 	"github.com/saucelabs/sypl/options"
 )
 
+// ILineBreaker specifies what a LineBreaker does.
+type ILineBreaker interface {
+	// Restore known linebreaks.
+	Restore()
+
+	// Detects (cross-OS) and removes any newline/line-break, at the end of the
+	// content, ensuring text processing is done properly (e.g.: suffix).
+	Strip()
+}
+
 // IMessage specifies what a message does.
 type IMessage interface {
+	ILineBreaker
+	ITag
+
 	// String interface.
 	String() string
 
@@ -54,6 +67,12 @@ type IMessage interface {
 	// SetLevel sets the level.
 	SetLevel(l level.Level)
 
+	// getLineBreaker returns linebreaker.
+	getLineBreaker() *lineBreaker
+
+	// setLineBreaker sets the linebreaker.
+	setLineBreaker(lB *lineBreaker)
+
 	// GetMessage (low-level) returns the message.
 	GetMessage() *message
 
@@ -81,27 +100,24 @@ type IMessage interface {
 	// SetProcessorsNames sets the processors names that should be used.
 	SetProcessorsNames(processorsNames []string)
 
-	// GetRestoreLineBreak returns the line break status.
-	GetRestoreLineBreak() bool
-
-	// SetRestoreLineBreak sets the line break status.
-	SetRestoreLineBreak(s bool)
-
-	// AddTags adds one or more tags.
-	AddTags(tags ...string)
-
-	// GetTags retrieves tags.
-	GetTags() []string
-
-	// DeleteTag deletes a tag.
-	DeleteTag(tag string)
-
-	// ContainTag verifies if tags contains the specified tag.
-	ContainTag(tag string) bool
-
 	// GetTimestamp returns the timestamp.
 	GetTimestamp() time.Time
 
 	// SetTimestamp sets the timestamp.
 	SetTimestamp(timestamp time.Time)
+}
+
+// ITag specifies what a Tag does.
+type ITag interface {
+	// AddTags adds one or more tags.
+	AddTags(tags ...string)
+
+	// ContainTag verifies if tags contains the specified tag.
+	ContainTag(tag string) bool
+
+	// DeleteTag deletes a tag.
+	DeleteTag(tag string)
+
+	// GetTags retrieves tags.
+	GetTags() []string
 }

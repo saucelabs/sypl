@@ -185,9 +185,8 @@ func (o *output) Write(m message.IMessage) error {
 	m.SetProcessorsNames(processorsNames)
 
 	// Strips the last line break, which allows the content to be
-	// properly processed. It gets restore later.
-	// See: `Message.restoreLineBreak` documentation for more info.
-	m = recursiveLineBreakStripper(m)
+	// properly processed. It gets restore later, if any.
+	m.Strip()
 
 	// Executes processors in series.
 	o.processProcessors(m, strings.Join(processorsNames, ","))
@@ -223,42 +222,6 @@ func (o *output) Write(m message.IMessage) error {
 // Helpers.
 //////
 
-// Detects (cross-OS) and removes any newline/line-break, at the end of the
-// content, ensuring text processing is done properly (e.g.: suffix).
-func recursiveLineBreakStripper(m message.IMessage) message.IMessage {
-	if strings.HasSuffix(m.GetContent().GetProcessed(), "\r\n") {
-		m.GetContent().SetProcessed(
-			strings.TrimSuffix(m.GetContent().GetProcessed(), "\r\n"),
-		)
-
-		m.SetRestoreLineBreak(true)
-
-		recursiveLineBreakStripper(m)
-	}
-
-	if strings.HasSuffix(m.GetContent().GetProcessed(), "\n") {
-		m.GetContent().SetProcessed(
-			strings.TrimSuffix(m.GetContent().GetProcessed(), "\n"),
-		)
-
-		m.SetRestoreLineBreak(true)
-
-		recursiveLineBreakStripper(m)
-	}
-
-	if strings.HasSuffix(m.GetContent().GetProcessed(), "\r") {
-		m.GetContent().SetProcessed(
-			strings.TrimSuffix(m.GetContent().GetProcessed(), "\r"),
-		)
-
-		m.SetRestoreLineBreak(true)
-
-		recursiveLineBreakStripper(m)
-	}
-
-	return m
-}
-
 // Processors logic of the Write method.
 func (o *output) processProcessors(m message.IMessage, processorsNames string) {
 	// Should not process if message is flagged with `Skip` or `SkipAndForce`.
@@ -288,10 +251,8 @@ func (o *output) write(m message.IMessage) error {
 		}
 	}
 
-	// Restore the line break, if needed.
-	if m.GetRestoreLineBreak() {
-		m.GetContent().SetProcessed(fmt.Sprintln(m.GetContent().GetProcessed()))
-	}
+	// Restore linebreak(s), if needed.
+	m.Restore()
 
 	// Write to writer.
 	if err := o.GetBuiltinLogger().OutputBuiltin(

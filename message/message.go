@@ -5,6 +5,7 @@
 package message
 
 import (
+	"strings"
 	"time"
 
 	"github.com/emirpasic/gods/sets/treeset"
@@ -12,7 +13,34 @@ import (
 	"github.com/saucelabs/sypl/flag"
 	"github.com/saucelabs/sypl/level"
 	"github.com/saucelabs/sypl/options"
+	"github.com/saucelabs/sypl/status"
 )
+
+// LineBreaker defines if `Content` needs linebreak strip/restoration.
+//
+// Context: When a message enters the pipeline, line breakers are
+// removed (see: `output.Write`). Content is then processed and only, at the
+// final stage - before printing, the line break is restored, if needed.
+// (see: `output.write`).
+type lineBreaker struct {
+	// ControlChars accumulates stripped control chars.
+	ControlChars []string
+
+	// KnownLineBreakers is a list known linebreakers.
+	KnownLineBreakers []string
+
+	// Status indicates whether message had control chars stripped, or not.
+	Status status.Status
+}
+
+// newLineBreaker is the lineBreaker factory.
+func newLineBreaker(knownLineBreakers ...string) *lineBreaker {
+	return &lineBreaker{
+		ControlChars:      []string{},
+		KnownLineBreakers: knownLineBreakers,
+		Status:            status.Enabled,
+	}
+}
 
 // Message envelops the content and contains meta-information about it.
 //
@@ -39,14 +67,8 @@ type message struct {
 	// Processor in use.
 	ProcessorName string `json:"-"`
 
-	// If set to true, a new line break will be added before printing.
-	//
-	// Context: When a message enters the pipeline, the last line break is
-	// removed - if any (see: `Println`). Content is then processed and only, at
-	// the final stage - before printing, the line break is restored, if needed.
-	// (see: `write`). This flag controls/indicates if the line break should be
-	// restored or not.
-	RestoreLineBreak bool `json:"-"`
+	// Message's linebreaker. See `lineBreaker` for more information.
+	lineBreaker *lineBreaker `json:"-"`
 
 	// tags are indicators consumed by `Output`s and `Processor`s.
 	tags *treeset.Set
@@ -61,6 +83,79 @@ func (m message) String() string {
 }
 
 //////
+// ITag interface implementation.
+//////
+
+// AddTags adds one or more tags.
+func (m *message) AddTags(tags ...string) {
+	for _, tag := range tags {
+		m.tags.Add(tag)
+	}
+}
+
+// ContainTag verifies if tags contains the specified tag.
+func (m *message) ContainTag(tag string) bool {
+	return m.tags.Contains(tag)
+}
+
+// DeleteTag deletes a tag.
+func (m *message) DeleteTag(tag string) {
+	m.tags.Remove(tag)
+}
+
+// GetTags retrieves tags.
+func (m *message) GetTags() []string {
+	tags := []string{}
+
+	m.tags.Each(func(index int, value interface{}) {
+		tags = append(tags, value.(string))
+	})
+
+	return tags
+}
+
+//////
+// ILineBreaker interface implementation.
+//////
+
+// getLineBreaker returns linebreaker.
+func (m *message) getLineBreaker() *lineBreaker {
+	return m.lineBreaker
+}
+
+// setLineBreaker sets the line break status.
+func (m *message) setLineBreaker(lB *lineBreaker) {
+	m.lineBreaker = lB
+}
+
+// Restore known linebreaks.
+func (m *message) Restore() {
+	if m.getLineBreaker().Status == status.Enabled {
+		for _, controlChar := range m.getLineBreaker().ControlChars {
+			m.GetContent().SetProcessed(m.GetContent().GetProcessed() + controlChar)
+		}
+	}
+}
+
+// Detects (cross-OS) and removes any newline/line-break, at the end of the
+// content, ensuring text processing is done properly (e.g.: suffix).
+func (m *message) Strip() {
+	if m.getLineBreaker().Status == status.Enabled {
+		for _, knownLineBreaker := range m.getLineBreaker().KnownLineBreakers {
+			if strings.HasSuffix(m.GetContent().GetProcessed(), knownLineBreaker) {
+				m.GetContent().SetProcessed(
+					strings.TrimSuffix(m.GetContent().GetProcessed(), knownLineBreaker),
+				)
+
+				m.getLineBreaker().ControlChars = append(m.getLineBreaker().ControlChars, knownLineBreaker)
+
+				m.Strip()
+			}
+		}
+	}
+}
+
+//////
 // IMessage interface implementation.
 //////
 
@@ -72,16 +167,6 @@ func (m *message) GetComponentName() string {
 // SetComponentName sets the component name.
 func (m *message) SetComponentName(name string) {
 	m.componentName = name
-}
-
-// GetRestoreLineBreak returns the line break status.
-func (m *message) GetRestoreLineBreak() bool {
-	return m.RestoreLineBreak
-}
-
-// SetRestoreLineBreak sets the line break status.
-func (m *message) SetRestoreLineBreak(s bool) {
-	m.RestoreLineBreak = s
 }
 
 // GetContent returns the content.
@@ -179,34 +264,6 @@ func (m *message) SetProcessorsNames(processorsNames []string) {
 	m.ProcessorsNames = processorsNames
 }
 
-// AddTags adds one or more tags.
-func (m *message) AddTags(tags ...string) {
-	for _, tag := range tags {
-		m.tags.Add(tag)
-	}
-}
-
-// GetTags retrieves tags.
-func (m *message) GetTags() []string {
-	tags := []string{}
-
-	m.tags.Each(func(index int, value interface{}) {
-		tags = append(tags, value.(string))
-	})
-
-	return tags
-}
-
-// DeleteTag deletes a tag.
-func (m *message) DeleteTag(tag string) {
-	m.tags.Remove(tag)
-}
-
-// ContainTag verifies if tags contains the specified tag.
-func (m *message) ContainTag(tag string) bool {
-	return m.tags.Contains(tag)
-}
-
 // GetTimestamp returns the timestamp.
 func (m *message) GetTimestamp() time.Time {
 	return m.Timestamp
@@ -227,6 +284,8 @@ func (m *message) SetTimestamp(timestamp time.Time) {
 // - Changes in the `Message` or `Options` data structure may reflects here.
 // - Could use something like the `Copier` package, but that's going to cause a
 // data race, because `Output`s are processed concurrently.
+//
+// TODO: This can be improved.
 func Copy(m IMessage) IMessage {
 	msg := NewMessage(m.GetLevel(), m.GetContent().GetOriginal())
 
@@ -240,11 +299,14 @@ func Copy(m IMessage) IMessage {
 	msg.SetFields(m.GetFields())
 	msg.SetFlag(m.GetFlag())
 	msg.SetID(m.GetID())
+
+	gLB := *m.getLineBreaker()
+	msg.setLineBreaker(&gLB)
+
 	msg.SetOutputName(m.GetOutputName())
 	msg.SetOutputsNames(m.GetOutputsNames())
 	msg.SetProcessorName(m.GetProcessorName())
 	msg.SetProcessorsNames(m.GetProcessorsNames())
-	msg.SetRestoreLineBreak(m.GetRestoreLineBreak())
 	msg.SetTimestamp(m.GetTimestamp())
 
 	return msg
@@ -261,11 +323,11 @@ func NewMessage(l level.Level, ct string) IMessage {
 	return &message{
 		Options: options.NewDefaultOptions(),
 
-		Content:          content.NewContent(ct),
-		ID:               generateUUID(),
-		Level:            l,
-		RestoreLineBreak: false,
-		tags:             treeset.NewWithStringComparator(),
-		Timestamp:        time.Now(),
+		Content:     content.NewContent(ct),
+		ID:          generateUUID(),
+		Level:       l,
+		lineBreaker: newLineBreaker("\n", "\r"),
+		tags:        treeset.NewWithStringComparator(),
+		Timestamp:   time.Now(),
 	}
 }

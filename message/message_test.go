@@ -5,6 +5,7 @@
 package message
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/go-test/deep"
@@ -96,6 +97,89 @@ func TestCopy(t *testing.T) {
 				t.Log("Expected:", shared.Prettify(m))
 				t.Log("Got:", shared.Prettify(Copy(m)))
 				t.Error("Diff:", res)
+			}
+		})
+	}
+}
+
+func Test_message_strip(t *testing.T) {
+	tests := []struct {
+		name                string
+		m                   IMessage
+		wantChars           []string
+		wantContent         string
+		wantContentOriginal string
+		wantSize            int
+	}{
+		{
+			name:                "Should work - \\n",
+			m:                   NewMessage(level.Info, "Test 1\n"),
+			wantChars:           []string{"\n"},
+			wantContent:         "Test 1",
+			wantContentOriginal: "Test 1\n",
+			wantSize:            1,
+		},
+		{
+			name:                "Should work - Println",
+			m:                   NewMessage(level.Info, fmt.Sprintln("Test 1")),
+			wantChars:           []string{"\n"},
+			wantContent:         "Test 1",
+			wantContentOriginal: "Test 1\n",
+			wantSize:            1,
+		},
+		{
+			name:                "Should work - Printf",
+			m:                   NewMessage(level.Info, fmt.Sprintf("%s\n", "Test 1")),
+			wantChars:           []string{"\n"},
+			wantContent:         "Test 1",
+			wantContentOriginal: "Test 1\n",
+			wantSize:            1,
+		},
+		{
+			name:                "Should work - \\r",
+			m:                   NewMessage(level.Info, "Test 1\r"),
+			wantChars:           []string{"\r"},
+			wantContent:         "Test 1",
+			wantContentOriginal: "Test 1\r",
+			wantSize:            1,
+		},
+		{
+			name:                "Should work - many (\\n\\r\\n)",
+			m:                   NewMessage(level.Info, "Test 1\n\r\n"),
+			wantChars:           []string{"\n", "\r", "\n"},
+			wantContent:         "Test 1",
+			wantContentOriginal: "Test 1\n\r\n",
+			wantSize:            3,
+		},
+		{
+			name:                "Should work - none",
+			m:                   NewMessage(level.Info, "Test 1"),
+			wantChars:           []string{},
+			wantContent:         "Test 1",
+			wantContentOriginal: "Test 1",
+			wantSize:            0,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.m.Strip()
+
+			if tt.wantSize != len(tt.m.getLineBreaker().ControlChars) {
+				t.Errorf("Strip got %v expected %v", tt.wantSize, len(tt.m.getLineBreaker().ControlChars))
+			}
+
+			if d := deep.Equal(tt.m.getLineBreaker().ControlChars, tt.wantChars); len(d) > 0 {
+				t.Errorf("Strip %+v", d)
+			}
+
+			if tt.wantContent != tt.m.GetContent().GetProcessed() {
+				t.Errorf("Strip got %v expected %v", tt.wantContent, tt.m.GetContent().GetProcessed())
+			}
+
+			tt.m.Restore()
+
+			if tt.m.GetContent().GetProcessed() != tt.wantContentOriginal {
+				t.Errorf("Restore got %v expected %v", tt.m.GetContent().GetProcessed(), tt.wantContentOriginal)
 			}
 		})
 	}

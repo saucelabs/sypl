@@ -112,7 +112,7 @@ func TestNew(t *testing.T) {
 			defer f.Close()
 
 			New(a.component).
-				AddOutputs(output.FileBased("virtual", filePath, level.Debug, f, processor.Prefixer("Test Prefix - "))).
+				AddOutputs(output.FileBased("virtual", level.Debug, f, processor.Prefixer("Test Prefix - "))).
 				Print(a.level, a.content)
 
 			b, err := afero.ReadFile(appFs, filePath)

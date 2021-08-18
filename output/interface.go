@@ -26,6 +26,7 @@ type IOutput interface {
 	GetBuiltinLogger() *builtin.Builtin
 
 	// SetBuiltinLogger sets the Golang's builtin logger.
+	// TODO: SetXYZ should return IOutput.
 	SetBuiltinLogger(builtinLogger *builtin.Builtin)
 
 	// GetFormatter returns the formatter.

@@ -38,10 +38,15 @@ func Console(maxLevel level.Level, processors ...processor.IProcessor) IOutput {
 	return NewOutput("Console", maxLevel, os.Stdout, processors...)
 }
 
+// StdErr is a built-in `output` - named `StdErr`, that writes to `stderr`.
+func StdErr(maxLevel level.Level, processors ...processor.IProcessor) IOutput {
+	return NewOutput("StdErr", maxLevel, os.Stderr, processors...)
+}
+
 // FileBased is a built-in `output`, that writes to the specified file.
+// TODO: Remove `path`.
 func FileBased(
 	name string,
-	path string,
 	maxLevel level.Level,
 	writer io.Writer,
 	processors ...processor.IProcessor,
@@ -67,7 +72,7 @@ func File(path string, maxLevel level.Level, processors ...processor.IProcessor)
 		log.Fatalf("%s File Output: Failed to create/open %s: %s", shared.ErrorPrefix, path, err)
 	}
 
-	return FileBased("File", path, maxLevel, f, processors...)
+	return FileBased("File", maxLevel, f, processors...)
 }
 
 // FileWithRotation is a built-in `output` - named `FileWithRotation`, that
@@ -94,7 +99,7 @@ func FileWithRotation(
 		MaxBytes:   options.MaxBytes,
 	}
 
-	return FileBased("FileWithRotation", path, maxLevel, rotation, processors...)
+	return FileBased("FileWithRotation", maxLevel, rotation, processors...)
 }
 
 // SafeBuffer is a built-in `output` - named `Buffer`, that writes to the buffer.

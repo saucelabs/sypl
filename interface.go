@@ -194,6 +194,12 @@ type ISypl interface {
 	// String interface.
 	String() string
 
+	// GetMaxLevel returns the `maxLevel` of all outputs.
+	GetMaxLevel() map[string]level.Level
+
+	// SetMaxLevel sets the `maxLevel` of all outputs.
+	SetMaxLevel(l level.Level)
+
 	// AddOutputs adds one or more outputs.
 	AddOutputs(outputs ...output.IOutput) ISypl
 

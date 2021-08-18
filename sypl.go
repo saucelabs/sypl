@@ -369,6 +369,24 @@ func (sypl *Sypl) Traceln(args ...interface{}) ISypl {
 // ISypl interface implementation.
 //////
 
+// GetMaxLevel returns the `maxLevel` of all outputs.
+func (sypl *Sypl) GetMaxLevel() map[string]level.Level {
+	levelMap := map[string]level.Level{}
+
+	for _, output := range sypl.GetOutputs() {
+		levelMap[output.GetName()] = output.GetMaxLevel()
+	}
+
+	return levelMap
+}
+
+// SetMaxLevel sets the `maxLevel` of all outputs.
+func (sypl *Sypl) SetMaxLevel(l level.Level) {
+	for _, output := range sypl.GetOutputs() {
+		output.SetMaxLevel(l)
+	}
+}
+
 // AddOutputs adds one or more outputs.
 func (sypl *Sypl) AddOutputs(outputs ...output.IOutput) ISypl {
 	sypl.outputs = append(sypl.outputs, outputs...)

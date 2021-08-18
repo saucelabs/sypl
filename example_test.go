@@ -453,8 +453,9 @@ func ExampleNew_stdErrOutputExample() {
 		Infoln(shared.DefaultContentOutput).
 		Errorln(shared.DefaultContentOutput)
 
-	// output:
+	// Prints:
 	//
+	// contentTest
 }
 
 // NewDefault output example.
@@ -482,4 +483,28 @@ func ExampleNew_printOnlyIfTagged() {
 	// Prints:
 	//
 	// component=componentNameTest output=console level=info timestamp=2021-08-17T19:19:57-07:00 message=contentTest
+}
+
+// Updating outputs' max levels example.
+func ExampleNew_updateOutputsMaxLevel() {
+	// Creates logger, and name it.
+	l := sypl.New(shared.DefaultComponentNameOutput).AddOutputs(
+		output.NewOutput("Console 1", level.Info, os.Stdout),
+		output.NewOutput("Console 2", level.Debug, os.Stdout),
+		output.NewOutput("Console 3", level.Trace, os.Stdout),
+	)
+
+	l.PrintlnWithOptions(&options.Options{
+		OutputsNames: []string{"Console 1"},
+	}, level.Info, l.GetMaxLevel())
+
+	l.SetMaxLevel(level.Info)
+
+	l.PrintlnWithOptions(&options.Options{
+		OutputsNames: []string{"Console 1"},
+	}, level.Info, l.GetMaxLevel())
+
+	// output:
+	// map[Console 1:Info Console 2:Debug Console 3:Trace]
+	// map[Console 1:Info Console 2:Info Console 3:Info]
 }

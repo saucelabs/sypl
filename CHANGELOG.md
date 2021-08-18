@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Add `doc.go` for all packages.
     - Update `README.md` to point to these new `doc.go`.
 
+## [1.3.7] - 2021-08-17
+## Changed
+- `NewDefault` only prints errors to `stderr`.
+
 ## [1.3.6] - 2021-08-17
 ## Added
 - Adds `PrintOnlyIfTagged` built-in processor.

@@ -552,14 +552,17 @@ func New(name string, outputs ...output.IOutput) *Sypl {
 
 // NewDefault creates a logger that covers most of all needs:
 // - Writes message to `stdout` @ the specified `maxLevel`
-// - Writes error messages to `stdout`, also to `stderr`
+// - Writes error messages only to `stderr`
 //
 // Note: `processors` are applied to both outputs.
 func NewDefault(name string, maxLevel level.Level, processors ...processor.IProcessor) *Sypl {
+	consoleProcessors := processors
+	consoleProcessors = append(consoleProcessors, processor.MuteBasedOnLevel(level.Error))
+
 	return &Sypl{
 		name: name,
 		outputs: []output.IOutput{
-			output.Console(maxLevel, processors...).SetFormatter(formatter.Text()),
+			output.Console(maxLevel, consoleProcessors...).SetFormatter(formatter.Text()),
 			output.StdErr(processors...).SetFormatter(formatter.Text()),
 		},
 	}

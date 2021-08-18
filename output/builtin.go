@@ -41,7 +41,7 @@ func Console(maxLevel level.Level, processors ...processor.IProcessor) IOutput {
 // StdErr is a built-in `output` - named `StdErr`, that only writes to `stderr`
 // message @ Error level.
 func StdErr(processors ...processor.IProcessor) IOutput {
-	processors = append(processors, processor.PrintOnlyLevel(level.Error))
+	processors = append(processors, processor.PrintOnlyAtLevel(level.Error))
 
 	return NewOutput("StdErr", level.Error, os.Stderr, processors...)
 }

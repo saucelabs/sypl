@@ -11,10 +11,12 @@ import (
 	"strings"
 
 	"github.com/saucelabs/sypl/flag"
+	"github.com/saucelabs/sypl/formatter"
 	"github.com/saucelabs/sypl/level"
 	"github.com/saucelabs/sypl/message"
 	"github.com/saucelabs/sypl/options"
 	"github.com/saucelabs/sypl/output"
+	"github.com/saucelabs/sypl/processor"
 	"github.com/saucelabs/sypl/shared"
 	"github.com/saucelabs/sypl/status"
 	"golang.org/x/sync/errgroup"
@@ -545,5 +547,20 @@ func New(name string, outputs ...output.IOutput) *Sypl {
 	return &Sypl{
 		name:    name,
 		outputs: outputs,
+	}
+}
+
+// NewDefault creates a logger that covers most of all needs:
+// - Writes message to `stdout` @ the specified `maxLevel`
+// - Writes error messages to `stdout`, also to `stderr`
+//
+// Note: `processors` are applied to both outputs.
+func NewDefault(name string, maxLevel level.Level, processors ...processor.IProcessor) *Sypl {
+	return &Sypl{
+		name: name,
+		outputs: []output.IOutput{
+			output.Console(maxLevel, processors...).SetFormatter(formatter.Text()),
+			output.StdErr(processors...).SetFormatter(formatter.Text()),
+		},
 	}
 }

@@ -456,3 +456,30 @@ func ExampleNew_stdErrOutputExample() {
 	// output:
 	//
 }
+
+// NewDefault output example.
+func ExampleNew_newDefault() {
+	// Creates logger, and name it.
+	sypl.NewDefault(shared.DefaultComponentNameOutput, level.Trace).
+		Infoln(shared.DefaultContentOutput).
+		Errorln("error message")
+
+	// Prints:
+	//
+	// component=componentNameTest output=console level=info timestamp=2021-08-17T19:10:00-07:00 message=contentTest
+	// component=componentNameTest output=console level=error timestamp=2021-08-17T19:10:00-07:00 message=error message
+}
+
+// PrintOnlyIfTagged output example.
+func ExampleNew_printOnlyIfTagged() {
+	// Creates logger, and name it.
+	sypl.NewDefault(shared.DefaultComponentNameOutput, level.Trace, processor.PrintOnlyIfTagged("testTag")).
+		Infoln(shared.DefaultContentOutput).
+		PrintlnWithOptions(&options.Options{
+			Tags: []string{"testTag"},
+		}, level.Info, shared.DefaultContentOutput)
+
+	// Prints:
+	//
+	// component=componentNameTest output=console level=info timestamp=2021-08-17T19:19:57-07:00 message=contentTest
+}

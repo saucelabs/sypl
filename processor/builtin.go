@@ -190,10 +190,21 @@ func Prefixer(prefix string) IProcessor {
 	})
 }
 
-// PrintOnlyLevel prints only if message is at the specified level.
-func PrintOnlyLevel(l level.Level) IProcessor {
-	return NewProcessor("PrintOnlyLevel", func(m message.IMessage) error {
+// PrintOnlyAtLevel prints only if message is at the specified level.
+func PrintOnlyAtLevel(l level.Level) IProcessor {
+	return NewProcessor("PrintOnlyAtLevel", func(m message.IMessage) error {
 		if m.GetLevel() != l {
+			m.SetFlag(flag.Mute)
+		}
+
+		return nil
+	})
+}
+
+// PrintOnlyIfTagged prints only if message contains the specified tag.
+func PrintOnlyIfTagged(tag string) IProcessor {
+	return NewProcessor("PrintOnlyIfTagged", func(m message.IMessage) error {
+		if !m.ContainTag(tag) {
 			m.SetFlag(flag.Mute)
 		}
 

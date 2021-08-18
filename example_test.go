@@ -445,3 +445,14 @@ func ExampleNew_printMessagesToOutputs() {
 	// output=Console 1 level=Debug message=Test 2
 	// output=Console 1 level=Info message=Test 1
 }
+
+// StdErr output example.
+func ExampleNew_stdErrOutputExample() {
+	// Creates logger, and name it.
+	sypl.New(shared.DefaultComponentNameOutput, output.StdErr()).
+		Infoln(shared.DefaultContentOutput).
+		Errorln(shared.DefaultContentOutput)
+
+	// output:
+	//
+}

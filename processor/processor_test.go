@@ -168,19 +168,6 @@ func TestProcessor_SetStatus(t *testing.T) {
 		status status.Status
 		want   string
 	}{
-		// {
-		// 	name: "Should work",
-		// 	args: args{
-		// 		name: "Prefixer",
-		// 		RunFunc: func(message message.IMessage) error {
-		// 			message.GetContent().SetProcessed(shared.DefaultPrefixValue + message.GetContent().GetProcessed())
-
-		// 			return nil
-		// 		},
-		// 	},
-		// 	status: status.Enabled,
-		// 	want:   shared.DefaultPrefixValue + shared.DefaultContentOutput,
-		// },
 		{
 			name: "Should work - No processing",
 			args: args{

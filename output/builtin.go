@@ -38,9 +38,12 @@ func Console(maxLevel level.Level, processors ...processor.IProcessor) IOutput {
 	return NewOutput("Console", maxLevel, os.Stdout, processors...)
 }
 
-// StdErr is a built-in `output` - named `StdErr`, that writes to `stderr`.
-func StdErr(maxLevel level.Level, processors ...processor.IProcessor) IOutput {
-	return NewOutput("StdErr", maxLevel, os.Stderr, processors...)
+// StdErr is a built-in `output` - named `StdErr`, that only writes to `stderr`
+// message @ Error level.
+func StdErr(processors ...processor.IProcessor) IOutput {
+	processors = append(processors, processor.PrintOnlyLevel(level.Error))
+
+	return NewOutput("StdErr", level.Error, os.Stderr, processors...)
 }
 
 // FileBased is a built-in `output`, that writes to the specified file.

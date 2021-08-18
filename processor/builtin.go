@@ -190,6 +190,17 @@ func Prefixer(prefix string) IProcessor {
 	})
 }
 
+// PrintOnlyLevel prints only if message is at the specified level.
+func PrintOnlyLevel(l level.Level) IProcessor {
+	return NewProcessor("PrintOnlyLevel", func(m message.IMessage) error {
+		if m.GetLevel() != l {
+			m.SetFlag(flag.Mute)
+		}
+
+		return nil
+	})
+}
+
 // Suffixer suffixes a message with the specified `suffix`.
 func Suffixer(suffix string) IProcessor {
 	return NewProcessor("Suffixer", func(m message.IMessage) error {

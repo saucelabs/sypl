@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Add `doc.go` for all packages.
     - Update `README.md` to point to these new `doc.go`.
 
+## [1.3.5] - 2021-08-17
+## Added
+- `StdErr` only prints @ `Error` `Level`.
+
 ## [1.3.4] - 2021-08-17
 ## Added
 - Creates `StdErr` built-in `Output`.

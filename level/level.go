@@ -5,7 +5,10 @@
 package level
 
 import (
+	"log"
 	"strings"
+
+	"github.com/saucelabs/sypl/shared"
 )
 
 // Level specification.
@@ -40,7 +43,7 @@ func FromInt(level int) Level {
 	return Level(level)
 }
 
-// FromInt returns a `Level` from a given integer.
+// FromString returns a `Level` from a given string.
 //
 // Note: Failure will return `None` level.
 func FromString(level string) Level {
@@ -49,6 +52,21 @@ func FromString(level string) Level {
 			return Level(i)
 		}
 	}
+
+	return None
+}
+
+// MustFromString returns a `Level` from a given string.
+//
+// Note: Failure will log, and exit.
+func MustFromString(level string) Level {
+	for i, levelString := range names {
+		if strings.EqualFold(level, levelString) {
+			return Level(i)
+		}
+	}
+
+	log.Fatalln(shared.ErrorPrefix, "Invalid level:", level)
 
 	return None
 }

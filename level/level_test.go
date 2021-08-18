@@ -67,6 +67,39 @@ func TestFromString(t *testing.T) {
 	}
 }
 
+func TestMustFromString(t *testing.T) {
+	type args struct {
+		level string
+	}
+	tests := []struct {
+		name string
+		args args
+		want Level
+	}{
+		{
+			name: "Should work - Valid - Uppercased",
+			args: args{
+				level: "Info",
+			},
+			want: Info,
+		},
+		{
+			name: "Should work - Valid - Lowercased",
+			args: args{
+				level: "info",
+			},
+			want: Info,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := MustFromString(tt.args.level); got != tt.want {
+				t.Errorf("FromString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestLevelsToString(t *testing.T) {
 	type args struct {
 		levels []Level

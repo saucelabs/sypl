@@ -184,6 +184,28 @@ func (sypl *Sypl) PrintlnPretty(l level.Level, data interface{}) ISypl {
 	return sypl.PrintMessage(msg)
 }
 
+// PrintMessagesToOutputsWithOptions allows you to concurrently print messages,
+// each one, at the specified level and to the specified output, with options.
+//
+// Note: If the named output doesn't exits, the message will not be printed.
+func (sypl *Sypl) PrintMessagesToOutputsWithOptions(
+	o *options.Options,
+	messagesToOutputs ...MessageToOutput,
+) ISypl {
+	messages := []message.IMessage{}
+
+	for _, mto := range messagesToOutputs {
+		m := message.New(mto.Level, mto.Content)
+		m.SetOutputsNames([]string{mto.OutputName})
+
+		messages = append(messages, mergeOptions(m, o))
+	}
+
+	sypl.process(messages...)
+
+	return sypl
+}
+
 // PrintMessagerPerOutput allows you to concurrently print messages, each one,
 // at the specified level and to the specified output.
 //

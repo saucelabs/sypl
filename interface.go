@@ -78,6 +78,13 @@ type IConvenientPrinter interface {
 	//
 	// Note: If the named output doesn't exits, the message will not be printed.
 	PrintMessagesToOutputs(messagesToOutputs ...MessageToOutput) ISypl
+
+	// PrintMessagesToOutputsWithOptions allows you to concurrently print
+	// messages, each one, at the specified level and to the specified output,
+	// with options.
+	//
+	// Note: If the named output doesn't exits, the message will not be printed.
+	PrintMessagesToOutputsWithOptions(o *options.Options, messagesToOutputs ...MessageToOutput) ISypl
 }
 
 // ILeveledPrinter specifies the leveled printers.

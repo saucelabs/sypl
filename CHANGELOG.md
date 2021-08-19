@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Add `doc.go` for all packages.
     - Update `README.md` to point to these new `doc.go`.
 
+## [1.4.2] - 2021-08-19
+## Added
+- Adds `PrintMessagesToOutputsWithOptions`
+
 ## [1.4.1] - 2021-08-19
 ## Changed
 - Allows to specify the name of `dashHandler` output.

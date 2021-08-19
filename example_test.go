@@ -508,3 +508,24 @@ func ExampleNew_updateOutputsMaxLevel() {
 	// map[Console 1:Info Console 2:Debug Console 3:Trace]
 	// map[Console 1:Info Console 2:Info Console 3:Info]
 }
+
+// PrintMessagesToOutputsWithOptions example.
+func ExampleNew_printMessagesToOutputsWithOptions() {
+	// Creates logger, and name it.
+	l := sypl.New(shared.DefaultComponentNameOutput).AddOutputs(
+		output.New("Console 1", level.Trace, os.Stdout).SetFormatter(formatter.Text()),
+		output.New("Console 2", level.Trace, os.Stdout).SetFormatter(formatter.Text()),
+	)
+
+	l.PrintMessagesToOutputsWithOptions(&options.Options{
+		Fields: options.Fields{"1": 2},
+	},
+		sypl.MessageToOutput{Content: fmt.Sprintln(shared.DefaultContentOutput), Level: level.Info, OutputName: "Console 1"},
+		sypl.MessageToOutput{Content: fmt.Sprintln(shared.DefaultContentOutput), Level: level.Warn, OutputName: "Console 2"},
+	)
+
+	// Prints:
+	//
+	// component=componentNameTest output=console 2 level=warn timestamp=2021-08-19T11:48:34-07:00 message=contentTest 1=2
+	// component=componentNameTest output=console 1 level=info timestamp=2021-08-19T11:48:34-07:00 message=contentTest 1=2
+}

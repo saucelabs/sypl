@@ -62,7 +62,7 @@ func generateDefaultPrefix(timestamp, component string, level level.Level) strin
 // will change the case of the first char of the Prefix mask, not the message
 // content!
 func ChangeFirstCharCase(casing Casing) IProcessor {
-	return NewProcessor("ChangeFirstCharCase", func(m message.IMessage) error {
+	return New("ChangeFirstCharCase", func(m message.IMessage) error {
 		firstChar := string(m.GetContent().GetProcessed()[0])
 		contentWithoutFirstChar := m.GetContent().GetProcessed()[1:len(m.GetContent().GetProcessed())]
 
@@ -79,7 +79,7 @@ func ChangeFirstCharCase(casing Casing) IProcessor {
 
 // ColorizeBasedOnLevel colorize messages based on the specified levels.
 func ColorizeBasedOnLevel(levelColorMap map[level.Level]color.Color) IProcessor {
-	return NewProcessor("ColorizeBasedOnLevel", func(m message.IMessage) error {
+	return New("ColorizeBasedOnLevel", func(m message.IMessage) error {
 		for level, color := range levelColorMap {
 			if m.GetLevel() == level {
 				m.GetContent().SetProcessed(color(m.GetContent().GetProcessed()))
@@ -93,7 +93,7 @@ func ColorizeBasedOnLevel(levelColorMap map[level.Level]color.Color) IProcessor 
 // ColorizeBasedOnWord colorize a messages with the specified colors if a
 // message contains a specific word.
 func ColorizeBasedOnWord(wordColorMap map[string]color.Color) IProcessor {
-	return NewProcessor("ColorizeBasedOnWord", func(m message.IMessage) error {
+	return New("ColorizeBasedOnWord", func(m message.IMessage) error {
 		for word, color := range wordColorMap {
 			if strings.Contains(m.GetContent().GetProcessed(), word) {
 				m.GetContent().SetProcessed(color(m.GetContent().GetProcessed()))
@@ -106,7 +106,7 @@ func ColorizeBasedOnWord(wordColorMap map[string]color.Color) IProcessor {
 
 // Decolourizer removes any colour.
 func Decolourizer() IProcessor {
-	return NewProcessor("Decolourizer", func(m message.IMessage) error {
+	return New("Decolourizer", func(m message.IMessage) error {
 		m.GetContent().SetProcessed(stripansi.Strip(m.GetContent().GetProcessed()))
 
 		return nil
@@ -116,14 +116,14 @@ func Decolourizer() IProcessor {
 // ErrorSimulator simulates an error in the pipeline.
 //nolint:goerr113
 func ErrorSimulator(msg string) IProcessor {
-	return NewProcessor("ErrorSimulator", func(m message.IMessage) error {
+	return New("ErrorSimulator", func(m message.IMessage) error {
 		return errors.New(msg)
 	})
 }
 
 // ForceBasedOnLevel force messages to be printed based on the specified levels.
 func ForceBasedOnLevel(levels ...level.Level) IProcessor {
-	return NewProcessor("ForceBasedOnLevel", func(m message.IMessage) error {
+	return New("ForceBasedOnLevel", func(m message.IMessage) error {
 		concatenatedLevels := level.LevelsToString(levels)
 
 		if strings.Contains(concatenatedLevels, m.GetLevel().String()) {
@@ -136,7 +136,7 @@ func ForceBasedOnLevel(levels ...level.Level) IProcessor {
 
 // MuteBasedOnLevel mute messages based on the specified levels.
 func MuteBasedOnLevel(levels ...level.Level) IProcessor {
-	return NewProcessor("MuteBasedOnLevel", func(m message.IMessage) error {
+	return New("MuteBasedOnLevel", func(m message.IMessage) error {
 		concatenatedLevels := level.LevelsToString(levels)
 
 		if strings.Contains(concatenatedLevels, m.GetLevel().String()) {
@@ -151,7 +151,7 @@ func MuteBasedOnLevel(levels ...level.Level) IProcessor {
 //
 // Example: 2021-06-22 12:51:46.089 [80819] [CLI] [Info].
 func PrefixBasedOnMask(timestampFormat string) IProcessor {
-	return NewProcessor("PrefixBasedOnMask", func(m message.IMessage) error {
+	return New("PrefixBasedOnMask", func(m message.IMessage) error {
 		m.GetContent().SetProcessed(generateDefaultPrefix(
 			m.GetTimestamp().Format(timestampFormat),
 			m.GetComponentName(),
@@ -166,7 +166,7 @@ func PrefixBasedOnMask(timestampFormat string) IProcessor {
 // `PrefixBasedOnMask`. It prefixes all messages, except for the specified
 // levels.
 func PrefixBasedOnMaskExceptForLevels(timestampFormat string, levels ...level.Level) IProcessor {
-	return NewProcessor("PrefixBasedOnMaskExceptForLevels", func(m message.IMessage) error {
+	return New("PrefixBasedOnMaskExceptForLevels", func(m message.IMessage) error {
 		concatenatedLevels := level.LevelsToString(levels)
 
 		if !strings.Contains(concatenatedLevels, m.GetLevel().String()) {
@@ -183,7 +183,7 @@ func PrefixBasedOnMaskExceptForLevels(timestampFormat string, levels ...level.Le
 
 // Prefixer prefixes a message with the specified `prefix`.
 func Prefixer(prefix string) IProcessor {
-	return NewProcessor("Prefixer", func(m message.IMessage) error {
+	return New("Prefixer", func(m message.IMessage) error {
 		m.GetContent().SetProcessed(prefix + m.GetContent().GetProcessed())
 
 		return nil
@@ -192,7 +192,7 @@ func Prefixer(prefix string) IProcessor {
 
 // PrintOnlyAtLevel prints only if message is at the specified level.
 func PrintOnlyAtLevel(l level.Level) IProcessor {
-	return NewProcessor("PrintOnlyAtLevel", func(m message.IMessage) error {
+	return New("PrintOnlyAtLevel", func(m message.IMessage) error {
 		if m.GetLevel() != l {
 			m.SetFlag(flag.Mute)
 		}
@@ -203,7 +203,7 @@ func PrintOnlyAtLevel(l level.Level) IProcessor {
 
 // PrintOnlyIfTagged prints only if message contains the specified tag.
 func PrintOnlyIfTagged(tag string) IProcessor {
-	return NewProcessor("PrintOnlyIfTagged", func(m message.IMessage) error {
+	return New("PrintOnlyIfTagged", func(m message.IMessage) error {
 		if !m.ContainTag(tag) {
 			m.SetFlag(flag.Mute)
 		}
@@ -214,7 +214,7 @@ func PrintOnlyIfTagged(tag string) IProcessor {
 
 // Suffixer suffixes a message with the specified `suffix`.
 func Suffixer(suffix string) IProcessor {
-	return NewProcessor("Suffixer", func(m message.IMessage) error {
+	return New("Suffixer", func(m message.IMessage) error {
 		m.GetContent().SetProcessed(m.GetContent().GetProcessed() + suffix)
 
 		return nil

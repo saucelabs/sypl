@@ -70,8 +70,8 @@ func (p *processor) Run(m message.IMessage) error {
 // Factory.
 //////
 
-// NewOutput is the Processor factory.
-func NewProcessor(name string, f RunFunc) IProcessor {
+// New is the Processor factory.
+func New(name string, f RunFunc) IProcessor {
 	return &processor{
 		f:      f,
 		name:   name,

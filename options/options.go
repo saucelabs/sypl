@@ -12,7 +12,7 @@ type Fields map[string]interface{}
 // Options extends printer's capabilities.
 //
 // Note: Changes in the `Message` or `Options` data structure may trigger
-// changes in the `Copy`, `mergeOptions`, `NewMessage`, or `NewOptions` methods.
+// changes in the `Copy`, `mergeOptions`, `New`, or `NewOptions` methods.
 type Options struct {
 	// Structured fields.
 	Fields Fields
@@ -34,10 +34,10 @@ type Options struct {
 // Factory.
 //////
 
-// NewDefaultOptions is the `Options` factory.
+// New is the `Options` factory.
 //
 // Note: Changes in the `Message` or `Options` data structure may reflects here.
-func NewDefaultOptions() *Options {
+func New() *Options {
 	return &Options{
 		Fields:          Fields{},
 		Flag:            flag.None,

@@ -14,12 +14,16 @@ import (
 // IFormatter specifies what a Formatter does.
 type IFormatter = processor.IProcessor
 
+//////
+// Built-in processors.
+//////
+
 // JSON is a JSON formatter. It automatically adds:
 // - Component name
 // - Level
 // - Timestamp (RFC3339).
 func JSON() IFormatter {
-	return processor.NewProcessor("JSON", func(m message.IMessage) error {
+	return processor.New("JSON", func(m message.IMessage) error {
 		mM := map[string]interface{}{}
 
 		mM["component"] = m.GetComponentName()
@@ -46,7 +50,7 @@ func JSON() IFormatter {
 // - Level
 // - Timestamp (RFC3339).
 func Text() IFormatter {
-	return processor.NewProcessor("Text", func(m message.IMessage) error {
+	return processor.New("Text", func(m message.IMessage) error {
 		buf := new(strings.Builder)
 
 		// Observe that the third line has no trailing tab,

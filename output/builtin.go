@@ -23,7 +23,7 @@ type FileRotationOptions lumberjack.Logger
 // stdout, and named "-".
 func dashHandler(path string, maxLevel level.Level, processors ...processor.IProcessor) IOutput {
 	if path == "-" {
-		return NewOutput("-", maxLevel, os.Stdout, processors...)
+		return New("-", maxLevel, os.Stdout, processors...)
 	}
 
 	return nil
@@ -35,7 +35,7 @@ func dashHandler(path string, maxLevel level.Level, processors ...processor.IPro
 
 // Console is a built-in `output` - named `Console`, that writes to `stdout`.
 func Console(maxLevel level.Level, processors ...processor.IProcessor) IOutput {
-	return NewOutput("Console", maxLevel, os.Stdout, processors...)
+	return New("Console", maxLevel, os.Stdout, processors...)
 }
 
 // StdErr is a built-in `output` - named `StdErr`, that only writes to `stderr`
@@ -43,7 +43,7 @@ func Console(maxLevel level.Level, processors ...processor.IProcessor) IOutput {
 func StdErr(processors ...processor.IProcessor) IOutput {
 	processors = append(processors, processor.PrintOnlyAtLevel(level.Error))
 
-	return NewOutput("StdErr", level.Error, os.Stderr, processors...)
+	return New("StdErr", level.Error, os.Stderr, processors...)
 }
 
 // FileBased is a built-in `output`, that writes to the specified file.
@@ -54,7 +54,7 @@ func FileBased(
 	writer io.Writer,
 	processors ...processor.IProcessor,
 ) IOutput {
-	return NewOutput(name, maxLevel, writer, processors...)
+	return New(name, maxLevel, writer, processors...)
 }
 
 // File is a built-in `output` - named `File`, that writes to the specified file.
@@ -109,7 +109,7 @@ func FileWithRotation(
 func SafeBuffer(maxLevel level.Level, processors ...processor.IProcessor) (*safebuffer.Buffer, IOutput) {
 	var buf safebuffer.Buffer
 
-	o := NewOutput("Buffer", maxLevel, &buf, processors...)
+	o := New("Buffer", maxLevel, &buf, processors...)
 
 	return &buf, o
 }

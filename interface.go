@@ -15,7 +15,7 @@ import (
 // IBasePrinter specifies the foundation for other printers.
 type IBasePrinter interface {
 	// PrintMessage prints messages. It's a powerful option because it gives
-	// full-control over the message. Use `NewMessage` to create the message.
+	// full-control over the message. Use `New` to create the message.
 	PrintMessage(messages ...message.IMessage) ISypl
 
 	// PrintWithOptions is a more flexible way of printing, allowing to specify

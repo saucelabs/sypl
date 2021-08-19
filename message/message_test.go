@@ -54,7 +54,7 @@ func TestNewMessage(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m := NewMessage(tt.args.level, tt.args.content)
+			m := New(tt.args.level, tt.args.content)
 
 			lenID := len(m.GetID())
 
@@ -91,7 +91,7 @@ func TestCopy(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m := NewMessage(level.Info, shared.DefaultContentOutput)
+			m := New(level.Info, shared.DefaultContentOutput)
 
 			if res := deep.Equal(Copy(m), m); len(res) > 0 {
 				t.Log("Expected:", shared.Prettify(m))
@@ -113,7 +113,7 @@ func Test_message_strip(t *testing.T) {
 	}{
 		{
 			name:                "Should work - \\n",
-			m:                   NewMessage(level.Info, "Test 1\n"),
+			m:                   New(level.Info, "Test 1\n"),
 			wantChars:           []string{"\n"},
 			wantContent:         "Test 1",
 			wantContentOriginal: "Test 1\n",
@@ -121,7 +121,7 @@ func Test_message_strip(t *testing.T) {
 		},
 		{
 			name:                "Should work - Println",
-			m:                   NewMessage(level.Info, fmt.Sprintln("Test 1")),
+			m:                   New(level.Info, fmt.Sprintln("Test 1")),
 			wantChars:           []string{"\n"},
 			wantContent:         "Test 1",
 			wantContentOriginal: "Test 1\n",
@@ -129,7 +129,7 @@ func Test_message_strip(t *testing.T) {
 		},
 		{
 			name:                "Should work - Printf",
-			m:                   NewMessage(level.Info, fmt.Sprintf("%s\n", "Test 1")),
+			m:                   New(level.Info, fmt.Sprintf("%s\n", "Test 1")),
 			wantChars:           []string{"\n"},
 			wantContent:         "Test 1",
 			wantContentOriginal: "Test 1\n",
@@ -137,7 +137,7 @@ func Test_message_strip(t *testing.T) {
 		},
 		{
 			name:                "Should work - \\r",
-			m:                   NewMessage(level.Info, "Test 1\r"),
+			m:                   New(level.Info, "Test 1\r"),
 			wantChars:           []string{"\r"},
 			wantContent:         "Test 1",
 			wantContentOriginal: "Test 1\r",
@@ -145,7 +145,7 @@ func Test_message_strip(t *testing.T) {
 		},
 		{
 			name:                "Should work - many (\\n\\r\\n)",
-			m:                   NewMessage(level.Info, "Test 1\n\r\n"),
+			m:                   New(level.Info, "Test 1\n\r\n"),
 			wantChars:           []string{"\n", "\r", "\n"},
 			wantContent:         "Test 1",
 			wantContentOriginal: "Test 1\n\r\n",
@@ -153,7 +153,7 @@ func Test_message_strip(t *testing.T) {
 		},
 		{
 			name:                "Should work - none",
-			m:                   NewMessage(level.Info, "Test 1"),
+			m:                   New(level.Info, "Test 1"),
 			wantChars:           []string{},
 			wantContent:         "Test 1",
 			wantContentOriginal: "Test 1",

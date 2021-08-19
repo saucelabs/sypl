@@ -33,11 +33,11 @@ func ExampleNew_notChained() {
 
 	// Creates an `Output`. In this case, called "Console" that will print to
 	// `stdout` and max print level @ `Info`.
-	ConsoleToStdOut := output.NewOutput("Console", level.Info, buf)
+	ConsoleToStdOut := output.New("Console", level.Info, buf)
 
 	// Creates a `Processor`. It will prefix all messages.
 	Prefixer := func(prefix string) processor.IProcessor {
-		return processor.NewProcessor("Prefixer", func(message message.IMessage) error {
+		return processor.New("Prefixer", func(message message.IMessage) error {
 			message.GetContent().SetProcessed(prefix + message.GetContent().GetProcessed())
 
 			return nil
@@ -67,12 +67,12 @@ func ExampleNew_chained() {
 		// Creates two `Output`s. "Console" and "Error". "Console" will print to
 		// `Fatal`, `Error`, and `Info`. "Error" will only print `Fatal`, and
 		// `Error` levels.
-		AddOutputs(output.NewOutput("Console", level.Info, os.Stdout)).
+		AddOutputs(output.New("Console", level.Info, os.Stdout)).
 		// Creates a `Processor`. It will prefix all messages. It will only
 		// prefix messages for this specific `Output`, and @ `Error` level.
-		AddOutputs(output.NewOutput("Error", level.Error, os.Stderr).
+		AddOutputs(output.New("Error", level.Error, os.Stderr).
 			AddProcessors(func(prefix string) processor.IProcessor {
-				return processor.NewProcessor("Prefixer", func(message message.IMessage) error {
+				return processor.New("Prefixer", func(message message.IMessage) error {
 					if message.GetLevel() == level.Error {
 						message.GetContent().SetProcessed(prefix + message.GetContent().GetProcessed())
 					}
@@ -131,18 +131,18 @@ func ExampleNew_printWithOptions() {
 	// Creates 3 `Output`s, all called "Console" that will print to `stdout`, and
 	// max print level @ `Info`.
 	var c1buf safebuffer.Buffer
-	Console1ToStdOut := output.NewOutput("Buffer 1", level.Info, &c1buf)
+	Console1ToStdOut := output.New("Buffer 1", level.Info, &c1buf)
 
 	var c2buf safebuffer.Buffer
-	Console2ToStdOut := output.NewOutput("Buffer 2", level.Info, &c2buf)
+	Console2ToStdOut := output.New("Buffer 2", level.Info, &c2buf)
 
 	var c3buf safebuffer.Buffer
-	Console3ToStdOut := output.NewOutput("Buffer 3", level.Info, &c3buf)
+	Console3ToStdOut := output.New("Buffer 3", level.Info, &c3buf)
 
 	// Creates a `Processor`. It will `prefix` all messages with the Output, and
 	// Processor names.
 	Prefixer := func() processor.IProcessor {
-		return processor.NewProcessor("Prefixer", func(message message.IMessage) error {
+		return processor.New("Prefixer", func(message message.IMessage) error {
 			prefix := fmt.Sprintf("Output: %s Processor: %s Content: ",
 				message.GetOutputName(),
 				message.GetProcessorName(),
@@ -157,7 +157,7 @@ func ExampleNew_printWithOptions() {
 	// Creates a `Processor`. It will `suffix` all messages with the specified
 	// `tag`.
 	SuffixBasedOnTag := func(tag string) processor.IProcessor {
-		return processor.NewProcessor("SuffixBasedOnTag", func(message message.IMessage) error {
+		return processor.New("SuffixBasedOnTag", func(message message.IMessage) error {
 			if message.ContainTag(tag) {
 				message.GetContent().SetProcessed(message.GetContent().GetProcessed() + " - My Suffix")
 			}
@@ -429,9 +429,9 @@ func ExampleNew_childLoggers() {
 func ExampleNew_printMessagesToOutputs() {
 	// Creates logger, and name it.
 	sypl.New("pod").AddOutputs(
-		output.NewOutput("Console 1", level.Trace, os.Stdout).SetFormatter(formatter.Text()),
-		output.NewOutput("Console 2", level.Trace, os.Stdout).SetFormatter(formatter.Text()),
-		output.NewOutput("Console 3", level.Trace, os.Stdout).SetFormatter(formatter.Text()),
+		output.New("Console 1", level.Trace, os.Stdout).SetFormatter(formatter.Text()),
+		output.New("Console 2", level.Trace, os.Stdout).SetFormatter(formatter.Text()),
+		output.New("Console 3", level.Trace, os.Stdout).SetFormatter(formatter.Text()),
 	).PrintMessagesToOutputs(
 		sypl.MessageToOutput{OutputName: "Console 1", Level: level.Info, Content: "Test 1\n"},
 		sypl.MessageToOutput{OutputName: "Console 1", Level: level.Debug, Content: "Test 2\n"},
@@ -489,9 +489,9 @@ func ExampleNew_printOnlyIfTagged() {
 func ExampleNew_updateOutputsMaxLevel() {
 	// Creates logger, and name it.
 	l := sypl.New(shared.DefaultComponentNameOutput).AddOutputs(
-		output.NewOutput("Console 1", level.Info, os.Stdout),
-		output.NewOutput("Console 2", level.Debug, os.Stdout),
-		output.NewOutput("Console 3", level.Trace, os.Stdout),
+		output.New("Console 1", level.Info, os.Stdout),
+		output.New("Console 2", level.Debug, os.Stdout),
+		output.New("Console 3", level.Trace, os.Stdout),
 	)
 
 	l.PrintlnWithOptions(&options.Options{

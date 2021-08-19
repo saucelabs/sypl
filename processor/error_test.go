@@ -25,7 +25,7 @@ func TestNewProcessingError(t *testing.T) {
 		{
 			name: "Should work",
 			args: args{
-				m: message.NewMessage(level.Info, "Message content"),
+				m: message.New(level.Info, "Message content"),
 				e: errors.New("Error content"),
 			},
 			wantErr: true,
@@ -56,7 +56,7 @@ func TestProcessingError_Error(t *testing.T) {
 			name: "Should work",
 			fields: fields{
 				Cause:         errors.New("Error content"),
-				Message:       message.NewMessage(level.Info, "Message content"),
+				Message:       message.New(level.Info, "Message content"),
 				OutputName:    "Test Output",
 				ProcessorName: "Test Processor",
 			},

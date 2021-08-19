@@ -41,9 +41,9 @@ func TestNewOutput(t *testing.T) {
 			var buf bytes.Buffer
 			bufWriter := bufio.NewWriter(&buf)
 
-			output := NewOutput(tt.args.name, tt.args.maxLevel, bufWriter, processor.Prefixer(shared.DefaultPrefixValue))
+			output := New(tt.args.name, tt.args.maxLevel, bufWriter, processor.Prefixer(shared.DefaultPrefixValue))
 
-			message := message.NewMessage(level.Info, shared.DefaultContentOutput)
+			message := message.New(level.Info, shared.DefaultContentOutput)
 
 			if message.GetComponentName() != "" &&
 				message.GetOutputName() != "" &&

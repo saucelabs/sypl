@@ -20,7 +20,7 @@ func TestText(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m := message.NewMessage(level.Info, shared.DefaultContentOutput)
+			m := message.New(level.Info, shared.DefaultContentOutput)
 			m.SetComponentName(shared.DefaultComponentNameOutput)
 			m.SetFields(options.Fields{
 				"key1": "value1",
@@ -59,7 +59,7 @@ func TestJSON(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m := message.NewMessage(level.Info, shared.DefaultContentOutput)
+			m := message.New(level.Info, shared.DefaultContentOutput)
 			m.SetComponentName(shared.DefaultComponentNameOutput)
 			m.SetFields(options.Fields{
 				"key1": "value1",

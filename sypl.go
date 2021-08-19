@@ -76,8 +76,8 @@ func (sypl *Sypl) SetStatus(s status.Status) {
 //////
 
 // PrintMessage prints messages. It's a powerful option because it gives
-// full-control over the message. Use `NewMessage` to create the message.
-// it gives full-control over the message. Use `NewMessage` to create the
+// full-control over the message. Use `New` to create the message.
+// it gives full-control over the message. Use `New` to create the
 // message.
 func (sypl *Sypl) PrintMessage(messages ...message.IMessage) ISypl {
 	sypl.process(messages...)
@@ -89,7 +89,7 @@ func (sypl *Sypl) PrintMessage(messages ...message.IMessage) ISypl {
 // a few message's options. For full-control over the message is possible
 // via `PrintMessage`.
 func (sypl *Sypl) PrintWithOptions(o *options.Options, l level.Level, args ...interface{}) ISypl {
-	m := message.NewMessage(l, fmt.Sprint(args...))
+	m := message.New(l, fmt.Sprint(args...))
 
 	sypl.PrintMessage(mergeOptions(m, o))
 
@@ -100,7 +100,7 @@ func (sypl *Sypl) PrintWithOptions(o *options.Options, l level.Level, args ...in
 // flexible way of printing, allowing to specify a few message's options.
 // For full-control over the message is possible via `PrintMessage`.
 func (sypl *Sypl) PrintfWithOptions(o *options.Options, l level.Level, format string, args ...interface{}) ISypl {
-	m := message.NewMessage(l, fmt.Sprintf(format, args...))
+	m := message.New(l, fmt.Sprintf(format, args...))
 
 	sypl.PrintMessage(mergeOptions(m, o))
 
@@ -112,7 +112,7 @@ func (sypl *Sypl) PrintfWithOptions(o *options.Options, l level.Level, format st
 // specify a few message's options. For full-control over the message is
 // possible via `PrintMessage`.
 func (sypl *Sypl) PrintlnfWithOptions(o *options.Options, l level.Level, format string, args ...interface{}) ISypl {
-	m := message.NewMessage(l, fmt.Sprintf(format+"\n", args...))
+	m := message.New(l, fmt.Sprintf(format+"\n", args...))
 
 	sypl.PrintMessage(mergeOptions(m, o))
 
@@ -123,7 +123,7 @@ func (sypl *Sypl) PrintlnfWithOptions(o *options.Options, l level.Level, format 
 // flexible way of printing, allowing to specify a few message's options.
 // For full-control over the message is possible via `PrintMessage`.
 func (sypl *Sypl) PrintlnWithOptions(o *options.Options, l level.Level, args ...interface{}) ISypl {
-	m := message.NewMessage(l, fmt.Sprintln(args...))
+	m := message.New(l, fmt.Sprintln(args...))
 
 	sypl.PrintMessage(mergeOptions(m, o))
 
@@ -136,23 +136,23 @@ func (sypl *Sypl) PrintlnWithOptions(o *options.Options, l level.Level, args ...
 
 // Print just prints.
 func (sypl *Sypl) Print(l level.Level, args ...interface{}) ISypl {
-	return sypl.PrintWithOptions(options.NewDefaultOptions(), l, args...)
+	return sypl.PrintWithOptions(options.New(), l, args...)
 }
 
 // Printf prints according with the specified format.
 func (sypl *Sypl) Printf(l level.Level, format string, args ...interface{}) ISypl {
-	return sypl.PrintfWithOptions(options.NewDefaultOptions(), l, format, args...)
+	return sypl.PrintfWithOptions(options.New(), l, format, args...)
 }
 
 // Printlnf prints according with the specified format, also adding a new line
 // to the end.
 func (sypl *Sypl) Printlnf(l level.Level, format string, args ...interface{}) ISypl {
-	return sypl.PrintlnfWithOptions(options.NewDefaultOptions(), l, format, args...)
+	return sypl.PrintlnfWithOptions(options.New(), l, format, args...)
 }
 
 // Println prints, also adding a new line to the end.
 func (sypl *Sypl) Println(l level.Level, args ...interface{}) ISypl {
-	return sypl.PrintlnWithOptions(options.NewDefaultOptions(), l, args...)
+	return sypl.PrintlnWithOptions(options.New(), l, args...)
 }
 
 //////
@@ -165,7 +165,7 @@ func (sypl *Sypl) Println(l level.Level, args ...interface{}) ISypl {
 // - Only exported fields of the data structure will be printed.
 // - Message isn't processed.
 func (sypl *Sypl) PrintPretty(l level.Level, data interface{}) ISypl {
-	msg := message.NewMessage(l, fmt.Sprint(shared.Prettify(data)))
+	msg := message.New(l, fmt.Sprint(shared.Prettify(data)))
 	msg.SetFlag(flag.Skip)
 
 	return sypl.PrintMessage(msg)
@@ -178,7 +178,7 @@ func (sypl *Sypl) PrintPretty(l level.Level, data interface{}) ISypl {
 // - Only exported fields of the data structure will be printed.
 // - Message isn't processed.
 func (sypl *Sypl) PrintlnPretty(l level.Level, data interface{}) ISypl {
-	msg := message.NewMessage(l, fmt.Sprintln(shared.Prettify(data)))
+	msg := message.New(l, fmt.Sprintln(shared.Prettify(data)))
 	msg.SetFlag(flag.Skip)
 
 	return sypl.PrintMessage(msg)
@@ -192,7 +192,7 @@ func (sypl *Sypl) PrintMessagesToOutputs(messagesToOutputs ...MessageToOutput) I
 	messages := []message.IMessage{}
 
 	for _, mto := range messagesToOutputs {
-		m := message.NewMessage(mto.Level, mto.Content)
+		m := message.New(mto.Level, mto.Content)
 		m.SetOutputsNames([]string{mto.OutputName})
 
 		messages = append(messages, m)

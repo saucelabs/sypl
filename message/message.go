@@ -45,7 +45,7 @@ func newLineBreaker(knownLineBreakers ...string) *lineBreaker {
 // Message envelops the content and contains meta-information about it.
 //
 // Note: Changes in the `Message` or `Options` data structure may trigger
-// changes in the `Copy`, `mergeOptions`, `NewMessage`, or `NewOptions` methods.
+// changes in the `Copy`, `mergeOptions`, `New`, or `NewOptions` methods.
 type message struct {
 	*options.Options
 
@@ -287,7 +287,7 @@ func (m *message) SetTimestamp(timestamp time.Time) {
 //
 // TODO: This can be improved.
 func Copy(m IMessage) IMessage {
-	msg := NewMessage(m.GetLevel(), m.GetContent().GetOriginal())
+	msg := New(m.GetLevel(), m.GetContent().GetOriginal())
 
 	// Copy `options.Tags`.
 	msg.GetMessage().Tags = m.GetMessage().Tags
@@ -316,14 +316,14 @@ func Copy(m IMessage) IMessage {
 // Factory.
 //////
 
-// NewMessage is the Message factory.
+// New is the Message factory.
 //
 // Note: Changes in the `Message` or `Options` data structure may reflects here.
-func NewMessage(l level.Level, ct string) IMessage {
+func New(l level.Level, ct string) IMessage {
 	return &message{
-		Options: options.NewDefaultOptions(),
+		Options: options.New(),
 
-		Content:     content.NewContent(ct),
+		Content:     content.New(ct),
 		ID:          generateUUID(),
 		Level:       l,
 		lineBreaker: newLineBreaker("\n", "\r"),

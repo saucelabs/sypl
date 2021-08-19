@@ -66,7 +66,7 @@ func TestPrefixer(t *testing.T) {
 			args: args{
 				prefix: shared.DefaultPrefixValue,
 			},
-			message: message.NewMessage(level.Info, shared.DefaultContentOutput),
+			message: message.New(level.Info, shared.DefaultContentOutput),
 			want:    shared.DefaultPrefixValue + shared.DefaultContentOutput,
 		},
 	}
@@ -99,7 +99,7 @@ func TestSuffixer(t *testing.T) {
 			args: args{
 				suffix: " - My Suffix",
 			},
-			message: message.NewMessage(level.Info, shared.DefaultContentOutput),
+			message: message.New(level.Info, shared.DefaultContentOutput),
 			want:    shared.DefaultContentOutput + " - My Suffix",
 		},
 	}
@@ -142,9 +142,9 @@ func TestNewProcessor(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p := NewProcessor(tt.args.name, tt.args.RunFunc)
+			p := New(tt.args.name, tt.args.RunFunc)
 
-			m := message.NewMessage(level.Info, shared.DefaultContentOutput)
+			m := message.New(level.Info, shared.DefaultContentOutput)
 
 			if err := p.Run(m); err != nil {
 				t.Errorf("Run failed: %s", err)
@@ -184,9 +184,9 @@ func TestProcessor_SetStatus(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p := NewProcessor(tt.args.name, tt.args.RunFunc)
+			p := New(tt.args.name, tt.args.RunFunc)
 
-			m := message.NewMessage(level.Info, shared.DefaultContentOutput)
+			m := message.New(level.Info, shared.DefaultContentOutput)
 
 			p.SetStatus(tt.status)
 
@@ -228,7 +228,7 @@ func TestProcessor_GetStatus(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p := NewProcessor(tt.args.name, tt.args.RunFunc)
+			p := New(tt.args.name, tt.args.RunFunc)
 
 			p.SetStatus(tt.status)
 

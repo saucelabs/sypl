@@ -50,8 +50,8 @@ func (c *content) SetProcessed(content string) {
 // Factory.
 //////
 
-// NewContent is the Content factory.
-func NewContent(c string) IContent {
+// New is the Content factory.
+func New(c string) IContent {
 	return &content{
 		Original:  c,
 		Processed: c,

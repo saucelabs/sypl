@@ -269,8 +269,8 @@ func (o *output) write(m message.IMessage) error {
 // Factory.
 //////
 
-// NewOutput is the Output factory.
-func NewOutput(name string,
+// New is the Output factory.
+func New(name string,
 	maxLevel level.Level,
 	w io.Writer,
 	processors ...processor.IProcessor,

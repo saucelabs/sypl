@@ -319,8 +319,8 @@ func TestNew(t *testing.T) {
 			bufWriter := bufio.NewWriter(&buf)
 
 			New(a.component).
-				AddOutputs(output.NewOutput("buffer 1", a.maxLevel, bufWriter)).
-				AddOutputs(output.NewOutput("buffer 2", a.maxLevel, bufWriter)).
+				AddOutputs(output.New("buffer 1", a.maxLevel, bufWriter)).
+				AddOutputs(output.New("buffer 2", a.maxLevel, bufWriter)).
 				PrintWithOptions(&options.Options{
 					OutputsNames: []string{"buffer 1"},
 				}, a.level, shared.DefaultContentOutput)
@@ -357,8 +357,8 @@ func TestNew(t *testing.T) {
 			bufWriter := bufio.NewWriter(&buf)
 
 			New(a.component).
-				AddOutputs(output.NewOutput("buffer 1", a.maxLevel, bufWriter)).
-				AddOutputs(output.NewOutput("buffer 2", a.maxLevel, bufWriter)).
+				AddOutputs(output.New("buffer 1", a.maxLevel, bufWriter)).
+				AddOutputs(output.New("buffer 2", a.maxLevel, bufWriter)).
 				PrintWithOptions(&options.Options{
 					OutputsNames: []string{"buffer 2"},
 				}, level.Info, shared.DefaultContentOutput)
@@ -379,7 +379,7 @@ func TestNew(t *testing.T) {
 			bufWriter := bufio.NewWriter(&buf)
 
 			New(a.component).
-				AddOutputs(output.NewOutput("buffer 1", a.maxLevel, bufWriter, processor.ChangeFirstCharCase(processor.Uppercase))).
+				AddOutputs(output.New("buffer 1", a.maxLevel, bufWriter, processor.ChangeFirstCharCase(processor.Uppercase))).
 				Info(shared.DefaultContentOutput)
 
 			bufWriter.Flush()
@@ -398,7 +398,7 @@ func TestNew(t *testing.T) {
 			bufWriter := bufio.NewWriter(&buf)
 
 			New(a.component).
-				AddOutputs(output.NewOutput("buffer 1", a.maxLevel, bufWriter, processor.ChangeFirstCharCase(processor.Lowercase))).
+				AddOutputs(output.New("buffer 1", a.maxLevel, bufWriter, processor.ChangeFirstCharCase(processor.Lowercase))).
 				Info(shared.DefaultContentOutput)
 
 			bufWriter.Flush()
@@ -421,11 +421,11 @@ func TestNew(t *testing.T) {
 
 			// Creates an `Output`. In this case, called Console that will print to
 			// stdout and max print level @ Info.
-			ConsoleToStdOut := output.NewOutput("Console", level.Info, bufWriter)
+			ConsoleToStdOut := output.New("Console", level.Info, bufWriter)
 
 			// Creates a `Processor`. It will prefix all messages.
 			Prefixer := func(prefix string) processor.IProcessor {
-				return processor.NewProcessor("Prefixer", func(message message.IMessage) error {
+				return processor.New("Prefixer", func(message message.IMessage) error {
 					message.GetContent().SetProcessed(prefix + message.GetContent().GetProcessed())
 
 					return nil
@@ -461,7 +461,7 @@ func TestNew(t *testing.T) {
 
 			// Creates an `Output`. In this case, called Buffer that will write
 			// to the specified buffer, and max print level @ Info.
-			BufferOutput := output.NewOutput("Buffer", level.Info, bufWriter)
+			BufferOutput := output.New("Buffer", level.Info, bufWriter)
 
 			// Adds `Output` to logger.
 			testingLogger.AddOutputs(BufferOutput)

@@ -25,6 +25,8 @@ const (
 	Trace
 )
 
+// Changed from [...]string to []string so can be returned @ `LevelsNames` and
+// later on `strings.Join` by consumers.
 var names = []string{"None", "Fatal", "Error", "Info", "Warn", "Debug", "Trace"}
 
 // String interface implementation.

@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Add `doc.go` for all packages.
     - Update `README.md` to point to these new `doc.go`.
 
+## [1.3.10] - 2021-08-18
+## Changed
+- Improved `FromString`
+
 ## [1.3.9] - 2021-08-18
 ## Added
 - Adds `MustFromString`

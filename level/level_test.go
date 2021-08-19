@@ -60,7 +60,7 @@ func TestFromString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := FromString(tt.args.level); got != tt.want {
+			if got, _ := FromString(tt.args.level); got != tt.want {
 				t.Errorf("FromString() = %v, want %v", got, tt.want)
 			}
 		})

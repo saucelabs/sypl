@@ -11,7 +11,7 @@ const ErrorPrefix = "[sypl] [Error]"
 const (
 	DefaultComponentNameOutput = "componentNameTest"
 	DefaultContentOutput       = "contentTest"
-	DefaultFileMode            = 0644
+	DefaultFileMode            = 0o644
 	DefaultPrefixValue         = "My Prefix - "
 	DefaultTimestampFormat     = "2006"
 )

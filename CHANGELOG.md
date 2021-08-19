@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Add `doc.go` for all packages.
     - Update `README.md` to point to these new `doc.go`.
 
+## [1.4.1] - 2021-08-19
+## Changed
+- Allows to specify the name of `dashHandler` output.
+    - Now, when `-` is specified as a path, `dashHandler` is named after the original output.
+
 ## [1.4.0] - 2021-08-18
 ## Changed
 - Fixed names of the factories, so it doesn't stutters.

@@ -21,9 +21,9 @@ type FileRotationOptions lumberjack.Logger
 
 // Handles the common used "-" making the output behave as a Console writing to
 // stdout, and named "-".
-func dashHandler(path string, maxLevel level.Level, processors ...processor.IProcessor) IOutput {
+func dashHandler(name, path string, maxLevel level.Level, processors ...processor.IProcessor) IOutput {
 	if path == "-" {
-		return New("-", maxLevel, os.Stdout, processors...)
+		return New(name, maxLevel, os.Stdout, processors...)
 	}
 
 	return nil
@@ -60,9 +60,9 @@ func FileBased(
 // File is a built-in `output` - named `File`, that writes to the specified file.
 //
 // Note: If the common used "-" is used, it will behave as a Console writing to
-// stdout, and named "-".
+// stdout.
 func File(path string, maxLevel level.Level, processors ...processor.IProcessor) IOutput {
-	if o := dashHandler(path, maxLevel, processors...); o != nil {
+	if o := dashHandler("File", path, maxLevel, processors...); o != nil {
 		return o
 	}
 
@@ -82,14 +82,14 @@ func File(path string, maxLevel level.Level, processors ...processor.IProcessor)
 // writes to the specified file, an is automatically rotated.
 //
 // Note: If the common used "-" is used, it will behave as a Console writing to
-// stdout, and named "-".
+// stdout.
 func FileWithRotation(
 	path string,
 	maxLevel level.Level,
 	options *FileRotationOptions,
 	processors ...processor.IProcessor,
 ) IOutput {
-	if o := dashHandler(path, maxLevel, processors...); o != nil {
+	if o := dashHandler("FileWithRotation", path, maxLevel, processors...); o != nil {
 		return o
 	}
 

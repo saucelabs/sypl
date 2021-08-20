@@ -17,11 +17,11 @@ const (
 	// Mute message will be processed, but not printed.
 	Mute
 
-	// Skip message will not be processed, but printed.
+	// Skip message will not be processed, neither formatted, but printed.
 	Skip
 
-	// SkipAndForce message will not be processed, but will be printed
-	// independent of `Level` restrictions.
+	// SkipAndForce message will not be processed, , neither formatted, but will
+	// be printed independent of `Level` restrictions.
 	SkipAndForce
 
 	// SkipAndMute message will not be processed, neither printed.

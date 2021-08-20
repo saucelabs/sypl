@@ -529,3 +529,18 @@ func ExampleNew_printMessagesToOutputsWithOptions() {
 	// component=componentNameTest output=console 2 level=warn timestamp=2021-08-19T11:48:34-07:00 message=contentTest 1=2
 	// component=componentNameTest output=console 1 level=info timestamp=2021-08-19T11:48:34-07:00 message=contentTest 1=2
 }
+
+// PrintNewLine example.
+func ExampleNew_printNewLine() {
+	// Creates logger, and name it.
+	l := sypl.New(shared.DefaultComponentNameOutput, output.Console(level.Info))
+
+	l.Infoln(shared.DefaultContentOutput)
+	l.PrintNewLine()
+	l.Infoln(shared.DefaultContentOutput)
+
+	// output:
+	// contentTest
+	//
+	// contentTest
+}

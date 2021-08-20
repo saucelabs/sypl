@@ -244,8 +244,10 @@ func (o *output) processProcessors(m message.IMessage, processorsNames string) {
 
 // DRY for the writing step.
 func (o *output) write(m message.IMessage) error {
-	// Should only format if any.
-	if o.GetFormatter() != nil {
+	// Should only format if any, and if not flagged.
+	if o.GetFormatter() != nil &&
+		m.GetFlag() != flag.Skip &&
+		m.GetFlag() != flag.SkipAndForce {
 		if err := o.GetFormatter().Run(m); err != nil {
 			log.Println(shared.ErrorPrefix, processor.NewProcessingError(m, err))
 		}

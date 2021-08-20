@@ -7,9 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Roadmap
 
+- Flag should be an array.
 - Improve documentation:
     - Add `doc.go` for all packages.
     - Update `README.md` to point to these new `doc.go`.
+
+## [1.4.4] - 2021-08-20
+## Added
+- Adds `PrintNewLine`
+
+## Changed
+- `Skip` and `SkipAndForce` flags now skips formatters too.
 
 ## [1.4.3] - 2021-08-20
 ## Changed

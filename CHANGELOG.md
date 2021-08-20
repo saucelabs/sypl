@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Add `doc.go` for all packages.
     - Update `README.md` to point to these new `doc.go`.
 
+## [1.4.3] - 2021-08-20
+## Changed
+- Removes unused entries from `Makefile`
+- `sypl.New` now returns `*Sypl`
+
 ## [1.4.2] - 2021-08-19
 ## Added
 - Adds `PrintMessagesToOutputsWithOptions`

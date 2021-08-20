@@ -23,7 +23,7 @@ endif
 	@echo "Open localhost:6060/pkg/github.com/saucelabs/sypl/ in your browser\n"
 	@godoc -http :6060
 
-ci: lint test coverage cobertura
-ci-integration: lint test-integration coverage cobertura
+ci: lint test coverage
+ci-integration: lint test-integration coverage
 
-.PHONY: lint test coverage cobertura ci ci-integration
+.PHONY: lint test coverage ci ci-integration

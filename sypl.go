@@ -458,7 +458,7 @@ func (sypl *Sypl) GetOutputsNames() []string {
 // New creates a child logger. The child logger is an accurate, efficient and
 // shallow copy of the parent logger. Changes to internals, such as the state of
 // outputs, and processors, are reflected cross all other loggers.
-func (sypl *Sypl) New(name string) ISypl {
+func (sypl *Sypl) New(name string) *Sypl {
 	return New(name, sypl.outputs...)
 }
 

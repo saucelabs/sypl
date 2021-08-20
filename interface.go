@@ -223,7 +223,7 @@ type ISypl interface {
 	GetOutputsNames() []string
 
 	// New creates a child logger.
-	New(name string) ISypl
+	New(name string) *Sypl
 
 	// Process messages, per output, and process accordingly.
 	process(messages ...message.IMessage)

@@ -5,6 +5,7 @@
 package level
 
 import (
+	"errors"
 	"testing"
 )
 
@@ -39,29 +40,50 @@ func TestFromString(t *testing.T) {
 		level string
 	}
 	tests := []struct {
-		name string
-		args args
-		want Level
+		name       string
+		args       args
+		want       Level
+		wantErr    bool
+		wantErrMsg string
 	}{
 		{
 			name: "Should work - Valid",
 			args: args{
 				level: "Info",
 			},
-			want: Info,
+			want:       Info,
+			wantErr:    false,
+			wantErrMsg: "",
 		},
 		{
 			name: "Should work - None",
 			args: args{
 				level: "Invalid",
 			},
-			want: None,
+			want:       None,
+			wantErr:    true,
+			wantErrMsg: "invalid error level: Invalid",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := FromString(tt.args.level); got != tt.want {
+			got, err := FromString(tt.args.level)
+			if got != tt.want {
 				t.Errorf("FromString() = %v, want %v", got, tt.want)
+			}
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Expected error = %v, want %v", err, tt.wantErr)
+			}
+
+			if tt.wantErr && (err != nil) {
+				if err.Error() != tt.wantErrMsg {
+					t.Errorf("Expected error = %v, want %v", err.Error(), tt.wantErrMsg)
+				}
+
+				if !errors.Is(err, ErrInvalidLevel) {
+					t.Errorf("Expected error to be ErrInvalidLevel")
+				}
 			}
 		})
 	}

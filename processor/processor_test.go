@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/saucelabs/sypl/flag"
 	"github.com/saucelabs/sypl/level"
 	"github.com/saucelabs/sypl/message"
 	"github.com/saucelabs/sypl/shared"
@@ -112,6 +113,72 @@ func TestSuffixer(t *testing.T) {
 
 			if !strings.EqualFold(tt.message.GetContent().GetProcessed(), tt.want) {
 				t.Errorf("Suffixer() = %v, want %v", tt.message.GetContent().GetProcessed(), tt.want)
+			}
+		})
+	}
+}
+
+func TestPrintOnlyAtLevel(t *testing.T) {
+	type args struct {
+		levels []level.Level
+	}
+	tests := []struct {
+		name    string
+		args    args
+		message message.IMessage
+		want    flag.Flag
+	}{
+		{
+			name: "Should work - should not mute - multiple levels",
+			args: args{
+				levels: []level.Level{level.Info, level.Warn},
+			},
+			message: message.New(level.Info, shared.DefaultContentOutput),
+			want:    flag.None,
+		},
+		{
+			name: "Should work - should not mute - multiple levels",
+			args: args{
+				levels: []level.Level{level.Info, level.Warn},
+			},
+			message: message.New(level.Warn, shared.DefaultContentOutput),
+			want:    flag.None,
+		},
+		{
+			name: "Should work - should mute - multiple levels",
+			args: args{
+				levels: []level.Level{level.Info, level.Warn},
+			},
+			message: message.New(level.Debug, shared.DefaultContentOutput),
+			want:    flag.Mute,
+		},
+		{
+			name: "Should work - should mute - one level",
+			args: args{
+				levels: []level.Level{level.Trace},
+			},
+			message: message.New(level.Debug, shared.DefaultContentOutput),
+			want:    flag.Mute,
+		},
+		{
+			name: "Should work - should not mute - one level",
+			args: args{
+				levels: []level.Level{level.Trace},
+			},
+			message: message.New(level.Trace, shared.DefaultContentOutput),
+			want:    flag.None,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p := PrintOnlyAtLevel(tt.args.levels...)
+
+			if err := p.Run(tt.message); err != nil {
+				t.Errorf("Run failed: %s", err)
+			}
+
+			if tt.message.GetFlag() != tt.want {
+				t.Errorf("Flag got: %s expected: %s ", tt.message.GetFlag(), tt.want)
 			}
 		})
 	}

@@ -12,6 +12,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Add `doc.go` for all packages.
     - Update `README.md` to point to these new `doc.go`.
 
+## [1.4.5] - 2021-08-30
+## Changed
+- `StdErr` now only prints `Error` AND `Fatal` instead of only `Error`.
+- `Console` now ignores `Error` AND `Fatal` instead of only `Error`.
+- `PrintOnlyAtLevel` now handle multiples levels.
+- `FromString` now returns the level, and error instead of level, and bool (ok).
+- Internal `sypl.process` is now validated. In case of failure it throws `ErrSyplNotInitialized`.
+- All `error.go` files were renamed to `errors.go`, following Go standards.
+
 ## [1.4.4] - 2021-08-20
 ## Added
 - Adds `PrintNewLine`

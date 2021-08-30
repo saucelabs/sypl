@@ -5,6 +5,7 @@
 package level
 
 import (
+	"fmt"
 	"log"
 	"strings"
 
@@ -48,14 +49,14 @@ func FromInt(level int) Level {
 // FromString returns a `Level` from a given string. It can also be used to
 // validate if a given string, is a `Level`. An invalid level will return `None`
 // as `Level`, and not ok (`false`).
-func FromString(level string) (Level, bool) {
+func FromString(level string) (Level, error) {
 	for i, levelString := range names {
 		if strings.EqualFold(level, levelString) {
-			return Level(i), true
+			return Level(i), nil
 		}
 	}
 
-	return None, false
+	return None, fmt.Errorf("%w: %s", ErrInvalidLevel, level)
 }
 
 // MustFromString returns a `Level` from a given string. Failure will log, and

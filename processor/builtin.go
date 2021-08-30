@@ -191,9 +191,11 @@ func Prefixer(prefix string) IProcessor {
 }
 
 // PrintOnlyAtLevel prints only if message is at the specified level.
-func PrintOnlyAtLevel(l level.Level) IProcessor {
+func PrintOnlyAtLevel(levels ...level.Level) IProcessor {
 	return New("PrintOnlyAtLevel", func(m message.IMessage) error {
-		if m.GetLevel() != l {
+		concatenatedLevels := level.LevelsToString(levels)
+
+		if !strings.Contains(concatenatedLevels, m.GetLevel().String()) {
 			m.SetFlag(flag.Mute)
 		}
 

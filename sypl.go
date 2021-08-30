@@ -7,6 +7,7 @@ package sypl
 import (
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 
@@ -475,6 +476,10 @@ func (sypl *Sypl) New(name string) *Sypl {
 
 // Process messages, per output, and process accordingly.
 func (sypl *Sypl) process(messages ...message.IMessage) {
+	if sypl == nil {
+		log.Fatalf("%s %s", shared.ErrorPrefix, ErrSyplNotInitialized)
+	}
+
 	shouldExit := false
 
 	g := new(errgroup.Group)
@@ -608,7 +613,7 @@ func New(name string, outputs ...output.IOutput) *Sypl {
 // Note: `processors` are applied to both outputs.
 func NewDefault(name string, maxLevel level.Level, processors ...processor.IProcessor) *Sypl {
 	consoleProcessors := processors
-	consoleProcessors = append(consoleProcessors, processor.MuteBasedOnLevel(level.Error))
+	consoleProcessors = append(consoleProcessors, processor.MuteBasedOnLevel(level.Fatal, level.Error))
 
 	return &Sypl{
 		name: name,

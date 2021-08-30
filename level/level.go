@@ -26,8 +26,6 @@ const (
 	Trace
 )
 
-// Changed from [...]string to []string so can be returned @ `LevelsNames` and
-// later on `strings.Join` by consumers.
 var names = []string{"None", "Fatal", "Error", "Info", "Warn", "Debug", "Trace"}
 
 // String interface implementation.
@@ -56,7 +54,7 @@ func FromString(level string) (Level, error) {
 		}
 	}
 
-	return None, fmt.Errorf("%w: %s", ErrInvalidLevel, level)
+	return None, fmt.Errorf("%w: %s. Available: %s", ErrInvalidLevel, level, strings.Join(LevelsNames(), ", "))
 }
 
 // MustFromString returns a `Level` from a given string. Failure will log, and
@@ -86,5 +84,11 @@ func LevelsToString(levels []Level) string {
 
 // LevelsNames returns the name of all available levels.
 func LevelsNames() []string {
-	return names
+	finalNames := []string{}
+
+	for _, name := range names {
+		finalNames = append(finalNames, strings.ToLower(name))
+	}
+
+	return finalNames
 }

@@ -12,6 +12,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Add `doc.go` for all packages.
     - Update `README.md` to point to these new `doc.go`.
 
+## [1.4.6] - 2021-08-30
+## Changed
+- `FromString` error now prints also available levels.
+- `LevelsNames` returns lower-cased levels.
+
 ## [1.4.5] - 2021-08-30
 ## Changed
 - `StdErr` now only prints `Error` AND `Fatal` instead of only `Error`.

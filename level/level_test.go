@@ -62,7 +62,7 @@ func TestFromString(t *testing.T) {
 			},
 			want:       None,
 			wantErr:    true,
-			wantErrMsg: "invalid error level: Invalid",
+			wantErrMsg: "invalid error level: Invalid. Available: none, fatal, error, info, warn, debug, trace",
 		},
 	}
 	for _, tt := range tests {

@@ -411,8 +411,10 @@ func (sypl *Sypl) GetFields() fields.Fields {
 }
 
 // SetFields sets the structured fields.
-func (sypl *Sypl) SetFields(fields fields.Fields) {
+func (sypl *Sypl) SetFields(fields fields.Fields) ISypl {
 	sypl.fields = fields
+
+	return sypl
 }
 
 // GetMaxLevel returns the `maxLevel` of all outputs.

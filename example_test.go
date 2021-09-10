@@ -24,6 +24,27 @@ import (
 	"github.com/saucelabs/sypl/status"
 )
 
+//////
+// Helpers
+//////
+
+// Checks if `src` has `texts`.
+func stringContains(src string, texts ...string) bool {
+	contains := true
+
+	for _, text := range texts {
+		if !strings.Contains(src, text) {
+			contains = false
+		}
+	}
+
+	return contains
+}
+
+//////
+// Examples.
+//////
+
 // NonChained is a non-chained example of creating, and setting up a `sypl`
 // logger. It writes to a custom buffer.
 func ExampleNew_notChained() {
@@ -547,8 +568,10 @@ func ExampleNew_printNewLine() {
 
 // Global fields example.
 func ExampleNew_globalFields() {
+	buf, o := output.SafeBuffer(level.Info)
+
 	// Creates logger, and name it.
-	l := sypl.New(shared.DefaultComponentNameOutput, output.Console(level.Info).SetFormatter(formatter.Text()))
+	l := sypl.New(shared.DefaultComponentNameOutput, o.SetFormatter(formatter.Text()))
 	l.SetFields(fields.Fields{"test": 1})
 
 	l.Infoln(shared.DefaultContentOutput)
@@ -556,8 +579,13 @@ func ExampleNew_globalFields() {
 		Fields: fields.Fields{"test": 2, "test2": 3},
 	}, level.Info, shared.DefaultContentOutput)
 
+	fmt.Println(stringContains(buf.String(), "message=contentTest test=1", "contentTest test=2 test2=3"))
+
 	// Prints:
 	//
 	// component=componentNameTest output=console level=info timestamp=2021-09-10T14:19:38-07:00 message=contentTest test=1
 	// component=componentNameTest output=console level=info timestamp=2021-09-10T14:19:38-07:00 message=contentTest test=2 test2=3
+
+	// output:
+	// true
 }

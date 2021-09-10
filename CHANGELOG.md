@@ -25,6 +25,10 @@ Refs. for badges:
 - github.com/wayneashleyberry/terminal-dimensions
 - https://github.com/golangci/golangci-lint
 
+## [1.5.1] - 2021-09-10
+## Changed
+- Sypl `SetFields` is chainable.
+
 ## [1.5.0] - 2021-09-10
 ## Added
 - Adds the ability to set global Fields.

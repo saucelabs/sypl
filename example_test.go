@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/saucelabs/sypl"
+	"github.com/saucelabs/sypl/fields"
 	"github.com/saucelabs/sypl/flag"
 	"github.com/saucelabs/sypl/formatter"
 	"github.com/saucelabs/sypl/level"
@@ -313,7 +314,7 @@ func ExampleNew_textFormatter() {
 	sypl.New(shared.DefaultComponentNameOutput).
 		AddOutputs(o).
 		PrintlnWithOptions(&options.Options{
-			Fields: options.Fields{
+			Fields: fields.Fields{
 				"field1": "value1",
 				"field2": "value2",
 				"field3": "value3",
@@ -349,7 +350,7 @@ func ExampleNew_jsonFormatter() {
 	sypl.New(shared.DefaultComponentNameOutput).
 		AddOutputs(o).
 		PrintWithOptions(&options.Options{
-			Fields: options.Fields{
+			Fields: fields.Fields{
 				"field1": "value1",
 				"field2": 1,
 				"field3": true,
@@ -391,7 +392,6 @@ func ExampleNew_jsonFormatter() {
 }
 
 // Simulates a problematic processor.
-//nolint:lll
 func ExampleNew_errorSimulator() {
 	// Creates logger, and name it.
 	sypl.New(shared.DefaultComponentNameOutput).
@@ -518,7 +518,7 @@ func ExampleNew_printMessagesToOutputsWithOptions() {
 	)
 
 	l.PrintMessagesToOutputsWithOptions(&options.Options{
-		Fields: options.Fields{"1": 2},
+		Fields: fields.Fields{"1": 2},
 	},
 		sypl.MessageToOutput{Content: fmt.Sprintln(shared.DefaultContentOutput), Level: level.Info, OutputName: "Console 1"},
 		sypl.MessageToOutput{Content: fmt.Sprintln(shared.DefaultContentOutput), Level: level.Warn, OutputName: "Console 2"},
@@ -543,4 +543,21 @@ func ExampleNew_printNewLine() {
 	// contentTest
 	//
 	// contentTest
+}
+
+// Global fields example.
+func ExampleNew_globalFields() {
+	// Creates logger, and name it.
+	l := sypl.New(shared.DefaultComponentNameOutput, output.Console(level.Info).SetFormatter(formatter.Text()))
+	l.SetFields(fields.Fields{"test": 1})
+
+	l.Infoln(shared.DefaultContentOutput)
+	l.PrintlnWithOptions(&options.Options{
+		Fields: fields.Fields{"test": 2, "test2": 3},
+	}, level.Info, shared.DefaultContentOutput)
+
+	// Prints:
+	//
+	// component=componentNameTest output=console level=info timestamp=2021-09-10T14:19:38-07:00 message=contentTest test=1
+	// component=componentNameTest output=console level=info timestamp=2021-09-10T14:19:38-07:00 message=contentTest test=2 test2=3
 }

@@ -11,6 +11,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/saucelabs/sypl/fields"
 	"github.com/saucelabs/sypl/flag"
 	"github.com/saucelabs/sypl/formatter"
 	"github.com/saucelabs/sypl/level"
@@ -39,6 +40,7 @@ type MessageToOutput struct {
 // Sypl logger definition.
 type Sypl struct {
 	name    string
+	fields  fields.Fields
 	outputs []output.IOutput
 	status  status.Status
 }
@@ -403,6 +405,16 @@ func (sypl *Sypl) Traceln(args ...interface{}) ISypl {
 // ISypl interface implementation.
 //////
 
+// GetFields returns the structured fields.
+func (sypl *Sypl) GetFields() fields.Fields {
+	return sypl.fields
+}
+
+// SetFields sets the structured fields.
+func (sypl *Sypl) SetFields(fields fields.Fields) {
+	sypl.fields = fields
+}
+
 // GetMaxLevel returns the `maxLevel` of all outputs.
 func (sypl *Sypl) GetMaxLevel() map[string]level.Level {
 	levelMap := map[string]level.Level{}
@@ -512,6 +524,10 @@ func (sypl *Sypl) process(messages ...message.IMessage) {
 
 			m.SetOutputsNames(outputsNames)
 
+			// Should allows to set global fields. Per-message fields has
+			// precedence.
+			m.SetFields(fields.Copy(m.GetFields(), sypl.GetFields()))
+
 			sypl.processOutputs(m, strings.Join(outputsNames, ","))
 
 			if m.GetLevel() == level.Fatal {
@@ -616,7 +632,8 @@ func NewDefault(name string, maxLevel level.Level, processors ...processor.IProc
 	consoleProcessors = append(consoleProcessors, processor.MuteBasedOnLevel(level.Fatal, level.Error))
 
 	return &Sypl{
-		name: name,
+		name:   name,
+		fields: fields.Fields{},
 		outputs: []output.IOutput{
 			output.Console(maxLevel, consoleProcessors...).SetFormatter(formatter.Text()),
 			output.StdErr(processors...).SetFormatter(formatter.Text()),

@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/saucelabs/sypl/content"
+	"github.com/saucelabs/sypl/fields"
 	"github.com/saucelabs/sypl/flag"
 	"github.com/saucelabs/sypl/level"
-	"github.com/saucelabs/sypl/options"
 )
 
 // ILineBreaker specifies what a LineBreaker does.
@@ -44,10 +44,10 @@ type IMessage interface {
 	SetContent(c content.IContent)
 
 	// GetFields returns the structured fields.
-	GetFields() options.Fields
+	GetFields() fields.Fields
 
 	// SetFields sets the structured fields.
-	SetFields(fields options.Fields)
+	SetFields(fields fields.Fields)
 
 	// GetFlag returns the flag.
 	GetFlag() flag.Flag

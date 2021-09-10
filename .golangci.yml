@@ -31,6 +31,10 @@ issues:
         - gomnd
         - forbidigo
 
+    - path: example_test.go
+      linters:
+        - lll
+
     - path: internal/http/
       linters:
         - unparam

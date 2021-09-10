@@ -4,10 +4,10 @@
 
 package options
 
-import "github.com/saucelabs/sypl/flag"
-
-// Fields allows to add structured fields to a message.
-type Fields map[string]interface{}
+import (
+	"github.com/saucelabs/sypl/fields"
+	"github.com/saucelabs/sypl/flag"
+)
 
 // Options extends printer's capabilities.
 //
@@ -15,7 +15,7 @@ type Fields map[string]interface{}
 // changes in the `Copy`, `mergeOptions`, `New`, or `NewOptions` methods.
 type Options struct {
 	// Structured fields.
-	Fields Fields
+	Fields fields.Fields
 
 	// Flags define behaviors.
 	Flag flag.Flag
@@ -39,7 +39,7 @@ type Options struct {
 // Note: Changes in the `Message` or `Options` data structure may reflects here.
 func New() *Options {
 	return &Options{
-		Fields:          Fields{},
+		Fields:          fields.Fields{},
 		Flag:            flag.None,
 		OutputsNames:    []string{},
 		ProcessorsNames: []string{},

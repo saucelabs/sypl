@@ -4,9 +4,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/saucelabs/sypl/fields"
 	"github.com/saucelabs/sypl/level"
 	"github.com/saucelabs/sypl/message"
-	"github.com/saucelabs/sypl/options"
 	"github.com/saucelabs/sypl/shared"
 )
 
@@ -22,7 +22,7 @@ func TestText(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			m := message.New(level.Info, shared.DefaultContentOutput)
 			m.SetComponentName(shared.DefaultComponentNameOutput)
-			m.SetFields(options.Fields{
+			m.SetFields(fields.Fields{
 				"key1": "value1",
 			})
 
@@ -61,7 +61,7 @@ func TestJSON(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			m := message.New(level.Info, shared.DefaultContentOutput)
 			m.SetComponentName(shared.DefaultComponentNameOutput)
-			m.SetFields(options.Fields{
+			m.SetFields(fields.Fields{
 				"key1": "value1",
 			})
 

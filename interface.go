@@ -211,6 +211,11 @@ type ISypl interface {
 	// SetMaxLevel sets the `maxLevel` of all outputs.
 	SetMaxLevel(l level.Level)
 
+	// GetFields returns the global registered fields.
+
+	// SetFields sets global fields. Per-message fields has precedence over
+	// global fields.
+
 	// AddOutputs adds one or more outputs.
 	AddOutputs(outputs ...output.IOutput) ISypl
 

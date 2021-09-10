@@ -10,6 +10,7 @@ import (
 
 	"github.com/emirpasic/gods/sets/treeset"
 	"github.com/saucelabs/sypl/content"
+	"github.com/saucelabs/sypl/fields"
 	"github.com/saucelabs/sypl/flag"
 	"github.com/saucelabs/sypl/level"
 	"github.com/saucelabs/sypl/options"
@@ -180,12 +181,12 @@ func (m *message) SetContent(c content.IContent) {
 }
 
 // GetFields returns the structured fields.
-func (m *message) GetFields() options.Fields {
+func (m *message) GetFields() fields.Fields {
 	return m.Fields
 }
 
 // SetFields sets the structured fields.
-func (m *message) SetFields(fields options.Fields) {
+func (m *message) SetFields(fields fields.Fields) {
 	m.Fields = fields
 }
 

@@ -193,7 +193,6 @@ func (o *output) Write(m message.IMessage) error {
 
 	// Should print the message - regardless of the level, if flagged
 	// with `Force`.
-
 	if m.GetFlag() == flag.Force || m.GetFlag() == flag.SkipAndForce {
 		if err := o.write(m); err != nil {
 			log.Println(shared.ErrorPrefix, err)

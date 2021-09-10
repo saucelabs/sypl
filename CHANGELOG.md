@@ -7,10 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Roadmap
 
+- Add badges to README.md:
+  - GoDoc
+  - Go Report Card
+  - Build Status
+  - Coverage Status
+  - License
+  - Release
 - Flag should be an array.
+- Move `Options`' methods from `Message` to `Options`
+    - Create 2 interfaces: 1 for Sypl, 1 for Message.
 - Improve documentation:
     - Add `doc.go` for all packages.
     - Update `README.md` to point to these new `doc.go`.
+
+Refs. for badges:
+- github.com/wayneashleyberry/terminal-dimensions
+- https://github.com/golangci/golangci-lint
+
+## [1.5.0] - 2021-09-10
+## Added
+- Adds the ability to set global Fields.
 
 ## [1.4.6] - 2021-08-30
 ## Changed

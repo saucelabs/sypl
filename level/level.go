@@ -48,6 +48,10 @@ func FromInt(level int) Level {
 // validate if a given string, is a `Level`. An invalid level will return `None`
 // as `Level`, and not ok (`false`).
 func FromString(level string) (Level, error) {
+	if level == "" {
+		return None, fmt.Errorf("%w: No level specified. Available: %s", ErrInvalidLevel, strings.Join(LevelsNames(), ", "))
+	}
+
 	for i, levelString := range names {
 		if strings.EqualFold(level, levelString) {
 			return Level(i), nil
@@ -60,6 +64,10 @@ func FromString(level string) (Level, error) {
 // MustFromString returns a `Level` from a given string. Failure will log, and
 // exit printing available levels.
 func MustFromString(level string) Level {
+	if level == "" {
+		log.Fatalf("%s No level specified. Available: %s", shared.ErrorPrefix, strings.Join(LevelsNames(), ", "))
+	}
+
 	for i, levelString := range names {
 		if strings.EqualFold(level, levelString) {
 			return Level(i)

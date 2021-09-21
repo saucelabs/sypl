@@ -56,13 +56,20 @@ func TestFromString(t *testing.T) {
 			wantErrMsg: "",
 		},
 		{
-			name: "Should work - None",
+			name: "Should fail - Invalid",
 			args: args{
 				level: "Invalid",
 			},
 			want:       None,
 			wantErr:    true,
 			wantErrMsg: "invalid error level: Invalid. Available: none, fatal, error, info, warn, debug, trace",
+		},
+		{
+			name:       "Should fail - empty",
+			args:       args{},
+			want:       None,
+			wantErr:    true,
+			wantErrMsg: "invalid error level: No level specified. Available: none, fatal, error, info, warn, debug, trace",
 		},
 	}
 	for _, tt := range tests {

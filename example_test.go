@@ -578,6 +578,7 @@ func ExampleNew_globalFields() {
 	l.PrintlnWithOptions(&options.Options{
 		Fields: fields.Fields{"test": 2, "test2": 3},
 	}, level.Info, shared.DefaultContentOutput)
+	l.Infoln(shared.DefaultContentOutput)
 
 	fmt.Println(stringContains(buf.String(), "message=contentTest test=1", "contentTest test=2 test2=3"))
 

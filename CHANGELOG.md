@@ -25,6 +25,10 @@ Refs. for badges:
 - github.com/wayneashleyberry/terminal-dimensions
 - https://github.com/golangci/golangci-lint
 
+## [1.5.3] - 2021-09-21
+## Changed
+- Fix bug where setting fields for a message would set globally too.
+
 ## [1.5.2] - 2021-09-21
 ## Changed
 - Level `FromString`, and `MustFromString` methods validates if `level` param is empty.

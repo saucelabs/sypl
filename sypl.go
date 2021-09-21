@@ -526,9 +526,12 @@ func (sypl *Sypl) process(messages ...message.IMessage) {
 
 			m.SetOutputsNames(outputsNames)
 
-			// Should allows to set global fields. Per-message fields has
-			// precedence.
-			m.SetFields(fields.Copy(m.GetFields(), sypl.GetFields()))
+			// Should allows to set global fields.
+			// Per-message fields should have precedence.
+			finalFields := fields.Fields{}
+			finalFields = fields.Copy(sypl.GetFields(), finalFields)
+			finalFields = fields.Copy(m.GetFields(), finalFields)
+			m.SetFields(finalFields)
 
 			sypl.processOutputs(m, strings.Join(outputsNames, ","))
 

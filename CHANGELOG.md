@@ -16,38 +16,65 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Release
 - Flag should be an array.
 - Move `Options`' methods from `Message` to `Options`
-    - Create 2 interfaces: 1 for Sypl, 1 for Message.
 - Improve documentation:
-    - Add `doc.go` for all packages.
-    - Update `README.md` to point to these new `doc.go`.
+  - Add `doc.go` for all packages.
 
 Refs. for badges:
-- github.com/wayneashleyberry/terminal-dimensions
+
+- http://github.com/wayneashleyberry/terminal-dimensions
 - https://github.com/golangci/golangci-lint
 
+## [1.5.4] - 2021-10-13
+### Added
+In a application with many loggers, and child loggers, sometimes more fine control is needed, specially when debugging applications. Sypl offers two powerful ways to achieve that: `SYPL_FILTER`, and `SYPL_DEBUG` env vars.
+
+`SYPL_FILTER` allows to specify the name(s) of the component(s) that should be logged, for example, for a given application with the following loggers: `svc`, `pv`, and `cm`, if a developer wants only to see `svc`, and `pv` logging, it's achieved just setting `SYPL_FILTER="svc,pv"`.
+
+`SYPL_DEBUG` allows to specify the max level, for example, for a given application with the following loggers: `svc`, `pv`, and `cm`, if a developer sets:
+
+- `SYPL_DEBUG="debug"`: any application running using Sypl, any component, any output, will log messages bellow the `debug` level
+- `SYPL_DEBUG="console:debug"`: any application running using Sypl with an output called `console`, will log messages bellow the `debug` level
+- `SYPL_DEBUG="warn,console:debug"`: any application running using Sypl, any component, any output, will log messages bellow the `warn` level, AND any application running using Sypl with an output called `console`, will log messages bellow the `debug` level.
+
+_NOTE: `warn` is specified first. Only for this case - **global scope**, it's a requirement.
+`SYPL_DEBUG="console:debug,warn"`: In this case `warn` will be **discarded!**._
+
+- `SYPL_DEBUG="svc:console:debug"`: any application running using Sypl with a component called `svc` with an output called `console`, will log messages bellow the `debug` level
+- `SYPL_DEBUG="file:warn,svc:console:debug"`: any application running using Sypl with an output called `file` will log messages bellow the `warn` level, and any application running using Sypl with a component called `svc` with an output called `console` will log messages bellow the `debug`.
+
+Possible scopes:
+
+- `{componentName:outputName:level}`: Component, and output scoped
+- `{outputName:level}`: Output scoped
+- `{level}`: Global scope
+
+The possibilities are endless! Checkout the [`debugAndFilter`](example_test.go) example for more.
+### Changed
+- Renamed logging component filtering env var from `SYPL_DEBUG` to `SYPL_FILTER`.
+
 ## [1.5.3] - 2021-09-21
-## Changed
+### Changed
 - Fix bug where setting fields for a message would set globally too.
 
 ## [1.5.2] - 2021-09-21
-## Changed
+### Changed
 - Level `FromString`, and `MustFromString` methods validates if `level` param is empty.
 
 ## [1.5.1] - 2021-09-10
-## Changed
+### Changed
 - Sypl `SetFields` is chainable.
 
 ## [1.5.0] - 2021-09-10
-## Added
+### Added
 - Adds the ability to set global Fields.
 
 ## [1.4.6] - 2021-08-30
-## Changed
+### Changed
 - `FromString` error now prints also available levels.
 - `LevelsNames` returns lower-cased levels.
 
 ## [1.4.5] - 2021-08-30
-## Changed
+### Changed
 - `StdErr` now only prints `Error` AND `Fatal` instead of only `Error`.
 - `Console` now ignores `Error` AND `Fatal` instead of only `Error`.
 - `PrintOnlyAtLevel` now handle multiples levels.
@@ -56,84 +83,84 @@ Refs. for badges:
 - All `error.go` files were renamed to `errors.go`, following Go standards.
 
 ## [1.4.4] - 2021-08-20
-## Added
+### Added
 - Adds `PrintNewLine`
 
-## Changed
+### Changed
 - `Skip` and `SkipAndForce` flags now skips formatters too.
 
 ## [1.4.3] - 2021-08-20
-## Changed
+### Changed
 - Removes unused entries from `Makefile`
 - `sypl.New` now returns `*Sypl`
 
 ## [1.4.2] - 2021-08-19
-## Added
+### Added
 - Adds `PrintMessagesToOutputsWithOptions`
 
 ## [1.4.1] - 2021-08-19
-## Changed
+### Changed
 - Allows to specify the name of `dashHandler` output.
     - Now, when `-` is specified as a path, `dashHandler` is named after the original output.
 
 ## [1.4.0] - 2021-08-18
-## Changed
+### Changed
 - Fixed names of the factories, so it doesn't stutters.
 
 Note: Breaking change.
 
 ## [1.3.11] - 2021-08-18
-## Added
+### Added
 - Adds `LevelsNames`
 
 ## [1.3.10] - 2021-08-18
-## Changed
+### Changed
 - Improved `FromString`
 
 ## [1.3.9] - 2021-08-18
-## Added
+### Added
 - Adds `MustFromString`
 
 ## [1.3.8] - 2021-08-18
-## Added
+### Added
 - Adds the ability to get and set outputs' max level.
 
 ## [1.3.7] - 2021-08-17
-## Changed
+### Changed
 - `NewDefault` only prints errors to `stderr`.
 
 ## [1.3.6] - 2021-08-17
-## Added
+### Added
 - Adds `PrintOnlyIfTagged` built-in processor.
 
-## Changed
+### Changed
 - Renames `PrintOnlyLevel` to `PrintOnlyAtLevel`.
 
 ## [1.3.5] - 2021-08-17
-## Changed
+### Changed
 - `StdErr` only prints @ `Error` `Level`.
 
 ## [1.3.4] - 2021-08-17
-## Added
+### Added
 - Creates `StdErr` built-in `Output`.
 
-## Changed
+### Changed
 - Removes `path` (unused) from `FileBased` `Output`.
 
 ## [1.3.3] - 2021-08-14
-## Changed
+### Changed
 - Improved linebreak detection and restoration.
 
 ## [1.3.2] - 2021-08-13
-## Added
+### Added
 - Adds `PrintMessagerPerOutput` which allows you to concurrently print messages, each one, at the specified level and to the specified output. If the named output doesn't exits, the message will not be printed.
     - Cover with test.
 
-## Changed
+### Changed
 - Adds `output` field to `Text` and `JSON` formatters.
 
 ## [1.3.1] - 2021-08-11
-## Added
+### Added
 - Adds the ability to create child loggers (`New`). The child logger is an accurate, and efficient shallow copy of the parent logger. Changes to internals, such as the state of outputs, and processors, are reflected cross all other loggers.
 - Adds `Text`, and `JSON` formatters. It also process fields. See `example_test.go/ExampleNew_textFormatter` and `example_test.go/ExampleNew_jsonFormatter` for examples. Both formatters automatically adds:
     - Component name

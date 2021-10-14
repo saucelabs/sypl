@@ -12,7 +12,8 @@ import (
 // Options extends printer's capabilities.
 //
 // Note: Changes in the `Message` or `Options` data structure may trigger
-// changes in the `Copy`, `mergeOptions`, `New`, or `NewOptions` methods.
+// changes in the `New`, `Copy` (from `Message`), `mergeOptions` (from `Sypl`),
+// or `New` methods.
 type Options struct {
 	// Structured fields.
 	Fields fields.Fields

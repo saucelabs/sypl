@@ -11,6 +11,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/saucelabs/sypl/debug"
 	"github.com/saucelabs/sypl/fields"
 	"github.com/saucelabs/sypl/flag"
 	"github.com/saucelabs/sypl/formatter"
@@ -39,8 +40,8 @@ type MessageToOutput struct {
 
 // Sypl logger definition.
 type Sypl struct {
-	name    string
 	fields  fields.Fields
+	name    string
 	outputs []output.IOutput
 	status  status.Status
 }
@@ -485,7 +486,12 @@ func (sypl *Sypl) GetOutputsNames() []string {
 // shallow copy of the parent logger. Changes to internals, such as the state of
 // outputs, and processors, are reflected cross all other loggers.
 func (sypl *Sypl) New(name string) *Sypl {
-	return New(name, sypl.outputs...)
+	s := New(name, sypl.outputs...)
+
+	s.fields = sypl.fields
+	s.status = sypl.status
+
+	return s
 }
 
 // Process messages, per output, and process accordingly.
@@ -510,10 +516,10 @@ func (sypl *Sypl) process(messages ...message.IMessage) {
 			}
 
 			// Should allows to filter logging by components names.
-			allowedComponents := os.Getenv("SYPL_DEBUG")
+			syplFilterEnvVar := os.Getenv(shared.FilterEnvVar)
 
-			if allowedComponents != "" &&
-				!strings.Contains(allowedComponents, sypl.GetName()) {
+			if syplFilterEnvVar != "" &&
+				!strings.Contains(syplFilterEnvVar, sypl.GetName()) {
 				return nil
 			}
 
@@ -606,6 +612,14 @@ func (sypl *Sypl) processOutputs(m message.IMessage, outputsNames string) {
 			msg.SetComponentName(sypl.GetName())
 			msg.SetOutputName(o.GetName())
 
+			// Debug capability.
+			// Should only run if Debug env var is set.
+			if os.Getenv(shared.DebugEnvVar) != "" {
+				msg.SetDebugEnvVarRegexes(
+					debug.New(msg.GetComponentName(), msg.GetOutputName()),
+				)
+			}
+
 			g.Go(func() error {
 				return o.Write(msg)
 			})
@@ -624,6 +638,7 @@ func New(name string, outputs ...output.IOutput) *Sypl {
 	return &Sypl{
 		name:    name,
 		outputs: outputs,
+		status:  status.Enabled,
 	}
 }
 
@@ -637,11 +652,12 @@ func NewDefault(name string, maxLevel level.Level, processors ...processor.IProc
 	consoleProcessors = append(consoleProcessors, processor.MuteBasedOnLevel(level.Fatal, level.Error))
 
 	return &Sypl{
-		name:   name,
 		fields: fields.Fields{},
+		name:   name,
 		outputs: []output.IOutput{
 			output.Console(maxLevel, consoleProcessors...).SetFormatter(formatter.Text()),
 			output.StdErr(processors...).SetFormatter(formatter.Text()),
 		},
+		status: status.Enabled,
 	}
 }

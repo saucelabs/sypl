@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/saucelabs/sypl/flag"
@@ -200,11 +201,25 @@ func (o *output) Write(m message.IMessage) error {
 			return err
 		}
 	} else {
+		// Debug capability.
+		finalMaxLevel := o.GetMaxLevel()
+
+		// Should only run if Debug env var is set.
+		if os.Getenv(shared.DebugEnvVar) != "" {
+			debug := m.GetDebugEnvVarRegexes()
+
+			l, _, ok := debug.Level()
+
+			if ok {
+				finalMaxLevel = l
+			}
+		}
+
 		// Should only print if message `level` isn't above `MaxLevel`.
 		// Should only print if `level` isn't `None`.
 		// Should only print if not flagged with `Mute`.
 		if m.GetLevel() != level.None &&
-			m.GetLevel() <= o.GetMaxLevel() &&
+			m.GetLevel() <= finalMaxLevel &&
 			m.GetFlag() != flag.Mute {
 			if err := o.write(m); err != nil {
 				log.Println(shared.ErrorPrefix, err)

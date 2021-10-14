@@ -77,19 +77,27 @@ func TestFromString(t *testing.T) {
 			got, err := FromString(tt.args.level)
 			if got != tt.want {
 				t.Errorf("FromString() = %v, want %v", got, tt.want)
+
+				return
 			}
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Expected error = %v, want %v", err, tt.wantErr)
+
+				return
 			}
 
 			if tt.wantErr && (err != nil) {
 				if err.Error() != tt.wantErrMsg {
 					t.Errorf("Expected error = %v, want %v", err.Error(), tt.wantErrMsg)
+
+					return
 				}
 
 				if !errors.Is(err, ErrInvalidLevel) {
 					t.Errorf("Expected error to be ErrInvalidLevel")
+
+					return
 				}
 			}
 		})

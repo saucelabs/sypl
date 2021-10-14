@@ -10,6 +10,7 @@ import (
 
 	"github.com/emirpasic/gods/sets/treeset"
 	"github.com/saucelabs/sypl/content"
+	"github.com/saucelabs/sypl/debug"
 	"github.com/saucelabs/sypl/fields"
 	"github.com/saucelabs/sypl/flag"
 	"github.com/saucelabs/sypl/level"
@@ -46,12 +47,22 @@ func newLineBreaker(knownLineBreakers ...string) *lineBreaker {
 // Message envelops the content and contains meta-information about it.
 //
 // Note: Changes in the `Message` or `Options` data structure may trigger
-// changes in the `Copy`, `mergeOptions`, `New`, or `NewOptions` methods.
+// changes in the `New`, `Copy`, `mergeOptions` (from `Sypl`), or `New` (from
+// `Options`) methods.
 type message struct {
 	*options.Options
 
 	// Name of the component logging the message.
 	componentName string
+
+	// Message's linebreaker. See `lineBreaker` for more information.
+	lineBreaker *lineBreaker `json:"-"`
+
+	// tags are indicators consumed by `Output`s and `Processor`s.
+	tags *treeset.Set
+
+	// Debug capabilities.
+	debug *debug.Debug
 
 	// Content that should be written to `Output`.
 	Content content.IContent
@@ -67,12 +78,6 @@ type message struct {
 
 	// Processor in use.
 	ProcessorName string `json:"-"`
-
-	// Message's linebreaker. See `lineBreaker` for more information.
-	lineBreaker *lineBreaker `json:"-"`
-
-	// tags are indicators consumed by `Output`s and `Processor`s.
-	tags *treeset.Set
 
 	// The point in time when the message was created.
 	Timestamp time.Time
@@ -178,6 +183,18 @@ func (m *message) GetContent() content.IContent {
 // SetContent sets the content.
 func (m *message) SetContent(c content.IContent) {
 	m.Content = c
+}
+
+// GetDebugEnvVarRegexeses returns the Debug env var regexes matchers.
+func (m *message) GetDebugEnvVarRegexes() *debug.Debug {
+	return m.debug
+}
+
+// SetDebugEnvVarRegexeses sets the Debug env var regexes matchers.
+func (m *message) SetDebugEnvVarRegexes(d *debug.Debug) *message {
+	m.debug = d
+
+	return m
 }
 
 // GetFields returns the structured fields.
@@ -297,6 +314,8 @@ func Copy(m IMessage) IMessage {
 	msg.AddTags(m.GetTags()...)
 
 	msg.SetComponentName(m.GetComponentName())
+	msg.SetDebugEnvVarRegexes(m.GetDebugEnvVarRegexes())
+
 	msg.SetFields(m.GetFields())
 	msg.SetFlag(m.GetFlag())
 	msg.SetID(m.GetID())

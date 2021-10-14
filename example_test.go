@@ -28,13 +28,16 @@ import (
 // Helpers
 //////
 
-// Checks if `src` has `texts`.
+// Checks if `src` has `texts`. If not, it prints a message.
+//nolint:forbidigo
 func stringContains(src string, texts ...string) bool {
 	contains := true
 
 	for _, text := range texts {
 		if !strings.Contains(src, text) {
 			contains = false
+
+			fmt.Printf("Expected %s to contain %s\n", src, text)
 		}
 	}
 
@@ -308,24 +311,6 @@ func ExampleNew_serrorX() {
 	// true true true true
 }
 
-// SYPL_DEBUG (filter) example.
-func ExampleNew_syplDebug() {
-	// Creates logger, and name it.
-	os.Setenv("SYPL_DEBUG", "pod,svc")
-
-	sypl.New("pod").AddOutputs(output.Console(level.Info)).Infoln("pod created")
-	sypl.New("svc").AddOutputs(output.Console(level.Info)).Infoln("svc created")
-	sypl.New("vs").AddOutputs(output.Console(level.Info)).Infoln("vs created")
-	sypl.New("np").AddOutputs(output.Console(level.Info)).Infoln("np created")
-	sypl.New("cm").AddOutputs(output.Console(level.Info)).Infoln("cm created")
-
-	os.Unsetenv("SYPL_DEBUG")
-
-	// output:
-	// pod created
-	// svc created
-}
-
 // Text formatter example.
 func ExampleNew_textFormatter() {
 	buf, o := output.SafeBuffer(level.Info)
@@ -589,4 +574,51 @@ func ExampleNew_globalFields() {
 
 	// output:
 	// true
+}
+
+// Logging filtering, and debug capability example.
+func ExampleNew_debugAndFilter() {
+	// From any SYPL logger, bump all max levels to `info`
+	// From any SYPL logger havong a `console` output, bump max levels to `debug`
+	// From a logger named `pod`, for its output called `Console`, bump max levels to `trace`
+	// From a logger named `pv`, for its output called `o1`, bump max levels to `trace`
+	os.Setenv(shared.DebugEnvVar, "info,console:debug,pod:console:trace,pv:o1:trace")
+	defer os.Unsetenv(shared.DebugEnvVar)
+
+	// From any SYPL logger, only print the following ones.
+	os.Setenv(shared.FilterEnvVar, "pod,svc,vs,np,cm,pv")
+	defer os.Unsetenv(shared.FilterEnvVar)
+
+	// Will print, max level bumped to `trace` by `pod:console:trace`.
+	sypl.New("pod").AddOutputs(output.Console(level.Error)).Traceln("pod created")
+
+	// Will print, max level bumped to `debug`.
+	sypl.New("svc").AddOutputs(output.Console(level.Error)).Debugln("svc created")
+
+	// Will print, max level bumped to `debug`.
+	sypl.New("vs").AddOutputs(output.Console(level.Error)).Debugln("vs created")
+
+	// Will print, max level bumped to `debug`.
+	sypl.New("np").AddOutputs(output.Console(level.Error)).Debugln("np created")
+
+	// Will print, max level bumped to `debug`.
+	sypl.New("cm").AddOutputs(output.Console(level.Error)).Debugln("cm created")
+
+	sypl.New("pv").AddOutputs(
+		// Will print, max level bumped to `trace` by `pv:o1:trace`.
+		output.New("o1", level.Error, os.Stdout),
+		// Will not print, max level bumped to `info` but less than `debug`.
+		output.New("o2", level.Error, os.Stdout),
+	).Traceln("pv created")
+
+	// Will not print, max level bumped to `debug` but it's filtered out.
+	sypl.New("dp").AddOutputs(output.Console(level.Error)).Debugln("dp created")
+
+	// output:
+	// pod created
+	// svc created
+	// vs created
+	// np created
+	// cm created
+	// pv created
 }

@@ -59,7 +59,7 @@ func TestNewOutput(t *testing.T) {
 				builtin.DefaultCallDepth,
 				message.GetContent().GetProcessed(),
 			); err != nil {
-				t.Errorf("Failed to log to output: %w", err)
+				t.Errorf("Failed to log to output: %+v", err)
 			}
 
 			bufWriter.Flush()

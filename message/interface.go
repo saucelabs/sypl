@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/saucelabs/sypl/content"
+	"github.com/saucelabs/sypl/debug"
 	"github.com/saucelabs/sypl/fields"
 	"github.com/saucelabs/sypl/flag"
 	"github.com/saucelabs/sypl/level"
@@ -42,6 +43,12 @@ type IMessage interface {
 
 	// SetContent sets the content.
 	SetContent(c content.IContent)
+
+	// GetDebugEnvVarRegexeses returns the Debug env var regexes matchers.
+	GetDebugEnvVarRegexes() *debug.Debug
+
+	// SetDebugEnvVarRegexeses sets the Debug env var regexes matchers.
+	SetDebugEnvVarRegexes(d *debug.Debug) *message
 
 	// GetFields returns the structured fields.
 	GetFields() fields.Fields

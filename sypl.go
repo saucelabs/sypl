@@ -40,29 +40,31 @@ type MessageToOutput struct {
 
 // Sypl logger definition.
 type Sypl struct {
+	// Deal with https://github.com/golang/go/issues/5819.
+	Name string
+
 	fields  fields.Fields
-	name    string
 	outputs []output.IOutput
 	status  status.Status
 }
 
 // String interface implementation.
 func (sypl Sypl) String() string {
-	return sypl.name
+	return sypl.Name
 }
 
 //////
 // IMeta interface implementation.
 //////
 
-// GetName returns the sypl name.
+// GetName returns the sypl Name.
 func (sypl *Sypl) GetName() string {
-	return sypl.name
+	return sypl.Name
 }
 
-// SetName sets the sypl name.
+// SetName sets the sypl Name.
 func (sypl *Sypl) SetName(name string) {
-	sypl.name = name
+	sypl.Name = name
 }
 
 // GetStatus returns the sypl status.
@@ -636,7 +638,7 @@ func (sypl *Sypl) processOutputs(m message.IMessage, outputsNames string) {
 // New is the Sypl factory.
 func New(name string, outputs ...output.IOutput) *Sypl {
 	return &Sypl{
-		name:    name,
+		Name:    name,
 		outputs: outputs,
 		status:  status.Enabled,
 	}
@@ -653,7 +655,7 @@ func NewDefault(name string, maxLevel level.Level, processors ...processor.IProc
 
 	return &Sypl{
 		fields: fields.Fields{},
-		name:   name,
+		Name:   name,
 		outputs: []output.IOutput{
 			output.Console(maxLevel, consoleProcessors...).SetFormatter(formatter.Text()),
 			output.StdErr(processors...).SetFormatter(formatter.Text()),

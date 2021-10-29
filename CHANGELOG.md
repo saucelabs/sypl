@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Roadmap
 
+- Fix possible race condition on `sypl.SetMaxLevel`
 - Add badges to README.md:
   - GoDoc
   - Go Report Card
@@ -23,6 +24,10 @@ Refs. for badges:
 
 - http://github.com/wayneashleyberry/terminal-dimensions
 - https://github.com/golangci/golangci-lint
+
+## [1.5.5] - 2021-10-29
+### Changed
+Exported `sypl.Name` to deal with https://github.com/golang/go/issues/5819.
 
 ## [1.5.4] - 2021-10-13
 ### Added

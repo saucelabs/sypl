@@ -5,6 +5,7 @@
 package sypl
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"log"
@@ -40,7 +41,9 @@ type MessageToOutput struct {
 
 // Sypl logger definition.
 type Sypl struct {
-	// Deal with https://github.com/golang/go/issues/5819.
+	// Name returns the logger name.
+	//
+	// Note: Exposed to deal with https://github.com/golang/go/issues/5819.
 	Name string
 
 	fields  fields.Fields
@@ -407,6 +410,32 @@ func (sypl *Sypl) Traceln(args ...interface{}) ISypl {
 //////
 // ISypl interface implementation.
 //////
+
+// Breakpoint will stop execution waiting the user press "/n" ("enter") to
+// continue. It helps users doing log-to-console debug strategy. A message
+// with the breakpoint `name`, and PID of the process will be printed using
+// the `debug` level. Arbitrary `data` can optionally be set - if set, it'll
+// be printed. Errors are printed using the `error` level. Set logging level
+// to `trace` for more.
+func (sypl *Sypl) Breakpoint(name string, data interface{}) ISypl {
+	breakpointName := fmt.Sprintf(`Breakpoint: %s. PID: %d`, name, os.Getpid())
+
+	if data != nil {
+		breakpointName = fmt.Sprintf("%s. Data: %+v", breakpointName, data)
+	}
+
+	sypl.Debuglnf("%s. Press enter to continue", breakpointName)
+
+	reader := bufio.NewReader(os.Stdin)
+
+	if _, err := reader.ReadString('\n'); err != nil {
+		sypl.Errorlnf("%s. Failed to read input: %s", breakpointName, err)
+	} else {
+		sypl.Traceln("Resuming")
+	}
+
+	return sypl
+}
 
 // GetFields returns the structured fields.
 func (sypl *Sypl) GetFields() fields.Fields {

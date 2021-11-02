@@ -203,6 +203,14 @@ type ISypl interface {
 	meta.IMeta
 	IPrinters
 
+	// Breakpoint will stop execution waiting the user press "/n" ("enter") to
+	// continue. It helps users doing log-to-console debug strategy. A message
+	// with the breakpoint `name`, and PID of the process will be printed using
+	// the `debug` level. Arbitrary `data` can optionally be set - if set, it'll
+	// be printed. Errors are printed using the `error` level. Set logging level
+	// to `trace` for more.
+	Breakpoint(name string, data interface{}) ISypl
+
 	// String interface.
 	String() string
 

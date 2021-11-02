@@ -25,9 +25,25 @@ Refs. for badges:
 - http://github.com/wayneashleyberry/terminal-dimensions
 - https://github.com/golangci/golangci-lint
 
+## [1.5.6] - 2021-11-02
+### Added
+Added the ability to set breakpoints. If a `Breakpoint` is set it'll stop execution waiting the user press `/n` (**"enter"**) to continue. It helps users doing quick, and effective log-to-console debug. A message with the breakpoint `name`, and `PID` of the process will be printed using the `debug` level. Arbitrary `data` can optionally be set - if set, it'll be printed. Errors are printed using the standard `error` level. Set logging level to `trace` for more.
+
+Previously, flow would look like:
+- Log markers are set, e.g.: `logger.Debugln("Here 1", whatever)`
+- Application runs
+- Scan visually `output`, or a `file` - via `grep` for the markers.
+
+Now:
+- Named `Breakpoint`s are set
+- Application runs
+- Breakpoint is hit. Information about it is printed.
+- Runtime is paused, allowing analysis of `data` - if any, right way. Additionally, an external and more advanced debugger can be attached.
+- Dev controls the flow, pressing `enter` at any time, continue.
+
 ## [1.5.5] - 2021-10-29
 ### Changed
-Exported `sypl.Name` to deal with https://github.com/golang/go/issues/5819.
+- Exported `sypl.Name` to deal with https://github.com/golang/go/issues/5819.
 
 ## [1.5.4] - 2021-10-13
 ### Added

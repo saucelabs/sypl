@@ -557,20 +557,17 @@ func ExampleNew_globalFields() {
 
 	// Creates logger, and name it.
 	l := sypl.New(shared.DefaultComponentNameOutput, o.SetFormatter(formatter.Text()))
-	l.SetFields(fields.Fields{"test": 1})
+	l.SetFields(fields.Fields{"a": 1})
 
-	l.Infoln(shared.DefaultContentOutput)
+	l.Infoln(shared.DefaultContentOutput) // a=1
+
 	l.PrintlnWithOptions(&options.Options{
-		Fields: fields.Fields{"test": 2, "test2": 3},
-	}, level.Info, shared.DefaultContentOutput)
-	l.Infoln(shared.DefaultContentOutput)
+		Fields: fields.Fields{"a": 2, "b": 3},
+	}, level.Info, shared.DefaultContentOutput) // a=2, b=3
 
-	fmt.Println(stringContains(buf.String(), "message=contentTest test=1", "contentTest test=2 test2=3"))
+	l.Infoln(shared.DefaultContentOutput) // a=1
 
-	// Prints:
-	//
-	// component=componentNameTest output=console level=info timestamp=2021-09-10T14:19:38-07:00 message=contentTest test=1
-	// component=componentNameTest output=console level=info timestamp=2021-09-10T14:19:38-07:00 message=contentTest test=2 test2=3
+	fmt.Println(stringContains(buf.String(), "contentTest", "a=1", "a=2", "b=3"))
 
 	// output:
 	// true

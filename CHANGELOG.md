@@ -25,6 +25,10 @@ Refs. for badges:
 - http://github.com/wayneashleyberry/terminal-dimensions
 - https://github.com/golangci/golangci-lint
 
+## [1.5.7] - 2021-11-02
+### Changed
+- Fixed `ExampleNew_globalFields` test.
+
 ## [1.5.6] - 2021-11-02
 ### Added
 Added the ability to set breakpoints. If a `Breakpoint` is set it'll stop execution waiting the user press `/n` (**"enter"**) to continue. It helps users doing quick, and effective log-to-console debug. A message with the breakpoint `name`, and `PID` of the process will be printed using the `debug` level. Arbitrary `data` can optionally be set - if set, it'll be printed. Errors are printed using the standard `error` level. Set logging level to `trace` for more.

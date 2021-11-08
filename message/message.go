@@ -130,8 +130,10 @@ func (m *message) getLineBreaker() *lineBreaker {
 }
 
 // setLineBreaker sets the line break status.
-func (m *message) setLineBreaker(lB *lineBreaker) {
+func (m *message) setLineBreaker(lB *lineBreaker) IMessage {
 	m.lineBreaker = lB
+
+	return m
 }
 
 // Restore known linebreaks.
@@ -171,8 +173,10 @@ func (m *message) GetComponentName() string {
 }
 
 // SetComponentName sets the component name.
-func (m *message) SetComponentName(name string) {
+func (m *message) SetComponentName(name string) IMessage {
 	m.componentName = name
+
+	return m
 }
 
 // GetContent returns the content.
@@ -181,8 +185,10 @@ func (m *message) GetContent() content.IContent {
 }
 
 // SetContent sets the content.
-func (m *message) SetContent(c content.IContent) {
+func (m *message) SetContent(c content.IContent) IMessage {
 	m.Content = c
+
+	return m
 }
 
 // GetDebugEnvVarRegexeses returns the Debug env var regexes matchers.
@@ -203,8 +209,10 @@ func (m *message) GetFields() fields.Fields {
 }
 
 // SetFields sets the structured fields.
-func (m *message) SetFields(fields fields.Fields) {
+func (m *message) SetFields(fields fields.Fields) IMessage {
 	m.Fields = fields
+
+	return m
 }
 
 // GetFlag returns the flag.
@@ -213,8 +221,10 @@ func (m *message) GetFlag() flag.Flag {
 }
 
 // SetFlag sets the flag.
-func (m *message) SetFlag(flag flag.Flag) {
+func (m *message) SetFlag(flag flag.Flag) IMessage {
 	m.Flag = flag
+
+	return m
 }
 
 // GetID returns the id.
@@ -233,8 +243,10 @@ func (m *message) GetLevel() level.Level {
 }
 
 // SetLevel sets the level.
-func (m *message) SetLevel(l level.Level) {
+func (m *message) SetLevel(l level.Level) IMessage {
 	m.Level = l
+
+	return m
 }
 
 // GetMessage (low-level) returns the message.
@@ -248,8 +260,10 @@ func (m *message) GetOutputName() string {
 }
 
 // SetOutputName sets the name of the output in use.
-func (m *message) SetOutputName(outputName string) {
+func (m *message) SetOutputName(outputName string) IMessage {
 	m.OutputName = outputName
+
+	return m
 }
 
 // GetOutputsNames returns the outputs names that should be used.
@@ -258,8 +272,10 @@ func (m *message) GetOutputsNames() []string {
 }
 
 // SetOutputsNames sets the outputs names that should be used.
-func (m *message) SetOutputsNames(outputsNames []string) {
+func (m *message) SetOutputsNames(outputsNames []string) IMessage {
 	m.OutputsNames = outputsNames
+
+	return m
 }
 
 // GetProcessorName returns the name of the processor in use.
@@ -268,8 +284,10 @@ func (m *message) GetProcessorName() string {
 }
 
 // SetProcessorName sets the name of the processor in use.
-func (m *message) SetProcessorName(processorName string) {
+func (m *message) SetProcessorName(processorName string) IMessage {
 	m.ProcessorName = processorName
+
+	return m
 }
 
 // GetProcessorsNames returns the processors names that should be used.
@@ -278,8 +296,10 @@ func (m *message) GetProcessorsNames() []string {
 }
 
 // SetProcessorsNames sets the processors names that should be used.
-func (m *message) SetProcessorsNames(processorsNames []string) {
+func (m *message) SetProcessorsNames(processorsNames []string) IMessage {
 	m.ProcessorsNames = processorsNames
+
+	return m
 }
 
 // GetTimestamp returns the timestamp.
@@ -288,8 +308,10 @@ func (m *message) GetTimestamp() time.Time {
 }
 
 // SetTimestamp sets the timestamp.
-func (m *message) SetTimestamp(timestamp time.Time) {
+func (m *message) SetTimestamp(timestamp time.Time) IMessage {
 	m.Timestamp = timestamp
+
+	return m
 }
 
 //////

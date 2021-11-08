@@ -36,13 +36,13 @@ type IMessage interface {
 	GetComponentName() string
 
 	// SetComponentName sets the component name.
-	SetComponentName(name string)
+	SetComponentName(name string) IMessage
 
 	// GetContent returns the content.
 	GetContent() content.IContent
 
 	// SetContent sets the content.
-	SetContent(c content.IContent)
+	SetContent(c content.IContent) IMessage
 
 	// GetDebugEnvVarRegexeses returns the Debug env var regexes matchers.
 	GetDebugEnvVarRegexes() *debug.Debug
@@ -54,13 +54,13 @@ type IMessage interface {
 	GetFields() fields.Fields
 
 	// SetFields sets the structured fields.
-	SetFields(fields fields.Fields)
+	SetFields(fields fields.Fields) IMessage
 
 	// GetFlag returns the flag.
 	GetFlag() flag.Flag
 
 	// SetFlag sets the flag.
-	SetFlag(flag flag.Flag)
+	SetFlag(flag flag.Flag) IMessage
 
 	// GetID returns the id.
 	GetID() string
@@ -72,13 +72,13 @@ type IMessage interface {
 	GetLevel() level.Level
 
 	// SetLevel sets the level.
-	SetLevel(l level.Level)
+	SetLevel(l level.Level) IMessage
 
 	// getLineBreaker returns linebreaker.
 	getLineBreaker() *lineBreaker
 
 	// setLineBreaker sets the linebreaker.
-	setLineBreaker(lB *lineBreaker)
+	setLineBreaker(lB *lineBreaker) IMessage
 
 	// GetMessage (low-level) returns the message.
 	GetMessage() *message
@@ -87,31 +87,31 @@ type IMessage interface {
 	GetOutputName() string
 
 	// SetOutputName sets the name of the output in use.
-	SetOutputName(outputName string)
+	SetOutputName(outputName string) IMessage
 
 	// GetOutputsNames returns the outputs names that should be used.
 	GetOutputsNames() []string
 
 	// SetOutputsNames sets the outputs names that should be used.
-	SetOutputsNames(outputsNames []string)
+	SetOutputsNames(outputsNames []string) IMessage
 
 	// GetProcessorName returns the name of the processor in use.
 	GetProcessorName() string
 
 	// SetProcessorName sets the name of the processor in use.
-	SetProcessorName(processorName string)
+	SetProcessorName(processorName string) IMessage
 
 	// GetProcessorsNames returns the processors names that should be used.
 	GetProcessorsNames() []string
 
 	// SetProcessorsNames sets the processors names that should be used.
-	SetProcessorsNames(processorsNames []string)
+	SetProcessorsNames(processorsNames []string) IMessage
 
 	// GetTimestamp returns the timestamp.
 	GetTimestamp() time.Time
 
 	// SetTimestamp sets the timestamp.
-	SetTimestamp(timestamp time.Time)
+	SetTimestamp(timestamp time.Time) IMessage
 }
 
 // ITag specifies what a Tag does.

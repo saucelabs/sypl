@@ -5,11 +5,13 @@
 package output
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"log"
 	"os"
 	"strings"
+	"syscall"
 
 	"github.com/saucelabs/sypl/flag"
 	"github.com/saucelabs/sypl/formatter"
@@ -89,8 +91,10 @@ func (o *output) GetBuiltinLogger() *builtin.Builtin {
 }
 
 // SetBuiltinLogger sets the Golang's builtin logger.
-func (o *output) SetBuiltinLogger(builtinLogger *builtin.Builtin) {
+func (o *output) SetBuiltinLogger(builtinLogger *builtin.Builtin) IOutput {
 	o.builtinLogger = builtinLogger
+
+	return o
 }
 
 // GetFormatter returns the formatter.
@@ -111,8 +115,10 @@ func (o *output) GetMaxLevel() level.Level {
 }
 
 // SetMaxLevel sets the max level.
-func (o *output) SetMaxLevel(l level.Level) {
+func (o *output) SetMaxLevel(l level.Level) IOutput {
 	o.maxLevel = l
+
+	return o
 }
 
 // AddProcessors adds one or more processors.
@@ -140,7 +146,7 @@ func (o *output) GetProcessors() []processor.IProcessor {
 }
 
 // GetProcessors returns registered processors.
-func (o *output) SetProcessors(processors ...processor.IProcessor) {
+func (o *output) SetProcessors(processors ...processor.IProcessor) IOutput {
 	for _, processor := range processors {
 		for i, p := range o.processors {
 			if strings.EqualFold(p.GetName(), processor.GetName()) {
@@ -148,6 +154,8 @@ func (o *output) SetProcessors(processors ...processor.IProcessor) {
 			}
 		}
 	}
+
+	return o
 }
 
 // GetProcessorsNames returns the names of the registered processors.
@@ -167,8 +175,10 @@ func (o *output) GetWriter() io.Writer {
 }
 
 // SetWriter sets the writer.
-func (o *output) SetWriter(w io.Writer) {
+func (o *output) SetWriter(w io.Writer) IOutput {
 	o.writer = w
+
+	return o
 }
 
 // Write the message to the defined output. In case of any error, it can be
@@ -275,6 +285,12 @@ func (o *output) write(m message.IMessage) error {
 		builtin.DefaultCallDepth,
 		m.GetContent().GetProcessed(),
 	); err != nil {
+		// It means application using Sypl was piped, but the pipe was broken so
+		// nothing to do.
+		if errors.Is(err, syscall.EPIPE) {
+			return nil
+		}
+
 		return fmt.Errorf(`"%s" output. Error: "%w"`, o.GetName(), err)
 	}
 

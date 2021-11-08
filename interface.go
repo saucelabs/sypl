@@ -209,7 +209,7 @@ type ISypl interface {
 	// the `debug` level. Arbitrary `data` can optionally be set - if set, it'll
 	// be printed. Errors are printed using the `error` level. Set logging level
 	// to `trace` for more.
-	Breakpoint(name string, data interface{}) ISypl
+	Breakpoint(name string, data ...interface{}) ISypl
 
 	// String interface.
 	String() string
@@ -225,7 +225,7 @@ type ISypl interface {
 	GetMaxLevel() map[string]level.Level
 
 	// SetMaxLevel sets the `maxLevel` of all outputs.
-	SetMaxLevel(l level.Level)
+	SetMaxLevel(l level.Level) ISypl
 
 	// AddOutputs adds one or more outputs.
 	AddOutputs(outputs ...output.IOutput) ISypl
@@ -234,7 +234,7 @@ type ISypl interface {
 	GetOutput(name string) output.IOutput
 
 	// SetOutputs sets one or more outputs. Use to update output(s).
-	SetOutputs(outputs ...output.IOutput)
+	SetOutputs(outputs ...output.IOutput) ISypl
 
 	// GetOutputs returns registered outputs.
 	GetOutputs() []output.IOutput

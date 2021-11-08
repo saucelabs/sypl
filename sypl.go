@@ -417,14 +417,20 @@ func (sypl *Sypl) Traceln(args ...interface{}) ISypl {
 // the `debug` level. Arbitrary `data` can optionally be set - if set, it'll
 // be printed. Errors are printed using the `error` level. Set logging level
 // to `trace` for more.
-func (sypl *Sypl) Breakpoint(name string, data interface{}) ISypl {
+func (sypl *Sypl) Breakpoint(name string, data ...interface{}) ISypl {
 	breakpointName := fmt.Sprintf(`Breakpoint: %s. PID: %d`, name, os.Getpid())
 
 	if data != nil {
-		breakpointName = fmt.Sprintf("%s. Data: %+v", breakpointName, data)
+		breakpointName = fmt.Sprintf("%s. Data:", breakpointName)
+
+		for _, d := range data {
+			breakpointName = fmt.Sprintf("%s %+v,", breakpointName, d)
+		}
+
+		breakpointName = strings.TrimSuffix(breakpointName, ",")
 	}
 
-	sypl.Debuglnf("%s. Press enter to continue", breakpointName)
+	sypl.Debugf("%s. Press enter to continue...", breakpointName)
 
 	reader := bufio.NewReader(os.Stdin)
 
@@ -461,10 +467,12 @@ func (sypl *Sypl) GetMaxLevel() map[string]level.Level {
 }
 
 // SetMaxLevel sets the `maxLevel` of all outputs.
-func (sypl *Sypl) SetMaxLevel(l level.Level) {
+func (sypl *Sypl) SetMaxLevel(l level.Level) ISypl {
 	for _, output := range sypl.GetOutputs() {
 		output.SetMaxLevel(l)
 	}
+
+	return sypl
 }
 
 // AddOutputs adds one or more outputs.
@@ -487,7 +495,7 @@ func (sypl *Sypl) GetOutput(name string) output.IOutput {
 }
 
 // SetOutputs sets one or more outputs. Use to update output(s).
-func (sypl *Sypl) SetOutputs(outputs ...output.IOutput) {
+func (sypl *Sypl) SetOutputs(outputs ...output.IOutput) ISypl {
 	for _, output := range outputs {
 		for i, o := range sypl.outputs {
 			if strings.EqualFold(o.GetName(), output.GetName()) {
@@ -495,6 +503,8 @@ func (sypl *Sypl) SetOutputs(outputs ...output.IOutput) {
 			}
 		}
 	}
+
+	return sypl
 }
 
 // GetOutputs returns registered outputs.

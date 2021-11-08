@@ -47,7 +47,6 @@ func StdErr(processors ...processor.IProcessor) IOutput {
 }
 
 // FileBased is a built-in `output`, that writes to the specified file.
-// TODO: Remove `path`.
 func FileBased(
 	name string,
 	maxLevel level.Level,

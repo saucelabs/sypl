@@ -26,8 +26,7 @@ type IOutput interface {
 	GetBuiltinLogger() *builtin.Builtin
 
 	// SetBuiltinLogger sets the Golang's builtin logger.
-	// TODO: SetXYZ should return IOutput.
-	SetBuiltinLogger(builtinLogger *builtin.Builtin)
+	SetBuiltinLogger(builtinLogger *builtin.Builtin) IOutput
 
 	// GetFormatter returns the formatter.
 	GetFormatter() formatter.IFormatter
@@ -39,7 +38,7 @@ type IOutput interface {
 	GetMaxLevel() level.Level
 
 	// SetMaxLevel sets the max level.
-	SetMaxLevel(l level.Level)
+	SetMaxLevel(l level.Level) IOutput
 
 	// AddProcessors adds one or more processors.
 	AddProcessors(processors ...processor.IProcessor) IOutput
@@ -48,7 +47,7 @@ type IOutput interface {
 	GetProcessor(name string) processor.IProcessor
 
 	// SetProcessors sets one or more processors.
-	SetProcessors(processors ...processor.IProcessor)
+	SetProcessors(processors ...processor.IProcessor) IOutput
 
 	// GetProcessors returns registered processors.
 	GetProcessors() []processor.IProcessor
@@ -60,7 +59,7 @@ type IOutput interface {
 	GetWriter() io.Writer
 
 	// SetWriter sets the writer.
-	SetWriter(w io.Writer)
+	SetWriter(w io.Writer) IOutput
 
 	// Write write the message to the defined output.
 	Write(m message.IMessage) error

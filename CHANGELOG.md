@@ -25,6 +25,12 @@ Refs. for badges:
 - http://github.com/wayneashleyberry/terminal-dimensions
 - https://github.com/golangci/golangci-lint
 
+## [1.5.8] - 2021-11-08
+### Changed
+- All `SetXYZ` methods returns its proper interface allowing method chaining.
+- `Breakpoint` is now variadic.
+- Properly handle cases where sypl writes to a piped output, but it's broken.
+
 ## [1.5.7] - 2021-11-02
 ### Changed
 - Fixed `ExampleNew_globalFields` test.

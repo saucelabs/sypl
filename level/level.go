@@ -26,7 +26,7 @@ const (
 	Trace
 )
 
-var names = []string{"None", "Fatal", "Error", "Info", "Warn", "Debug", "Trace"}
+var names = []string{"none", "fatal", "error", "info", "warn", "debug", "trace"}
 
 // String interface implementation.
 func (l Level) String() string {

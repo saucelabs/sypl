@@ -25,6 +25,12 @@ Refs. for badges:
 - http://github.com/wayneashleyberry/terminal-dimensions
 - https://github.com/golangci/golangci-lint
 
+## [1.5.9] - 2022-02-21
+### Changed
+- Fixed chained example.
+- Lowercased all levels.
+- It now warns when an application tries to write to a closed writer.
+
 ## [1.5.8] - 2021-11-08
 ### Changed
 - All `SetXYZ` methods returns its proper interface allowing method chaining.

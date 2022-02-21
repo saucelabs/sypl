@@ -291,7 +291,18 @@ func (o *output) write(m message.IMessage) error {
 			return nil
 		}
 
-		return fmt.Errorf(`"%s" output. Error: "%w"`, o.GetName(), err)
+		// It the output passed to Sypl is already closed, nothing to do.
+		if errors.Is(err, os.ErrClosed) {
+			log.Printf(`%s Attempt to write to closed writer. Output: "%s". Error: "%v"`,
+				shared.WarnPrefix,
+				o.GetName(),
+				err,
+			)
+
+			return nil
+		}
+
+		return fmt.Errorf(`output: "%s". error: "%w"`, o.GetName(), err)
 	}
 
 	return nil

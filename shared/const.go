@@ -5,7 +5,10 @@
 package shared
 
 // Standard logging prefix for internal errors.
-const ErrorPrefix = "[sypl] [Error]"
+const (
+	ErrorPrefix = "[sypl] [Error]"
+	WarnPrefix  = "[sypl] [Warn]"
+)
 
 // Default values used in tests.
 const (

@@ -89,13 +89,9 @@ func ExampleNew_notChained() {
 func ExampleNew_chained() {
 	// Creates logger, and name it.
 	sypl.New("Testing Logger").
-		// Creates two `Output`s. "Console" and "Error". "Console" will print to
-		// `Fatal`, `Error`, and `Info`. "Error" will only print `Fatal`, and
-		// `Error` levels.
-		AddOutputs(output.New("Console", level.Info, os.Stdout)).
 		// Creates a `Processor`. It will prefix all messages. It will only
 		// prefix messages for this specific `Output`, and @ `Error` level.
-		AddOutputs(output.New("Error", level.Error, os.Stderr).
+		AddOutputs(output.New("Error", level.Error, os.Stdout).
 			AddProcessors(func(prefix string) processor.IProcessor {
 				return processor.New("Prefixer", func(message message.IMessage) error {
 					if message.GetLevel() == level.Error {
@@ -106,17 +102,11 @@ func ExampleNew_chained() {
 				})
 			}(shared.DefaultPrefixValue))).
 		// Prints:
-		// Test info message
-		Println(level.Info, "Test info message").
-		// Prints:
-		// Test error message
 		// My Prefix - Test error message
 		Println(level.Error, "Test error message")
 
 	// Output:
 	// My Prefix - Test error message
-
-	// Note: Go "example" parser only captured the last message.
 }
 
 // ChainedUsingBuiltin is the chained example of creating, and setting up a

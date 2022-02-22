@@ -715,7 +715,7 @@ func New(name string, outputs ...output.IOutput) *Sypl {
 // NewDefault creates a logger that covers most of all needs:
 // - Writes message to `stdout` @ the specified `maxLevel`
 // - Writes error messages only to `stderr`
-// - Default io.Writer level is `none`. Explicity change that using
+// - Default io.Writer level is `none`. Explicitly change that using
 // `SetDefaultIoWriterLevel` to suit your need.
 //
 // NOTE: `processors` are applied to both outputs.

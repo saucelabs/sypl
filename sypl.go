@@ -96,7 +96,7 @@ func (sypl *Sypl) SetDefaultIoWriterLevel(l level.Level) {
 //////
 
 // Writer implements the io.Writer interface. Message level will be the one set
-// via `SetIoWriterLevel`, default is `error`. It always returns `0, nil`.
+// via `SetIoWriterLevel`, default is `none`. It always returns `0, nil`.
 //
 // NOTE: This is a convenient method, if it doesn't fits your need, just
 // implement the way you need, as you would do.
@@ -703,27 +703,31 @@ func (sypl *Sypl) processOutputs(m message.IMessage, outputsNames string) {
 // New is the Sypl factory.
 func New(name string, outputs ...output.IOutput) *Sypl {
 	return &Sypl{
-		Name:    name,
-		outputs: outputs,
-		status:  status.Enabled,
+		Name: name,
+
+		defaultIoWriterLevel: level.None,
+		fields:               fields.Fields{},
+		outputs:              outputs,
+		status:               status.Enabled,
 	}
 }
 
 // NewDefault creates a logger that covers most of all needs:
 // - Writes message to `stdout` @ the specified `maxLevel`
 // - Writes error messages only to `stderr`
-// - Default io.Writer level is `error`. Use `SetDefaultIoWriterLevel` to suit
-// your need.
+// - Default io.Writer level is `none`. Explicity change that using
+// `SetDefaultIoWriterLevel` to suit your need.
 //
-// Note: `processors` are applied to both outputs.
+// NOTE: `processors` are applied to both outputs.
 func NewDefault(name string, maxLevel level.Level, processors ...processor.IProcessor) *Sypl {
 	consoleProcessors := processors
 	consoleProcessors = append(consoleProcessors, processor.MuteBasedOnLevel(level.Fatal, level.Error))
 
 	return &Sypl{
-		defaultIoWriterLevel: level.Error,
+		Name: name,
+
+		defaultIoWriterLevel: level.None,
 		fields:               fields.Fields{},
-		Name:                 name,
 		outputs: []output.IOutput{
 			output.Console(maxLevel, consoleProcessors...).SetFormatter(formatter.Text()),
 			output.StdErr(processors...).SetFormatter(formatter.Text()),

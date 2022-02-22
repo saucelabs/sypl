@@ -610,20 +610,60 @@ func ExampleNew_debugAndFilter() {
 	// pv created
 }
 
-// Sypl as io.Writer.
+// Sypl as io.Writer, including sub-loggers thru interfaces.
+//nolint:gosimple
 func ExampleNew_ioWriter() {
-	buf, o := output.SafeBuffer(level.Info)
+	buf, o := output.SafeBuffer(level.Trace)
 
 	// Creates logger, and name it.
 	l := sypl.New(shared.DefaultComponentNameOutput, o.SetFormatter(formatter.Text()))
 
 	l.SetDefaultIoWriterLevel(level.Info)
 
-	if _, err := l.Write([]byte(shared.DefaultContentOutput)); err != nil {
+	if _, err := l.Write([]byte(shared.DefaultContentOutput + "1 \n")); err != nil {
 		fmt.Println(false)
 	}
 
-	fmt.Println(strings.Contains(buf.String(), "message=contentTest"))
+	l.SetDefaultIoWriterLevel(level.Warn)
+
+	if _, err := l.Write([]byte(shared.DefaultContentOutput + "2 \n")); err != nil {
+		fmt.Println(false)
+	}
+
+	var m sypl.ISypl
+
+	m = l.New("sub")
+
+	m.SetDefaultIoWriterLevel(level.Debug)
+
+	if _, err := m.Write([]byte(shared.DefaultContentOutput + "3 \n")); err != nil {
+		fmt.Println(false)
+	}
+
+	m.SetDefaultIoWriterLevel(level.Trace)
+
+	if _, err := m.Write([]byte(shared.DefaultContentOutput + "4 \n")); err != nil {
+		fmt.Println(false)
+	}
+
+	// Buf content should be...:
+	// component=componentNameTest output=buffer level=info timestamp=2022-02-22T09:58:22-08:00 message=contentTest1
+	// component=componentNameTest output=buffer level=warn timestamp=2022-02-22T09:58:22-08:00 message=contentTest2
+	// component=sub output=buffer level=debug timestamp=2022-02-22T09:58:22-08:00 message=contentTest3
+	// component=sub output=buffer level=trace timestamp=2022-02-22T09:58:22-08:00 message=contentTest4
+
+	fmt.Println(stringContains(buf.String(),
+		"componentNameTest",
+		"sub",
+		"contentTest1",
+		"contentTest2",
+		"contentTest3",
+		"contentTest4",
+		"info",
+		"warn",
+		"debug",
+		"trace",
+	))
 
 	// output:
 	// true

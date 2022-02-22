@@ -46,9 +46,10 @@ type Sypl struct {
 	// Note: Exposed to deal with https://github.com/golang/go/issues/5819.
 	Name string
 
-	fields  fields.Fields
-	outputs []output.IOutput
-	status  status.Status
+	defaultIoWriterLevel level.Level
+	fields               fields.Fields
+	outputs              []output.IOutput
+	status               status.Status
 }
 
 // String interface implementation.
@@ -78,6 +79,31 @@ func (sypl *Sypl) GetStatus() status.Status {
 // SetStatus sets the sypl status.
 func (sypl *Sypl) SetStatus(s status.Status) {
 	sypl.status = s
+}
+
+// GetDefaultIoWriterLevel returns the sypl status.
+func (sypl *Sypl) GetDefaultIoWriterLevel() level.Level {
+	return sypl.defaultIoWriterLevel
+}
+
+// SetDefaultIoWriterLevel sets the default io.Writer level.
+func (sypl *Sypl) SetDefaultIoWriterLevel(l level.Level) {
+	sypl.defaultIoWriterLevel = l
+}
+
+//////
+// Writer interface implementation.
+//////
+
+// Writer implements the io.Writer interface. Message level will be the one set
+// via `SetIoWriterLevel`, default is `error`. It always returns `0, nil`.
+//
+// NOTE: This is a convenient method, if it doesn't fits your need, just
+// implement the way you need, as you would do.
+func (sypl *Sypl) Write(p []byte) (n int, err error) {
+	sypl.process(message.New(sypl.defaultIoWriterLevel, string(p)))
+
+	return 0, nil
 }
 
 //////
@@ -686,6 +712,8 @@ func New(name string, outputs ...output.IOutput) *Sypl {
 // NewDefault creates a logger that covers most of all needs:
 // - Writes message to `stdout` @ the specified `maxLevel`
 // - Writes error messages only to `stderr`
+// - Default io.Writer level is `error`. Use `SetDefaultIoWriterLevel` to suit
+// your need.
 //
 // Note: `processors` are applied to both outputs.
 func NewDefault(name string, maxLevel level.Level, processors ...processor.IProcessor) *Sypl {
@@ -693,8 +721,9 @@ func NewDefault(name string, maxLevel level.Level, processors ...processor.IProc
 	consoleProcessors = append(consoleProcessors, processor.MuteBasedOnLevel(level.Fatal, level.Error))
 
 	return &Sypl{
-		fields: fields.Fields{},
-		Name:   name,
+		defaultIoWriterLevel: level.Error,
+		fields:               fields.Fields{},
+		Name:                 name,
 		outputs: []output.IOutput{
 			output.Console(maxLevel, consoleProcessors...).SetFormatter(formatter.Text()),
 			output.StdErr(processors...).SetFormatter(formatter.Text()),

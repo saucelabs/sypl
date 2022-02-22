@@ -501,8 +501,8 @@ func ExampleNew_updateOutputsMaxLevel() {
 	}, level.Info, l.GetMaxLevel())
 
 	// output:
-	// map[Console 1:Info Console 2:Debug Console 3:Trace]
-	// map[Console 1:Info Console 2:Info Console 3:Info]
+	// map[Console 1:info Console 2:debug Console 3:trace]
+	// map[Console 1:info Console 2:info Console 3:info]
 }
 
 // PrintMessagesToOutputsWithOptions example.
@@ -608,4 +608,23 @@ func ExampleNew_debugAndFilter() {
 	// np created
 	// cm created
 	// pv created
+}
+
+// Sypl as io.Writer.
+func ExampleNew_ioWriter() {
+	buf, o := output.SafeBuffer(level.Info)
+
+	// Creates logger, and name it.
+	l := sypl.New(shared.DefaultComponentNameOutput, o.SetFormatter(formatter.Text()))
+
+	l.SetDefaultIoWriterLevel(level.Info)
+
+	if _, err := l.Write([]byte(shared.DefaultContentOutput)); err != nil {
+		fmt.Println(false)
+	}
+
+	fmt.Println(strings.Contains(buf.String(), "message=contentTest"))
+
+	// output:
+	// true
 }

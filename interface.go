@@ -203,6 +203,12 @@ type ISypl interface {
 	meta.IMeta
 	IPrinters
 
+	// GetDefaultIoWriterLevel returns the sypl status.
+	GetDefaultIoWriterLevel() level.Level
+
+	// SetDefaultIoWriterLevel sets the default io.Writer level.
+	SetDefaultIoWriterLevel(l level.Level)
+
 	// Breakpoint will stop execution waiting the user press "/n" ("enter") to
 	// continue. It helps users doing log-to-console debug strategy. A message
 	// with the breakpoint `name`, and PID of the process will be printed using
@@ -244,6 +250,13 @@ type ISypl interface {
 
 	// New creates a child logger.
 	New(name string) *Sypl
+
+	// Writer implements the io.Writer interface. Message level will be the one set
+	// via `SetIoWriterLevel`, default is `error`. It always returns `0, nil`.
+	//
+	// NOTE: This is a convenient method, if it doesn't fits your need, just
+	// implement the way you need, as you would do.
+	Write(p []byte) (n int, err error)
 
 	// Process messages, per output, and process accordingly.
 	process(messages ...message.IMessage)

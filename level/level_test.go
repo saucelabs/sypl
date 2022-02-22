@@ -151,7 +151,7 @@ func TestLevelsToString(t *testing.T) {
 			args: args{
 				levels: []Level{Info, Warn},
 			},
-			want: "Info,Warn",
+			want: "info,warn",
 		},
 		{
 			name: "Should work - Unknown",

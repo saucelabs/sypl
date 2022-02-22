@@ -36,7 +36,7 @@ func Test_generateDefaultPrefix(t *testing.T) {
 				component: shared.DefaultComponentNameOutput,
 				level:     level.Trace,
 			},
-			want: fmt.Sprintf("%d [%d] [%s] [Trace] ",
+			want: fmt.Sprintf("%d [%d] [%s] [trace] ",
 				time.Now().Year(),
 				os.Getpid(),
 				shared.DefaultComponentNameOutput,

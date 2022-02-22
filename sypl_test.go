@@ -535,7 +535,7 @@ func TestNew(t *testing.T) {
 					time.Now().Year(),
 					os.Getpid(),
 					a.component,
-					"Error",
+					"error",
 					a.content)
 			},
 		},
@@ -547,7 +547,7 @@ func TestNew(t *testing.T) {
 					time.Now().Year(),
 					os.Getpid(),
 					a.component,
-					"Info",
+					"info",
 					a.content)
 			},
 		},
@@ -559,7 +559,7 @@ func TestNew(t *testing.T) {
 					time.Now().Year(),
 					os.Getpid(),
 					a.component,
-					"Warn",
+					"warn",
 					a.content)
 			},
 		},
@@ -571,7 +571,7 @@ func TestNew(t *testing.T) {
 					time.Now().Year(),
 					os.Getpid(),
 					a.component,
-					"Debug",
+					"debug",
 					a.content)
 			},
 		},
@@ -583,7 +583,7 @@ func TestNew(t *testing.T) {
 					time.Now().Year(),
 					os.Getpid(),
 					a.component,
-					"Trace",
+					"trace",
 					a.content)
 			},
 		},

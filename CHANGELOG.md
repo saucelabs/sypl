@@ -26,6 +26,9 @@ Refs. for badges:
 - https://github.com/golangci/golangci-lint
 
 ## [1.5.9] - 2022-02-21
+### Added
+- For convenience, conforms with `io.Writer` interface. Default level: `error`. `SetIoWriterLevel` changes the default level.
+
 ### Changed
 - Fixed chained example.
 - Lowercased all levels.

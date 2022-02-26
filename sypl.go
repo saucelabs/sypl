@@ -46,6 +46,7 @@ type Sypl struct {
 	// Note: Exposed to deal with https://github.com/golang/go/issues/5819.
 	Name string
 
+	// NOTE: Changes here may reflect in the `New(name string)` method (Child).
 	defaultIoWriterLevel level.Level
 	fields               fields.Fields
 	outputs              []output.IOutput
@@ -555,6 +556,7 @@ func (sypl *Sypl) GetOutputsNames() []string {
 func (sypl *Sypl) New(name string) *Sypl {
 	s := New(name, sypl.outputs...)
 
+	s.defaultIoWriterLevel = sypl.defaultIoWriterLevel
 	s.fields = sypl.fields
 	s.status = sypl.status
 

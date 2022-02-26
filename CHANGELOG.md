@@ -25,6 +25,10 @@ Refs. for badges:
 - http://github.com/wayneashleyberry/terminal-dimensions
 - https://github.com/golangci/golangci-lint
 
+## [1.5.11] - 2022-02-25
+### Changed
+- Fix missing field in copy fields to child logger.
+
 ## [1.5.10] - 2022-02-22
 ### Changed
 - Fixed `New`, was missing setting `defaultIoWriterLevel`, `fields`, `status`.

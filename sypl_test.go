@@ -22,6 +22,7 @@ import (
 	"github.com/spf13/afero"
 )
 
+//nolint:maintidx
 func TestNew(t *testing.T) {
 	type args struct {
 		component string

@@ -18,7 +18,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-
 package sypl
 
 import (
@@ -35,7 +34,6 @@ const (
 		"https://github.com/saucelabs/sypl/issues/new and reference this error: %v"
 )
 
-
 // RedirectStdLog redirects output from the standard library's package-global
 // logger to the supplied logger at level.Info. Since zap already handles caller
 // annotations, timestamps, etc., it automatically disables the standard
@@ -49,6 +47,7 @@ func RedirectStdLog(sypl *Sypl) func() {
 		// Passing InfoLevel to redirectStdLogAt should always work
 		panic(fmt.Sprintf(_programmerErrorTemplate, err))
 	}
+
 	return f
 }
 
@@ -68,11 +67,14 @@ func redirectStdLogAt(sypl *Sypl, lvl level.Level) (func(), error) {
 	prefix := log.Prefix()
 	log.SetFlags(0)
 	log.SetPrefix("")
+
 	logFunc, err := levelToFunc(sypl, lvl)
 	if err != nil {
 		return nil, err
 	}
+
 	log.SetOutput(&loggerWriter{logFunc})
+
 	return func() {
 		log.SetFlags(flags)
 		log.SetPrefix(prefix)
@@ -94,8 +96,11 @@ func levelToFunc(sypl *Sypl, lvl level.Level) (func(...interface{}) ISypl, error
 		return sypl.Errorln, nil
 	case level.Fatal:
 		return sypl.Fatalln, nil
+	case level.None:
+		return nil, fmt.Errorf("unable to assign log level None")
 	}
-	return nil, fmt.Errorf("Unrecognized log level: %q", lvl)
+
+	return nil, fmt.Errorf("unrecognized log level: %q", lvl)
 }
 
 type loggerWriter struct {
@@ -105,5 +110,6 @@ type loggerWriter struct {
 func (l *loggerWriter) Write(p []byte) (int, error) {
 	p = bytes.TrimSpace(p)
 	l.logFunc(string(p))
+
 	return len(p), nil
 }

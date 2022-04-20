@@ -15,6 +15,9 @@ linters:
     - cyclop
     - tagliatelle
     - goerr113
+    - forcetypeassert
+    - ireturn
+    - varnamelen
   fast: false
 
 # Settings for specific linters
@@ -22,6 +25,7 @@ linters-settings:
   funlen:
     lines: 150
     statements: 45
+
 
 issues:
   exclude-rules:

@@ -13,7 +13,6 @@ import (
 	"github.com/saucelabs/sypl/shared"
 )
 
-
 func getBufferLogger(name string, lvl level.Level) (*Sypl, *safebuffer.Buffer) {
 	logger := NewDefault(name, lvl)
 	buffer, outputBuffer := output.SafeBuffer(level.Trace, processor.PrefixBasedOnMask(shared.DefaultTimestampFormat))
@@ -22,19 +21,16 @@ func getBufferLogger(name string, lvl level.Level) (*Sypl, *safebuffer.Buffer) {
 	return logger, buffer
 }
 
-
 func TestRedirectStdLogAt(t *testing.T) {
 	initialFlags := log.Flags()
 	initialPrefix := log.Prefix()
-	
+
 	levels := []level.Level{level.Trace, level.Debug, level.Info, level.Warn, level.Error}
 	for _, lvl := range levels {
 		runRedirectTest(t, lvl)
-		
 	}
 	checkInitialFlags(t, initialFlags, initialPrefix)
 }
-
 
 func TestRedirectStdLogAtInvalid(t *testing.T) {
 	logger := NewDefault("test-invalid", level.Debug)
@@ -45,17 +41,18 @@ func TestRedirectStdLogAtInvalid(t *testing.T) {
 		}
 	}()
 
-	if (err == nil) {
+	if err == nil {
 		t.Error("Expected an error with an invalid log level")
 	}
 }
 
 func runRedirectTest(t *testing.T, lvl level.Level) {
+	t.Helper()
 	logger, logBuffer := getBufferLogger(fmt.Sprintf("test-%d", lvl), level.Trace)
 
 	// test standard logger before and after redirect
 	beforeMsg := "Before redirect"
-	afterMsg := "After redirect" 
+	afterMsg := "After redirect"
 	log.Println(beforeMsg)
 
 	restore, err := RedirectStdLogAt(logger, lvl)
@@ -66,11 +63,10 @@ func runRedirectTest(t *testing.T, lvl level.Level) {
 
 	log.Println(afterMsg)
 	checkLogMessage(t, beforeMsg, afterMsg, logBuffer)
-
 }
 
-func checkLogMessage(t *testing.T, beforeMsg string, afterMsg string, logBuffer *safebuffer.Buffer) {
-
+func checkLogMessage(t *testing.T, beforeMsg string, afterMsg string, logBuffer fmt.Stringer) {
+	t.Helper()
 	bufferStr := logBuffer.String()
 
 	if strings.Contains(bufferStr, beforeMsg) {
@@ -82,6 +78,7 @@ func checkLogMessage(t *testing.T, beforeMsg string, afterMsg string, logBuffer 
 }
 
 func checkInitialFlags(t *testing.T, initialFlags int, initialPrefix string) {
+	t.Helper()
 	if initialFlags != log.Flags() {
 		t.Error("Expected to reset initial flags")
 	}

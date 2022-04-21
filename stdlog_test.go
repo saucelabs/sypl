@@ -3,7 +3,6 @@ package sypl
 import (
 	"fmt"
 	"log"
-	"strings"
 	"testing"
 
 	"github.com/saucelabs/sypl/level"
@@ -11,6 +10,7 @@ import (
 	"github.com/saucelabs/sypl/processor"
 	"github.com/saucelabs/sypl/safebuffer"
 	"github.com/saucelabs/sypl/shared"
+	"github.com/stretchr/testify/assert"
 )
 
 func getBufferLogger(name string, lvl level.Level) (*Sypl, *safebuffer.Buffer) {
@@ -29,6 +29,7 @@ func TestRedirectStdLogAt(t *testing.T) {
 	for _, lvl := range levels {
 		runRedirectTest(t, lvl)
 	}
+
 	checkInitialFlags(t, initialFlags, initialPrefix)
 }
 
@@ -41,9 +42,7 @@ func TestRedirectStdLogAtInvalid(t *testing.T) {
 		}
 	}()
 
-	if err == nil {
-		t.Error("Expected an error with an invalid log level")
-	}
+	assert.Error(t, err, "Expeted an error with an invalid log level")
 }
 
 func runRedirectTest(t *testing.T, lvl level.Level) {
@@ -56,33 +55,22 @@ func runRedirectTest(t *testing.T, lvl level.Level) {
 	log.Println(beforeMsg)
 
 	restore, err := RedirectStdLogAt(logger, lvl)
-	if err != nil {
-		t.Errorf("Unexpected error redirecting std logs: %x", err)
-	}
+	assert.Nil(t, err, "Unexpected error redirecting std logs")
 	defer restore()
 
 	log.Println(afterMsg)
-	checkLogMessage(t, beforeMsg, afterMsg, logBuffer)
+	checkLogMessage(t, beforeMsg, afterMsg, logBuffer.String())
 }
 
-func checkLogMessage(t *testing.T, beforeMsg string, afterMsg string, logBuffer fmt.Stringer) {
+func checkLogMessage(t *testing.T, beforeMsg string, afterMsg string, logBuffer string) {
 	t.Helper()
-	bufferStr := logBuffer.String()
 
-	if strings.Contains(bufferStr, beforeMsg) {
-		t.Errorf("%s should not appear in proxy logger: %s", beforeMsg, bufferStr)
-	}
-	if !strings.Contains(bufferStr, afterMsg) {
-		t.Errorf("%s should appear in proxy logger: %s", afterMsg, bufferStr)
-	}
+	assert.NotContains(t, logBuffer, beforeMsg, "Log message written before redirect should not appear in Sypl logs")
+	assert.Contains(t, logBuffer, afterMsg, "Log message written after redirect should appear in Sypl logs")
 }
 
 func checkInitialFlags(t *testing.T, initialFlags int, initialPrefix string) {
 	t.Helper()
-	if initialFlags != log.Flags() {
-		t.Error("Expected to reset initial flags")
-	}
-	if initialPrefix != log.Prefix() {
-		t.Error("Expected to reset initial prefix")
-	}
+	assert.Equal(t, initialFlags, log.Flags(), "Expected to reset initial flags")
+	assert.Equal(t, initialPrefix, log.Prefix(), "Expeted to reset initial prefix")
 }

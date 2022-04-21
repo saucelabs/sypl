@@ -15,6 +15,9 @@ linters:
     - cyclop
     - tagliatelle
     - goerr113
+    - forcetypeassert
+    - ireturn
+    - varnamelen
   fast: false
 
 # Settings for specific linters

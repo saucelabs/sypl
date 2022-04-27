@@ -24,7 +24,6 @@ import (
 	"bytes"
 	"fmt"
 	"log"
-	"os"
 
 	"github.com/saucelabs/sypl/level"
 )
@@ -65,6 +64,7 @@ func RedirectStdLogAt(sypl *Sypl, lvl level.Level) (func(), error) {
 func redirectStdLogAt(sypl *Sypl, lvl level.Level) (func(), error) {
 	flags := log.Flags()
 	prefix := log.Prefix()
+	writer := log.Writer()
 	log.SetFlags(0)
 	log.SetPrefix("")
 
@@ -78,7 +78,7 @@ func redirectStdLogAt(sypl *Sypl, lvl level.Level) (func(), error) {
 	return func() {
 		log.SetFlags(flags)
 		log.SetPrefix(prefix)
-		log.SetOutput(os.Stderr)
+		log.SetOutput(writer)
 	}, nil
 }
 

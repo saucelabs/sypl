@@ -25,6 +25,10 @@ Refs. for badges:
 - http://github.com/wayneashleyberry/terminal-dimensions
 - https://github.com/golangci/golangci-lint
 
+## Unreleased
+### Changed
+- Fix the restoration of the standard log's writer by `RedirectStdLog` and `RedirectStdLogAt`.
+
 ## [1.5.12] - 2022-04-20
 ### Added
 - `RedirectStdLog` and `RedirectStdLogAt` to redirect the standard logger to a Sypl logger.

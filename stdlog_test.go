@@ -2,6 +2,7 @@ package sypl
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"testing"
 
@@ -24,13 +25,14 @@ func getBufferLogger(name string, lvl level.Level) (*Sypl, *safebuffer.Buffer) {
 func TestRedirectStdLogAt(t *testing.T) {
 	initialFlags := log.Flags()
 	initialPrefix := log.Prefix()
+	initialWriter := log.Writer()
 
 	levels := []level.Level{level.Trace, level.Debug, level.Info, level.Warn, level.Error}
 	for _, lvl := range levels {
 		runRedirectTest(t, lvl)
 	}
 
-	checkInitialFlags(t, initialFlags, initialPrefix)
+	checkInitialFlags(t, initialFlags, initialPrefix, initialWriter)
 }
 
 func TestRedirectStdLogAtInvalid(t *testing.T) {
@@ -42,7 +44,7 @@ func TestRedirectStdLogAtInvalid(t *testing.T) {
 		}
 	}()
 
-	assert.Error(t, err, "Expeted an error with an invalid log level")
+	assert.Error(t, err, "Expected an error with an invalid log level")
 }
 
 func runRedirectTest(t *testing.T, lvl level.Level) {
@@ -69,8 +71,9 @@ func checkLogMessage(t *testing.T, beforeMsg string, afterMsg string, logBuffer 
 	assert.Contains(t, logBuffer, afterMsg, "Log message written after redirect should appear in Sypl logs")
 }
 
-func checkInitialFlags(t *testing.T, initialFlags int, initialPrefix string) {
+func checkInitialFlags(t *testing.T, initialFlags int, initialPrefix string, initialWriter io.Writer) {
 	t.Helper()
 	assert.Equal(t, initialFlags, log.Flags(), "Expected to reset initial flags")
-	assert.Equal(t, initialPrefix, log.Prefix(), "Expeted to reset initial prefix")
+	assert.Equal(t, initialPrefix, log.Prefix(), "Expected to reset initial prefix")
+	assert.Equal(t, initialWriter, log.Writer(), "Expected to reset initial writer")
 }

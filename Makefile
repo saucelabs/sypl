@@ -18,7 +18,7 @@ coverage:
 
 doc:
 ifndef HAS_GODOC
-	$(error You must install godoc, run "go get golang.org/x/tools/cmd/godoc")
+	$(error You must install godoc, run "go install golang.org/x/tools/cmd/godoc@latest")
 endif
 	@echo "Open localhost:6060/pkg/github.com/saucelabs/sypl/ in your browser\n"
 	@godoc -http :6060

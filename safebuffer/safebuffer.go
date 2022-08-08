@@ -30,7 +30,7 @@ func (s *Buffer) String() string {
 // It returns the number of bytes written.
 //
 // io.Writer interface implementation.
-func (s *Buffer) Write(p []byte) (n int, err error) {
+func (s *Buffer) Write(p []byte) (int, error) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 

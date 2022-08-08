@@ -29,6 +29,7 @@ import (
 //////
 
 // Checks if `src` has `texts`. If not, it prints a message.
+//
 //nolint:forbidigo
 func stringContains(src string, texts ...string) bool {
 	contains := true
@@ -84,7 +85,7 @@ func ExampleNew_notChained() {
 	// My Prefix - Test info message
 }
 
-// Chained is the chained example of creating, and setting up a `sypl` logger.
+// Chained is an example of creating and setting up a `sypl` logger chaining.
 // It writes to both `stdout` and `stderr`.
 func ExampleNew_chained() {
 	// Creates logger, and name it.
@@ -109,9 +110,9 @@ func ExampleNew_chained() {
 	// My Prefix - Test error message
 }
 
-// ChainedUsingBuiltin is the chained example of creating, and setting up a
-// `sypl` logger using built-in `Output`, and `Processor`. It writes to
-// `stdout`, and `stderr`.
+// ChainedUsingBuiltin is an example of creating, and setting up a
+// `sypl` logger using built-in `Output`, and `Processor` chaining.
+// It writes to `stdout`, and `stderr`.
 func ExampleNew_chainedUsingBuiltin() {
 	// Creates logger, and name it.
 	sypl.New("Testing Logger").
@@ -276,6 +277,7 @@ func ExampleNew_flags() {
 }
 
 // Serror{f|lnf|ln} example.
+//
 //nolint:goerr113
 func ExampleNew_serrorX() {
 	// Creates logger, and name it.
@@ -611,6 +613,7 @@ func ExampleNew_debugAndFilter() {
 }
 
 // Sypl as io.Writer, including sub-loggers thru interfaces.
+//
 //nolint:gosimple
 func ExampleNew_ioWriter() {
 	buf, o := output.SafeBuffer(level.Trace)

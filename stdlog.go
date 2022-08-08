@@ -30,7 +30,7 @@ import (
 )
 
 const (
-	_programmerErrorTemplate = "You've found a bug in sypl! Please file a bug at " +
+	programmerErrorTemplate = "You've found a bug in sypl! Please file a bug at " +
 		"https://github.com/saucelabs/sypl/issues/new and reference this error: %v"
 )
 
@@ -45,7 +45,7 @@ func RedirectStdLog(sypl *Sypl) func() {
 	f, err := redirectStdLogAt(sypl, level.Info)
 	if err != nil {
 		// Passing InfoLevel to redirectStdLogAt should always work
-		panic(fmt.Sprintf(_programmerErrorTemplate, err))
+		panic(fmt.Sprintf(programmerErrorTemplate, err))
 	}
 
 	return f

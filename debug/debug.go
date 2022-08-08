@@ -75,7 +75,7 @@ type Debug struct {
 // MatchL uses the `Levels` matcher against any valid level, specified at the
 // beginning of the debug env var, examples:
 // - SYPL_DEBUG="info,componentX:outputY:debug,outputZ:trace" -> `info`
-// - SYPL_DEBUG="componentX:outputY:debug,outputZ:trace,info" -> ``.
+// - SYPL_DEBUG="componentX:outputY:debug,outputZ:trace,info" -> “.
 //
 // Notes:
 // - For this matcher, the order matter!

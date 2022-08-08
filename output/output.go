@@ -184,6 +184,7 @@ func (o *output) SetWriter(w io.Writer) IOutput {
 // Write the message to the defined output. In case of any error, it can be
 // introspected, providing more information about the failure. The error will be
 // the type of `ProcessingError`.
+//
 //nolint:nestif
 func (o *output) Write(m message.IMessage) error {
 	// Should allows to specify `Output`(s).

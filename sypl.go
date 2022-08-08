@@ -101,10 +101,12 @@ func (sypl *Sypl) SetDefaultIoWriterLevel(l level.Level) {
 //
 // NOTE: This is a convenient method, if it doesn't fits your need, just
 // implement the way you need, as you would do.
-func (sypl *Sypl) Write(p []byte) (n int, err error) {
+func (sypl *Sypl) Write(p []byte) (int, error) {
+	n := 0
+
 	sypl.process(message.New(sypl.defaultIoWriterLevel, string(p)))
 
-	return 0, nil
+	return n, nil
 }
 
 //////

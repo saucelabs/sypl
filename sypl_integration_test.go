@@ -5,7 +5,7 @@
 package sypl
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -78,7 +78,12 @@ func TestNewIntegration(t *testing.T) {
 				Printf(a.level, "%s 1", a.content).
 				Printf(a.level, "%s 2", a.content)
 
-			b, err := ioutil.ReadFile(filePath)
+			file, err := os.Open(filePath)
+			if err != nil {
+				t.Error("Failed to open file", err)
+			}
+			defer file.Close()
+			b, err := io.ReadAll(file)
 			if err != nil {
 				t.Error("Failed to read file", err)
 			}

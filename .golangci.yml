@@ -1,3 +1,8 @@
+# Copyright 2021 The sypl Authors. All rights reserved.
+# Use of this source code is governed by a MIT
+# license that can be found in the LICENSE file.
+
+---
 run:
   timeout: 1m
   skip-files:
@@ -10,6 +15,7 @@ linters:
     - testpackage
     - gochecknoglobals
     - exhaustivestruct
+    - exhaustruct
     - paralleltest
     - godox
     - cyclop
@@ -54,6 +60,10 @@ issues:
     - path: doc.go
       linters:
         - lll
+
+    - path: example_test.go
+      linters:
+        - nosnakecase
 
     - linters:
         - lll

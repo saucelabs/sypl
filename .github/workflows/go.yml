@@ -1,3 +1,8 @@
+# Copyright 2021 The sypl Authors. All rights reserved.
+# Use of this source code is governed by a MIT
+# license that can be found in the LICENSE file.
+
+---
 name: Go
 
 on:
@@ -15,12 +20,12 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.15
+          go-version: 1.19
 
       - name: Setup golangci-lint
-        uses: golangci/golangci-lint-action@v3.1.0
+        uses: golangci/golangci-lint-action@v3.2.0
         with:
-          version: v1.45.1
+          version: v1.46.2
 
       - name: Lint
         run: golangci-lint run -v -c .golangci.yml

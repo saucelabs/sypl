@@ -65,6 +65,10 @@ issues:
       linters:
         - nosnakecase
 
+    - text: "O_WRONLY|O_RDWR|O_CREATE|O_TRUNC|O_APPEND"
+      linters:
+        - nosnakecase
+
     - linters:
         - lll
       source: "json:"

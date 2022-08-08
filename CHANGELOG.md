@@ -25,9 +25,12 @@ Refs. for badges:
 - http://github.com/wayneashleyberry/terminal-dimensions
 - https://github.com/golangci/golangci-lint
 
-## Unreleased
+## [1.5.13] - 2022-08-09
 ### Changed
 - Fix the restoration of the standard log's writer by `RedirectStdLog` and `RedirectStdLogAt`.
+- Updating dependencies
+- Updating the CI linter version
+- Linting the code
 
 ## [1.5.12] - 2022-04-20
 ### Added

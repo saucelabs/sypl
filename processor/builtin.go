@@ -114,6 +114,7 @@ func Decolourizer() IProcessor {
 }
 
 // ErrorSimulator simulates an error in the pipeline.
+//
 //nolint:goerr113
 func ErrorSimulator(msg string) IProcessor {
 	return New("ErrorSimulator", func(m message.IMessage) error {

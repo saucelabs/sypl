@@ -25,6 +25,10 @@ Refs. for badges:
 - http://github.com/wayneashleyberry/terminal-dimensions
 - https://github.com/golangci/golangci-lint
 
+## [1.5.14] - 2022-08-09
+### Changed
+- Updating dependency - https://github.com/saucelabs/lumberjack
+
 ## [1.5.13] - 2022-08-09
 ### Changed
 - Fix the restoration of the standard log's writer by `RedirectStdLog` and `RedirectStdLogAt`.
